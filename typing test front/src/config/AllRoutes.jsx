@@ -1,4 +1,3 @@
-import React from 'react'
 import { Navigate, useRoutes } from 'react-router-dom'
 import RootModule from '../modules/RootModule'
 import AdminModule from '../modules/AdminModule'
