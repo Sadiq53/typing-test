@@ -3,6 +3,7 @@ import Header from '../../../../shared/header/Header'
 import Footer from '../../../../shared/footer/Footer'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleGetLeaderboardData, resetState } from '../../../../../redux/UserDataSlice'
+import { BASE_API_URL } from '../../../../../util/API_URL'
 
 const LeaderBoard = () => {
 
@@ -17,8 +18,8 @@ const LeaderBoard = () => {
 
     useEffect(() => {
         if (rawAllUserData) {
-            setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.all?.match1Data?.avgAcc1, avgWpm : value?.all?.match1Data?.avgWpm1, avgConsis : value?.all?.match1Data?.avgConsis1}}))
-            console.log(rawAllUserData)
+            setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.overall?.avgAcc, avgWpm : value?.overall?.avgWpm, avgConsis : value?.overall?.avgConsis}}))
+            // console.log(rawAllUserData)  
         }
     }, [rawAllUserData]);
     
@@ -36,71 +37,30 @@ const LeaderBoard = () => {
         dispatch(handleGetLeaderboardData(obj))
     }
 
-    useEffect(()=>{
-        switch (levelFilter) {
+    const updateDataOnLevels = () => {
+        switch(levelFilter) {
             case 'all' :
-                switch (timeFilter) {
-                    case '1' :
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.all?.match1Data?.avgAcc1, avgWpm : value?.all?.match1Data?.avgWpm1, avgConsis : value?.all?.match1Data?.avgConsis1}}))
-                        break;
-                    case '3' : 
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.all?.match3Data?.avgAcc3, avgWpm : value?.all?.match3Data?.avgWpm3, avgConsis : value?.all?.match1Data?.avgConsis3}}))
-                        break;
-                    case '5' :
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.all?.match5Data?.avgAcc5, avgWpm : value?.all?.match5Data?.avgWpm5, avgConsis : value?.all?.match1Data?.avgConsis5}}))
-                        break;
-                    default:
-                        console.warn(`Unhandled match type: ${match}`);
-                }
+                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.overall?.avgAcc, avgWpm : value?.overall?.avgWpm, avgConsis : value?.overall?.avgConsis}}))
                 break;
+            
             case 'easy' :
-                switch (timeFilter) {
-                    case '1' :
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.easy1?.avgAcc, avgWpm : value?.easy1?.avgWpm, avgConsis : value?.easy1?.avgConsis}}))
-                        break;
-                    case '3' : 
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.easy3?.avgAcc, avgWpm : value?.easy3?.avgWpm, avgConsis : value?.easy3?.avgConsis}}))
-                        break;
-                    case '5' :
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.easy5?.avgAcc, avgWpm : value?.easy5?.avgWpm, avgConsis : value?.easy5?.avgConsis}}))
-                        break;
-                    default:
-                        console.warn(`Unhandled match type: ${match}`);
-                }
+                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.easy?.avgAcc, avgWpm : value?.levels?.easy?.avgWpm, avgConsis : value?.levels?.easy?.avgConsis}}))
                 break;
+            
             case 'medium' :
-                switch (timeFilter) {
-                    case '1' :
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.medium1?.avgAcc, avgWpm : value?.medium1?.avgWpm, avgConsis : value?.medium1?.avgConsis}}))
-                        break;
-                    case '3' : 
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.medium3?.avgAcc, avgWpm : value?.medium3?.avgWpm, avgConsis : value?.medium3?.avgConsis}}))
-                        break;
-                    case '5' :
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.medium5?.avgAcc, avgWpm : value?.medium5?.avgWpm, avgConsis : value?.medium5?.avgConsis}}))
-                        break;
-                    default:
-                        console.warn(`Unhandled match type: ${match}`);
-                }
+                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.medium?.avgAcc, avgWpm : value?.levels?.medium?.avgWpm, avgConsis : value?.levels?.medium?.avgConsis}}))
                 break;
+            
             case 'hard' :
-                switch (timeFilter) {
-                    case '1' :
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.hard1?.avgAcc, avgWpm : value?.hard1?.avgWpm, avgConsis : value?.hard1?.avgConsis}}))
-                        break;
-                    case '3' : 
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.hard3?.avgAcc, avgWpm : value?.hard3?.avgWpm, avgConsis : value?.hard3?.avgConsis}}))
-                        break;
-                    case '5' :
-                        setDisplayData(rawAllUserData?.map(value => {return {username : value.username, avgAcc : value?.hard5?.avgAcc, avgWpm : value?.hard5?.avgWpm, avgConsis : value?.hard5?.avgConsis}}))
-                        break;
-                    default:
-                        console.warn(`Unhandled match type: ${match}`);
-                }
+                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.hard?.avgAcc, avgWpm : value?.levels?.hard?.avgWpm, avgConsis : value?.levels?.hard?.avgConsis}}))
                 break;
             default:
                 console.warn(`Unhandled match type: ${match}`);
         }
+    }
+
+    useEffect(()=>{
+        updateDataOnLevels()
     }, [timeFilter, levelFilter])
 
     const handleFilterLevel = (level) =>{
@@ -173,7 +133,7 @@ const LeaderBoard = () => {
                                         displayData?.map((value, index) => (
                                             <tr>
                                                 <td>{index+1}</td>
-                                                <td><div className='profile'><img src="/assets/images/profile.png" alt="" />{value?.username}</div></td>
+                                                <td><div className='profile'><img src={value?.profile ? `${BASE_API_URL}/uploads/${value?.profile}` : "/assets/images/profile.png"}  alt="" />{value?.username}</div></td>
                                                 <td>{Math.round(value?.avgWpm)}</td>
                                                 <td>{Math.round(value?.avgAcc)}</td>
                                                 <td>{Math.round(value?.avgConsis)}</td>

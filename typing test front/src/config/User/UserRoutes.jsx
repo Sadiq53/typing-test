@@ -22,7 +22,7 @@ const userRoutes = [
         element : <LeaderBoard />
     },
     {
-        path : 'signout',
+        path : 'signout/:type',
         element : <Signout />
     },
 ]

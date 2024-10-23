@@ -5,6 +5,7 @@ import { emailSchema, usernameSchema } from '../../../../../schemas/UserSigninSc
 import { useDispatch, useSelector } from 'react-redux'
 import { handleSigninUser, resetState } from '../../../../../redux/UserDataSlice';
 import { NavLink, useNavigate } from 'react-router-dom';
+import GoogleAuth from './GoogleAuth';
 
 // Helper function to check if the input is an email
 const isEmail = (value) => {
@@ -95,6 +96,7 @@ const UserSignin = () => {
         <input onChange={handleSigninChange} // Custom handler for changing schema
           onBlur={userSigninForm.handleBlur}
           value={userSigninForm.values.signin}
+          required
           name='signin' type="text" placeholder='Email' />
         </div>
 
@@ -102,6 +104,7 @@ const UserSignin = () => {
         <input onChange={userSigninForm.handleChange}
           onBlur={userSigninForm.handleBlur}
           value={userSigninForm.values.password}
+          required
           name='password' type={eye ? 'text' : 'password'} placeholder='Password' />
           <button
               type="button"
@@ -119,10 +122,10 @@ const UserSignin = () => {
           <div><input type='checkbox' /> <label className='font-idle'> &nbsp; Remember Me</label></div>
           <NavLink to='' className='font-idle'>Forgot Password?</NavLink>
         </div>
-        <button type='submit' className='theme-btn lg width-90'>Log In  { loader ? <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> : null }</button>
+        <button type='submit' className='theme-btn lg width-90'>Sign In  { loader ? <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> : null }</button>
         <div className='width-90'><p className='font-idle text-center'>or</p></div>
         <div className='d-flex justify-content-center width-90'>
-          <button className='google-sign-btn'><img src="/assets/images/google.svg" alt="" />Sign in with Google</button>
+          <GoogleAuth props={'Sign In'} />
         </div>
       </div>
       </form>

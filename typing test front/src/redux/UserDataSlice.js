@@ -32,6 +32,28 @@ const handleSigninUser = createAsyncThunk('handleSigninUser', async(formData) =>
         return checkMsg
     }
 })
+const handleSigninUserWithGoogle = createAsyncThunk('handleSigninUserWithGoogle', async(UserInfo) => {
+    const response = await axios.post(`${USER_API_URL}/signin/google`, UserInfo)
+    // console.log(response.data)
+    if(response.data.status === 200) {
+        localStorage.setItem('isSignin', true)
+        localStorage.setItem('userToken', response.data.token)
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type
+        }
+        // console.log(checkMsg)
+        return checkMsg
+    }
+})
 
 const handleUpdatePassword = createAsyncThunk('handleUpdatePassword', async(formData) => {
     const ID = localStorage.getItem('userToken')
@@ -46,11 +68,38 @@ const handleCreateUser = createAsyncThunk('handleCreateUser', async(formData) =>
     const response = await axios.post(`${USER_API_URL}/signup`, formData)
     // console.log(response.data)
     if(response.data.status === 200) {
+        localStorage.setItem('isSignin', true)
         localStorage.setItem('userToken', response.data.token)
         let checkMsg = {
             status : true,
-            message : '',
-            type : ''
+            message : response.data.message,
+            type : response.data.type
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type
+        }
+        // console.log(checkMsg)
+        return checkMsg
+    }
+});
+
+const handleSignupWithGoogle = createAsyncThunk('handleSignupWithGoogle', async(token) => {
+    const formData = {
+        token : token,
+        createdate : new Date()
+    }
+    const response = await axios.post(`${USER_API_URL}/signup/google`, formData)
+    if(response.data.status === 200) {
+        localStorage.setItem('isSignin', true)
+        localStorage.setItem('userToken', response.data.token)
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type
         }
         return checkMsg
     } else {
@@ -66,14 +115,17 @@ const handleCreateUser = createAsyncThunk('handleCreateUser', async(formData) =>
 
 const handleTest = createAsyncThunk('handleTest', async(stats)=>{
     const ID = localStorage.getItem('userToken')
-    console.log(stats)
     const response = await axios.post(`${USER_API_URL}`, stats, { headers : { Authorization : ID } } )
+    // console.log(response.data.recordBreak)
     if(response.data.status === 200) {
+        if(response.data.recordBreak) {
+            localStorage.setItem('newRecord', JSON.stringify(response.data.recordBreak))
+        }
         let checkMsg = {
             status : true,
             message : response.data.message,
             type : response.data.type,
-            data : response.data.stats,
+            data : {stats : response.data.stats, avgData : response.data.avgData},
         }
         return checkMsg
     } else {
@@ -101,6 +153,66 @@ const handleGetLeaderboardData = createAsyncThunk('handleGetLeaderboardData', as
         return checkMsg
     }
 })
+
+const handleUploadProfile = createAsyncThunk('handleUploadProfile', async(formData) => {
+    const ID = localStorage.getItem('userToken')
+    try {
+        // Send the file to your server endpoint
+        const response = await axios.post(`${USER_API_URL}/upload-profile`, formData, {
+            headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization : ID
+        },
+        });
+        console.log(response.data)
+        if(response.data.status === 200) {
+            let checkMsg = {
+                status : true,
+                message : response.data.message,
+                type : response.data.type,
+                data : response.data.profile,
+            }
+            return checkMsg
+        } else {
+            let checkMsg = {
+                status : false,
+                message : response.data.message,
+                type : response.data.type,
+                data : []
+            }
+            return checkMsg
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+    }
+});
+
+const handleDeleteUserAccount = createAsyncThunk('handleDeleteUserAccount', async() => {
+    const ID = localStorage.getItem('userToken')
+    try{
+        const response = await axios.delete(`${USER_API_URL}`, { headers : { Authorization : ID } })
+        console.log(response.data)
+        if(response.data.status === 200) {
+            let checkMsg = {
+                status : true,
+                message : response.data.message,
+                type : response.data.type,
+                data : [],
+            }
+            return checkMsg
+        } else {
+            let checkMsg = {
+                status : false,
+                message : response.data.message,
+                type : response.data.type,
+                data : []
+            }
+            return checkMsg
+        }
+    } catch (error) {
+        console.error('Error deleting account:', error);
+    }
+}) 
 
 
 const initialState = {
@@ -179,10 +291,30 @@ const UserDataSlice = createSlice({
         builder.addCase(handleSigninUser.pending, (state, action) => {
             state.isProcessing = true
         });
+        builder.addCase(handleSigninUserWithGoogle.fulfilled, (state, action) => {
+            if(action.payload.status) {
+                state.isFullfilled = true
+                state.fullFillMsg.type = action.payload.type,
+                state.fullFillMsg.message = action.payload.message,
+                state.isError = false
+                state.isProcessing = false
+            } else { 
+                state.isProcessing = false
+                state.isError = true
+                state.errorMsg.message = action.payload.message
+                state.errorMsg.type = action.payload.type
+            }
+        });
+        builder.addCase(handleSigninUserWithGoogle.pending, (state, action) => {
+            state.isProcessing = true
+        });
         builder.addCase(handleCreateUser.fulfilled, (state, action) => {
             if(action.payload.status) {
                 state.isFullfilled = true
+                state.isProcessing = false
                 state.isError = false
+                state.fullFillMsg.type = action.payload.type,
+                state.fullFillMsg.message = action.payload.message
             } else { 
                 state.isProcessing = false
                 state.isError = true
@@ -191,6 +323,23 @@ const UserDataSlice = createSlice({
             }
         });
         builder.addCase(handleCreateUser.pending, (state, action) => {
+            state.isProcessing = true
+        });
+        builder.addCase(handleSignupWithGoogle.fulfilled, (state, action) => {
+            if(action.payload.status) {
+                state.isFullfilled = true
+                state.isProcessing = false
+                state.isError = false
+                state.fullFillMsg.type = action.payload.type,
+                state.fullFillMsg.message = action.payload.message
+            } else { 
+                state.isProcessing = false
+                state.isError = true
+                state.errorMsg.message = action.payload.message
+                state.errorMsg.type = action.payload.type
+            }
+        });
+        builder.addCase(handleSignupWithGoogle.pending, (state, action) => {
             state.isProcessing = true
         });
         builder.addCase(handleUpdatePassword.fulfilled, (state, action) => {
@@ -206,33 +355,66 @@ const UserDataSlice = createSlice({
             state.isProcessing = true
         });
         builder.addCase(handleTest.fulfilled, (state, action) => {
-            console.log("i am payload", action.payload)
-            if(action.payload?.status) {
-                state.isFullfilled = true,
-                state.fullFillMsg.type = action.payload.type,
-                state.fullFillMsg.message = action.payload.message,
-                state.isProcessing = false
-                const {data} = action.payload
-                const {time} = data
-                // Create a mapping of time values to match properties
+            if (action.payload?.status) {
+                // Updating general state properties based on fulfilled action
+                state.isFullfilled = true;
+                state.fullFillMsg.type = action.payload.type;
+                state.fullFillMsg.message = action.payload.message;
+                state.isProcessing = false;
+        
+                // Extracting stats and avgData from the action payload
+                const { stats } = action.payload.data;
+                const { avgData } = action.payload.data;
+        
+                // Extracting the time from stats and mapping to match properties
+                const { time } = stats;
+        
                 const matchPropertyMap = {
-                    60: 'match1',
                     15: 'match1',
+                    60: 'match1',
                     180: 'match3',
                     300: 'match5',
                 };
-                
+        
                 const matchProperty = matchPropertyMap[time];
-            
+        
+                // If the matchProperty is found, update it immutably in the state
                 if (matchProperty) {
-                    state[matchProperty]?.push(data)
-                } 
+                    state[matchProperty] = [...(state[matchProperty] || []), stats];
+                }
+        
+                // Determine which "topXminavg" property to update based on the time value
+                const avgPropertyMap = {
+                    15: 'top1minavg',
+                    60: 'top1minavg',
+                    180: 'top3minavg',
+                    300: 'top5minavg',
+                };
+        
+                const avgProperty = avgPropertyMap[time];
+                
+        
+                // If there's a corresponding avgProperty for the time, update userData immutably
+                if (avgProperty) {
+        
+                    const difficultyKey = Object.keys(avgData).find(key => key !== 'all');
+        
+                    state.userData = {
+                        ...state.userData,
+                        [avgProperty]: {
+                            ...(state.userData[avgProperty] || {}),
+                            all: avgData.all,
+                            ...(difficultyKey && { [difficultyKey]: avgData[difficultyKey] }),
+                        }
+                    };
+                }
             } else {
-                state.isError = true,
-                state.errorMsg.type = action.payload.type
-                state.errorMsg.message = action.payload.message
+                // Handle error case
+                state.isError = true;
+                state.errorMsg.type = action.payload.type;
+                state.errorMsg.message = action.payload.message;
             }
-        });
+        });            
         builder.addCase(handleTest.pending, (state, action) => {
             state.isProcessing = true
         });
@@ -254,9 +436,44 @@ const UserDataSlice = createSlice({
         builder.addCase(handleGetLeaderboardData.pending, (state, action) => {
             state.isProcessing = true
         });
+        builder.addCase(handleUploadProfile.fulfilled, (state, action) => {
+            if(action.payload.status) {
+                state.isFullfilled = true
+                state.fullFillMsg.type = action.payload.type,
+                state.fullFillMsg.message = action.payload.message,
+                state.userData.profileimage = action.payload.data,
+                state.isError = false
+                state.isProcessing = false
+            } else { 
+                state.isProcessing = false
+                state.isError = true
+                state.errorMsg.message = action.payload.message
+                state.errorMsg.type = action.payload.type
+            }
+        });
+        builder.addCase(handleUploadProfile.pending, (state, action) => {
+            state.isProcessing = true
+        });
+        builder.addCase(handleDeleteUserAccount.fulfilled, (state, action) => {
+            if(action.payload.status) {
+                state.isFullfilled = true
+                state.fullFillMsg.type = action.payload.type,
+                state.fullFillMsg.message = action.payload.message,
+                state.isError = false
+                state.isProcessing = false
+            } else { 
+                state.isProcessing = false
+                state.isError = true
+                state.errorMsg.message = action.payload.message
+                state.errorMsg.type = action.payload.type
+            }
+        });
+        builder.addCase(handleDeleteUserAccount.pending, (state, action) => {
+            state.isProcessing = true
+        });
     }
 })
 
 export default UserDataSlice.reducer;
-export {handleGetUserData, handleSigninUser, handleCreateUser, handleUpdatePassword, handleTest, handleGetLeaderboardData};
+export {handleGetUserData, handleSigninUser, handleCreateUser, handleUploadProfile, handleDeleteUserAccount, handleUpdatePassword, handleSignupWithGoogle, handleTest, handleGetLeaderboardData, handleSigninUserWithGoogle};
 export const{ resetState, handleClearState } = UserDataSlice.actions

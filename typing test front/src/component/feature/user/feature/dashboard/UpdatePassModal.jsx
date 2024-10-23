@@ -20,7 +20,7 @@ const UpdatePassModal = () => {
             repassword : ''
         },
         onSubmit : (formData) => {
-            console.log(formData)
+            // console.log(formData)
             dispatch(handleUpdatePassword(formData))
         }   
     })

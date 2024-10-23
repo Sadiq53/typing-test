@@ -4,6 +4,10 @@ const sha = require('sha1')
 const userModel = require('../model/UserSchema')
 const key = require('../config/token_Keys');
 const randNum = require('random-number')
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
+
 
 const calculateAverage = (numbers) => {
     if (numbers.length === 0) return 0; // Avoid division by zero
@@ -11,12 +15,68 @@ const calculateAverage = (numbers) => {
     return sum / numbers.length; // Return the average
 };
 
+// Directory to store uploaded files temporarily
+const uploadDir = path.join(__dirname, '..', 'assets', 'uploads');
+
+// Ensure the upload directory exists
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir); // Save the file to the upload directory
+    },
+    filename: function (req, file, cb) {
+        // Generate a unique name for the file (use timestamp + original extension)
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname); // Get the file extension
+        const newFilename = `${uniqueSuffix}${extension}`;
+        cb(null, newFilename); // Set the new filename
+    }
+});
+
+// Multer instance with limits and file type filter
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // Limit to 10MB
+    fileFilter: (req, file, cb) => {
+        // Allow only .jpeg, .jpg, .png file types
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only JPEG, JPG, and PNG are allowed.'), false);
+        }
+    }
+});
+
+
 route.get('/:id', async(req, res) => {
     // console.log(req.headers.authorization)
     if(req.headers.authorization){
         let ID = jwt.decode(req.params.id, key)
+        // console.log(ID.id)
         let userData = await userModel.findOne({_id : ID?.id})
         if(userData) {
+            userData = {
+                accountid : userData?.accountid,
+                createdate : userData?.createdate,
+                email :  userData?.email,
+                highestrecord1min :  userData?.highestrecord1min,
+                highestrecord3min : userData?.highestrecord3min,
+                highestrecord5min : userData?.highestrecord5min,
+                match_1 : userData?.match_1, 
+                match_3 : userData?.match_3, 
+                match_5 : userData?.match_5, 
+                password : userData?.password ,
+                profileimage : userData?.profileimage,
+                top1minavg : userData?.top1minavg,
+                top3minavg : userData?.top3minavg,
+                top5minavg : userData?.top5minavg, 
+                username : userData?.username
+            }
             res.send({ status : 200, userdata : userData })
         }else{
             res.send({status : 403})
@@ -24,115 +84,104 @@ route.get('/:id', async(req, res) => {
     }
 });
 
-route.get('/dashdata/:limit/:type', async(req, res) => {
-
+route.get('/dashdata/:limit/:type', async (req, res) => {
     const fetchFilteredData = async (filterType, limit) => {
         const levels = ['all', 'easy', 'medium', 'hard'];
         const queries = levels.map(level => ({
-            [`${filterType}.${level}.avgwpm`]: { $gt: 20 },
-            [`${filterType}.${level}.avgconsis`]: { $gt: 20 },
-            [`${filterType}.${level}.avgacc`]: { $gt: 20 }
+            [`${filterType}.${level}.avgwpm`]: { $gt: 1 },
+            [`${filterType}.${level}.avgconsis`]: { $gt: 1 },
+            [`${filterType}.${level}.avgacc`]: { $gt: 1 }
         }));
-    
+
         const results = await userModel.find({
             $or: queries
         }).limit(limit);
-    
-        return results; // This returns the unique users based on the combined criteria
+
+        return results;
     };
-    
-    // Assuming 'req' is your request object
+
     const limit = parseInt(req.params.limit, 10);
     const type = req.params.type;
-    
+
     const typeMap = {
         '1': 'top1minavg',
         '3': 'top3minavg',
         '5': 'top5minavg'
     };
-    
+
+    const matchMap = {
+        '1': 'match_1',
+        '3': 'match_3',
+        '5': 'match_5'
+    };
+
     const filterType = typeMap[type];
-    
-    if (!filterType) {
+    const matchType = matchMap[type];
+
+    if (!filterType || !matchType) {
         return res.status(400).send({ message: 'Invalid type provided' });
     }
-    
-    // console.log(`Fetching data for filterType: ${filterType} with limit: ${limit}`);
+
     const allUser = await fetchFilteredData(filterType, limit);
-    // console.log(allUser);
-    
-    // const allUser = await userModel.find({}).limit(limit)
-    
+
     const extractLevelData = (matchData, level) => {
         const filteredData = matchData?.filter(value => value.level === level);
-        
         return {
-            avgWpm: calculateAverage(filteredData.map(value => value.avgwpm)),
-            avgAcc: calculateAverage(filteredData.map(value => value.avgacc)),
-            avgConsis: calculateAverage(filteredData.map(value => value.avgconsis)),
+            avgWpm: calculateAverage(filteredData.map(value => parseFloat(value.avgwpm))),
+            avgAcc: calculateAverage(filteredData.map(value => parseFloat(value.avgacc))),
+            avgConsis: calculateAverage(filteredData.map(value => parseFloat(value.avgconsis))),
         };
     };
-    
-    
-    const filteredData = allUser?.map(value => {
-        const match1 = value?.match_1 || [];
-        const match3 = value?.match_3 || [];
-        const match5 = value?.match_5 || [];
-    
-        // Calculate overall averages for match 1, 3, and 5
-        const match1Data = {
-            avgAcc1: calculateAverage(match1.map(value => parseFloat(value.avgacc))),
-            avgConsis1: calculateAverage(match1.map(value => parseFloat(value.avgconsis))),
-            avgWpm1: calculateAverage(match1.map(value => parseFloat(value.avgwpm))),
-        };
-    
-        const match3Data = {
-            avgAcc3: calculateAverage(match3.map(value => parseFloat(value.avgacc))),
-            avgConsis3: calculateAverage(match3.map(value => parseFloat(value.avgconsis))),
-            avgWpm3: calculateAverage(match3.map(value => parseFloat(value.avgwpm))),
-        };
-    
-        const match5Data = {
-            avgAcc5: calculateAverage(match5.map(value => value.avgacc)),
-            avgConsis5: calculateAverage(match5.map(value => parseFloat(value.avgconsis))),
-            avgWpm5: calculateAverage(match5.map(value => parseFloat(value.avgwpm))),
-        };
-    
+
+    const filteredData = allUser?.map(user => {
+        const matchData = user[matchType] || [];
+
         // Extract data for easy, medium, and hard levels
-        const easy1 = extractLevelData(match1, 'easy');
-        const medium1 = extractLevelData(match1, 'medium');
-        const hard1 = extractLevelData(match1, 'hard');
-    
-        const easy3 = extractLevelData(match3, 'easy');
-        const medium3 = extractLevelData(match3, 'medium');
-        const hard3 = extractLevelData(match3, 'hard');
-    
-        const easy5 = extractLevelData(match5, 'easy');
-        const medium5 = extractLevelData(match5, 'medium');
-        const hard5 = extractLevelData(match5, 'hard');
-    
+        const easyData = extractLevelData(matchData, 'easy');
+        const mediumData = extractLevelData(matchData, 'medium');
+        const hardData = extractLevelData(matchData, 'hard');
+
+        // Return the structured response
         return {
-            username: value?.username,
-            all: {
-                match1Data,
-                match3Data,
-                match5Data
+            username: user?.username,
+            profile : user?.profileimage,
+            overall: {
+                avgWpm: calculateAverage(matchData.map(value => parseFloat(value.avgwpm))),
+                avgAcc: calculateAverage(matchData.map(value => parseFloat(value.avgacc))),
+                avgConsis: calculateAverage(matchData.map(value => parseFloat(value.avgconsis))),
             },
-            easy1,
-            medium1,
-            hard1,
-            easy3,
-            medium3,
-            hard3,
-            easy5,
-            medium5,
-            hard5
+            levels: {
+                easy: easyData,
+                medium: mediumData,
+                hard: hardData,
+            }
         };
     });
 
-    // console.log(filteredData[1]?.all)
-    // console.log(allUser[1]?.match_1)
-    res.send({status : 200, userData : filteredData, type : "pagination", message : "Leaderboard Data"})
+    res.send({ status: 200, userData: filteredData, type: "pagination", message: "Leaderboard Data" });
+});
+
+
+route.post('/signin/google', async(req, res) => {
+    const token = Object.keys(req.body)[0];
+    // Fetch user information from Google's Userinfo API
+    const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const userInfo = await userInfoResponse.json();
+    const {email_verified, email} = userInfo;
+    const isUserExist = await userModel.findOne({email : email})
+    if(isUserExist) {
+        if(email_verified) {
+            const ID = {id : isUserExist?._id};
+            const token = jwt.sign(ID, key)
+            res.send({ status : 200, token : token, message : "Logged in Successfully", type : 'signin' })
+        }
+    } else res.send({ status : 401, message : "Email ID is Invalid", type : 'signin' })
+    
 });
 
 route.post('/signin', async(req, res) => {
@@ -151,6 +200,40 @@ route.post('/signin', async(req, res) => {
         } else res.send({ status : 402, message : "Password is Incorrect", type : 'signin' })
     } else res.send({ status : 401, message : "Email ID is Invalid", type : 'signin' })
 });
+
+route.post('/signup/google', async(req, res) => {
+
+    const {token, createdate} = req.body;
+    // Fetch user information from Google's Userinfo API
+    const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const userInfo = await userInfoResponse.json();
+    const {email_verified, email} = userInfo;
+    const username = email?.split('@')[0]
+        const isUserExist = await userModel.findOne({ email : email })
+        if(!isUserExist) {
+            if(email_verified) {
+                const accountID = randNum.generator({ min : 100000, max : 9999999, integer : true });
+                const finalData = {
+                    username : username,
+                    email : email,
+                    createdate : createdate,
+                    accountid : accountID()
+                }
+                // console.log(finalData)
+            await userModel.create(finalData)
+            const getUser = await userModel.findOne({ email : email })
+            const ID = {id : getUser?._id};
+            const token = jwt.sign(ID, key)
+            res.send({ status : 200, token : token, message : "Signup Successfully", type : 'signup' })
+            }
+        } else res.send({ status : 402, message : "Email ID Exist", type : 'signup' }) 
+
+})
 
 route.post('/signup', async(req, res) => {
     const { email, username, password, createdate } = req.body;
@@ -171,7 +254,7 @@ route.post('/signup', async(req, res) => {
             const getUser = await userModel.findOne({ email : email })
             const ID = {id : getUser?._id};
             const token = jwt.sign(ID, key)
-            res.send({ status : 200, token : token })
+            res.send({ status : 200, message : "Account Created Successfully", type : 'signup', token : token })
         } else res.send({ status : 402, message : "Email ID Exist", type : 'signup' }) 
     } else res.send({ status : 402, message : "username exist", type : 'signup' })
 
@@ -235,8 +318,15 @@ route.post('/', async (req, res) => {
         };
 
         // Helper function to calculate new average
-        const calculateNewAverage = (currentAvg, newValue, length) => 
-            (currentAvg * length + newValue) / (length + 1);
+        const calculateNewAverage = (currentAvg, newValue, length) => {
+            if(currentAvg !== 0){
+                const newAvg = (currentAvg * (length-1) + newValue) / (length); // Adjusted length to include the new value
+                return Math.min(newAvg, 100); // Ensure the average does not exceed 100
+            } else {
+                return newValue
+            }
+            
+        };
 
         const matchProperty = matchPropertyMap[time];
             
@@ -248,7 +338,7 @@ route.post('/', async (req, res) => {
         
             const findProperty = findPropertyMatch[matchProperty];
             const checkDataPresent = getUserData?.[matchProperty];
-            
+            let finalAvgResult;
             if (checkDataPresent?.length !== 0) {
                 const getTotalAvgData = getUserData?.[findProperty];
                 const dataLength = checkDataPresent?.length;
@@ -268,6 +358,11 @@ route.post('/', async (req, res) => {
                     avgacc: calculateNewAverage(getTotalAvgData?.[level]?.avgacc, avgAcc, dataLength),
                     avgconsis: calculateNewAverage(getTotalAvgData?.[level]?.avgconsis, avgConsis, dataLength),
                 };
+
+                finalAvgResult = {
+                    all : allData,
+                    [level] : levelData
+                }
         
                 // Update the document with the new averages
                 await userModel.updateMany(
@@ -276,7 +371,36 @@ route.post('/', async (req, res) => {
                 );
             } 
 
-            return res.send({ status: 200, message: "test complete", type: "update", stats: testData });
+            // Mapping match properties to total average fields
+            const findRecordMatch = {
+                60: 'highestrecord1min',
+                15: 'highestrecord1min',
+                180: 'highestrecord3min',
+                300: 'highestrecord5min',
+            };
+            const getProp = findRecordMatch[time]
+            const getHighestRecord = getUserData?.[getProp]
+            const getHighestRecordLevel = getHighestRecord[level]
+            const combinationData = ((avgAcc + avgConsis + avgWpm) / 3)
+            let recordBreak;
+            // console.log("I am main Highest Record : ", getHighestRecord)
+            // console.log("I am level Highest Record : ", getHighestRecordLevel)
+            // console.log("I am Combination Data : ", combinationData)
+            if(getHighestRecordLevel?.combination) {
+                if(getHighestRecordLevel?.combination < combinationData) {
+                    await userModel.updateOne({_id : ID.id}, { $set: { [`${getProp}.${level}.combination`]: combinationData}} )
+                    recordBreak = {
+                        oldRecord : getHighestRecordLevel,
+                        newRecord : combinationData
+                    }
+                }
+            } else {
+                await userModel.updateOne({_id : ID.id}, { $set: { [`${getProp}.${level}.combination`]: combinationData}} )
+            }
+            // console.log("I am Record Breaker : ", recordBreak)
+            
+
+            return res.send({ status: 200, message: "test complete", type: "update", stats: testData, avgData : finalAvgResult, recordBreak : recordBreak });
         } else {
             return res.send({status : 400, message : "Invalid time line", type : "update"});
         }
@@ -286,65 +410,91 @@ route.post('/', async (req, res) => {
 });
 
 
+// Route to handle profile picture upload
+route.post('/upload-profile', upload.single('profile'), async (req, res) => {
+    if(req.headers.authorization) {
+        const ID = jwt.decode(req.headers.authorization, key);
+        if (!req.file) {
+            return res.status(400).send({ message: 'No file uploaded or invalid file type.' });
+        }
+
+        const isProfilePresent = await userModel.findOne({ _id : ID.id })
+
+        if(isProfilePresent) {
+            const getPath = isProfilePresent?.profileimage?.filepath;
+
+            if (getPath) {
+                fs.unlink(getPath, (err) => {
+                    if (err) {
+                        console.error("Failed to delete existing profile image:", err);
+                    } else {
+                        console.log("Existing profile image deleted successfully.");
+                    }
+                });
+            }
+            
+            // File uploaded successfully
+            const originalName = req.file.originalname;
+            const newName = req.file.filename;
+            const filePath = path.join(uploadDir, req.file.filename);
+            
+            const profileData = {
+                originalname : originalName,
+                newname : newName,
+                filepath : filePath,
+                updatedat : new Date()
+            }
+        
+            await userModel.updateOne({_id : ID?.id}, {profileimage : profileData});
+
+            // Send the details back to the client
+            return res.send({ status: 200, message: "Profile Uploaded Successfully", type: "profile", profile: profileData });
+        }
+    }
+});
+
 route.put('/', async(req, res) => {
     
 });
 
-route.delete('/', async(req, res) => {
+route.delete('/', async (req, res) => {
+    try {
+        // Check for the presence of the Authorization header
+        if (req.headers.authorization) {
+            // Decode the JWT token
+            const token = req.headers.authorization;
+            const decoded = jwt.verify(token, key); // Using jwt.verify instead of decode for security
+            
+            // Check if the requesting user exists
+            const checkAccount = await userModel.findOne({_id: decoded.id});
+            if (!checkAccount) {
+                return res.status(404).send({status: 404, message: 'User not found'});
+            }
+            
+            // Delete the account based on the accountid parameter
+            const deletionResult = await userModel.deleteOne({_id: decoded.id});
+            if (deletionResult.deletedCount === 0) {
+                return res.status(404).send({status: 404, message: 'Account not found or already deleted'});
+            }
 
+            // Successful deletion response
+            res.send({
+                status: 200,
+                type: 'delete',
+                message: 'Account Deleted Successfully'
+            });
+        } else {
+            // If no authorization header is present
+            res.status(401).send({status: 401, message: 'Authorization header missing'});
+        }
+    } catch (error) {
+        // Catch any errors that occur
+        console.error(error);
+        res.status(500).send({status: 500, message: 'An error occurred while deleting the account'});
+    }
 });
 
 
 
 
 module.exports = route;
-
-
-// if (getUserData) {
-//     const extractData = (matchData) => ({
-//         allAvgAcc: matchData?.map(value => value.avgacc),
-//         allAvgConsis: matchData?.map(value => value.avgconsis),
-//         allAvgWpm: matchData?.map(value => value.avgwpm),
-//         easyAvgAcc: matchData?.filter(value => value.level === 'easy')?.map(value => value.avgacc),
-//         easyAvgConsis: matchData?.filter(value => value.level === 'easy')?.map(value => value.avgconsis),
-//         easyAvgWpm: matchData?.filter(value => value.level === 'easy')?.map(value => value.avgwpm),
-//         mediumAvgAcc: matchData?.filter(value => value.level === 'medium')?.map(value => value.avgacc),
-//         mediumAvgConsis: matchData?.filter(value => value.level === 'medium')?.map(value => value.avgconsis),
-//         mediumAvgWpm: matchData?.filter(value => value.level === 'medium')?.map(value => value.avgwpm),
-//         hardAvgAcc: matchData?.filter(value => value.level === 'hard')?.map(value => value.avgacc),
-//         hardAvgConsis: matchData?.filter(value => value.level === 'hard')?.map(value => value.avgconsis),
-//         hardAvgWpm: matchData?.filter(value => value.level === 'hard')?.map(value => value.avgwpm)
-//     });
-
-//     const calculateMatchAvg = (matchData) => ({
-//         all: {
-//             avgwpm: calculateAverage(matchData?.allAvgWpm),
-//             avgacc: calculateAverage(matchData?.allAvgAcc),
-//             avgconsis: calculateAverage(matchData?.allAvgConsis),
-//         },
-//         easy: {
-//             avgwpm: calculateAverage(matchData?.easyAvgWpm),
-//             avgacc: calculateAverage(matchData?.easyAvgAcc),
-//             avgconsis: calculateAverage(matchData?.easyAvgConsis),
-//         },
-//         medium: {
-//             avgwpm: calculateAverage(matchData?.mediumAvgWpm),
-//             avgacc: calculateAverage(matchData?.mediumAvgAcc),
-//             avgconsis: calculateAverage(matchData?.mediumAvgConsis),
-//         },
-//         hard: {
-//             avgwpm: calculateAverage(matchData?.hardAvgWpm),
-//             avgacc: calculateAverage(matchData?.hardAvgAcc),
-//             avgconsis: calculateAverage(matchData?.hardAvgConsis),
-//         },
-//     });
-
-//     const match1Data = extractData(getUserData?.match_1);
-//     const match3Data = extractData(getUserData?.match_3);
-//     const match5Data = extractData(getUserData?.match_5);
-
-//     const match1Avg = calculateMatchAvg(match1Data);
-//     const match3Avg = calculateMatchAvg(match3Data);
-//     const match5Avg = calculateMatchAvg(match5Data);
-
-// }

@@ -4,6 +4,7 @@ import UserSignupSchema from '../../../../../schemas/UserSignupSchema'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleCreateUser, resetState } from '../../../../../redux/UserDataSlice'
 import { useNavigate } from 'react-router-dom'
+import GoogleAuth from './GoogleAuth'
 
 const UserSignup = () => {
 
@@ -15,6 +16,7 @@ const UserSignup = () => {
   const errorMsg = useSelector(state => state.UserDataSlice.errorMsg)
   const [eye, setEye] = useState({pass : false, repass : false})
   const [loader, setLoader] = useState(false)
+  const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
 
   const signupForm = useFormik({
     validationSchema : UserSignupSchema,
@@ -54,10 +56,12 @@ const UserSignup = () => {
 
   useEffect(() => {
     if(isFullfilled) {
-      navigate(`/user`)
-      dispatch(resetState())
+      if(fullFillMsg?.type === 'signup'){
+        navigate(`/user`)
+        dispatch(resetState())
+      }
     }
-  }, [isFullfilled])
+  }, [isFullfilled, fullFillMsg])
 
 
   return (
@@ -114,6 +118,10 @@ const UserSignup = () => {
             </button>
           </div>
           <button type='submit' className='theme-btn lg width-90'>Sign Up { loader ? <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> : null }</button>
+          <div className='width-90'><p className='font-idle text-center'>or</p></div>
+          <div className='d-flex justify-content-center width-90'>
+            <GoogleAuth props={'Sign Up'} />
+          </div>
         </div>
       </form>
     </>

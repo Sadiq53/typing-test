@@ -36,7 +36,7 @@ const Header = () => {
                                 <ul className="dropdown-menu">
                                     <NavLink to='/user'><li>Profile</li></NavLink>
                                     <NavLink to='/settings'><li>Settings</li></NavLink>
-                                    <NavLink to='/user/signout'><li>Logout</li></NavLink>
+                                    <NavLink to={`/user/signout/${'isSignout'}`}><li>Logout</li></NavLink>
                                 </ul>
                             </li>
                             </>

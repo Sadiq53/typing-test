@@ -5,6 +5,8 @@ import TypingTestStatistics from './TypingTestStatistics';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleTest, resetState } from '../../../../../redux/UserDataSlice';
 import { dynamicToast } from '../../../../shared/Toast/DynamicToast'
+import { easyWords, generateParagraph, hardWords, mediumWords } from './ParagraphGenerater';
+
 
 const generateRandomParagraph = (difficulty) => {
   const easy = "This is an easy sample sentence. Just relax and type.";
@@ -33,7 +35,7 @@ const Lobby = () => {
   const [timeLimit, setTimeLimit] = useState(60); // Default 30 seconds
   const [elapsedTime, setElapsedTime] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
-  const [currentParagraph, setCurrentParagraph] = useState(generateRandomParagraph(difficulty));
+  const [currentParagraph, setCurrentParagraph] = useState();
   const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
   const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
   const isError = useSelector(state => state.UserDataSlice.isError)
@@ -63,6 +65,29 @@ const Lobby = () => {
     time: 0,
     level : ''
   })
+
+  // Function to generate paragraph based on duration and difficulty
+  const generateTypingTestParagraph = () => {
+    const wordsPerMinute = 70; // Average typing speed (can be adjusted)
+    const totalWords = wordsPerMinute * (timeLimit/60); // Total words to match the duration
+    
+    let wordArray;
+    if (difficulty === "easy") {
+      wordArray = easyWords;
+    } else if (difficulty === "medium") {
+      wordArray = mediumWords.concat(easyWords); // Mix easy and medium words
+    } else if (difficulty === "hard") {
+      wordArray = hardWords.concat(mediumWords).concat(easyWords); // Mix all words
+    }
+    
+    const newParagraph = generateParagraph(wordArray, totalWords);
+    setCurrentParagraph(newParagraph);
+  }
+
+  useEffect(()=>{
+    generateTypingTestParagraph()
+  }, [difficulty, timeLimit, time])
+  
 
   // Focus input on load--------------------------------------------------------------------------
   useEffect(() => {
@@ -109,8 +134,6 @@ const Lobby = () => {
     const newDifficulty = e;
     // console.log(newDifficulty)
     setDifficulty(newDifficulty);
-    setCurrentParagraph(generateRandomParagraph(newDifficulty));
-    // resetTest();
   };
   // Handle paragraph difficulty change----------------------------------------------------------
 
@@ -221,7 +244,7 @@ const Lobby = () => {
   // updation of finalStats-------------------------------------------------------------------
   useEffect(()=>{
     setFinalStats(stats)
-    // console.log(stats)
+    console.log(stats)
   },[stats])
   // updation of finalStats-------------------------------------------------------------------
   
@@ -229,20 +252,21 @@ const Lobby = () => {
   useEffect(()=>{
     setStats((prevStats) => ({
       ...prevStats,   // Spread the previous stats object
-      level: difficulty     // Update the 'time' property
-    })); 
-  }, [difficulty])
+      level: difficulty,  // Update the 'level' property
+      time: time         // Update the 'time' property
+    }));
+  }, [difficulty, time])
   // updation Difficulty in stats-------------------------------------------------------------------
   
   // After test Done-------------------------------------------------------------------
   useEffect(()=>{
     if(showModal) {
-      localStorage.setItem('stats', JSON.stringify(finalStats))
+      const result = {
+        data : finalStats,
+        date : new Date()
+      }
+      localStorage.setItem('stats', JSON.stringify(result))
       if(localStorage.getItem('userToken')) {
-          const result = {
-            data : finalStats,
-            date : new Date()
-          }
           dispatch(handleTest(result))
       } else {
           navigate(`/stats`)
@@ -287,10 +311,10 @@ const Lobby = () => {
   // set the selected time in stats-----------------------------------------------------------------------------
   const handleTime = (value) => {
     setTime(value)
-    setStats((prevStats) => ({
-      ...prevStats,   // Spread the previous stats object
-      time: value     // Update the 'time' property
-    }));    
+    // setStats((prevStats) => ({
+    //   ...prevStats,   // Spread the previous stats object
+    //   time: value     // Update the 'time' property
+    // }));    
     setTimeLimit(Number(value))
   }
   // set the selected time in stats-----------------------------------------------------------------------------
@@ -300,6 +324,15 @@ const Lobby = () => {
       dynamicToast({ message: 'Logged out Successfully!', icon: 'info' })
       setTimeout(()=>{
         localStorage.removeItem('isSignout')
+      }, 3500)
+    }
+  }, [])
+
+  useEffect(()=>{
+    if(localStorage.getItem('accountDelete')) {
+      dynamicToast({ message: 'Account Deleted Successfully', icon: 'info' })
+      setTimeout(()=>{
+        localStorage.removeItem('accountDelete')
       }, 3500)
     }
   }, [])
@@ -316,8 +349,8 @@ const Lobby = () => {
                   <li>Time :</li>
                   <li>
                     <button
-                      onClick={() => handleTime(15)}
-                      className={time === 15 ? 'active' : ''}
+                      onClick={() => handleTime(60)}
+                      className={time === 60 ? 'active' : ''}
                     >
                       01 Min
                     </button>
@@ -385,7 +418,7 @@ const Lobby = () => {
                     onBlur={() => setHasFocus(false)}
                     >
                 <div style={{ fontSize: "30px" }}>
-                  {currentParagraph.split("").map((char, index) => (
+                  {currentParagraph?.split("").map((char, index) => (
                     <span
                       key={index}
                       className={`${userInput[index] === undefined ? 'text-light' : userInput[index] === char ? 'text-active' : 'text-wrong'} ${hasFocus && index === userInput?.length ? 'underline' : ''}`}
@@ -393,7 +426,7 @@ const Lobby = () => {
                       {char}
                     </span>
                   ))}
-                  {hasFocus && userInput.length < currentParagraph.length && (
+                  {hasFocus && userInput?.length < currentParagraph?.length && (
                     <span
                       style={{
                         borderLeft: "2px solid white",

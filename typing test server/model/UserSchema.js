@@ -6,9 +6,84 @@ const UserSchema = mongoose.Schema({
 
     username : String,
     email : String,
-    password : String,
+    password : { type : String, default : '' },
     createdate : Date,
     accountid : String,
+    highestrecord1min : {
+        easy : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        },
+        medium : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        },
+        hard : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        }
+    },
+    highestrecord3min : {
+        easy : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        },
+        medium : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        },
+        hard : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        }
+    },
+    highestrecord5min : {
+        easy : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        },
+        medium : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        },
+        hard : {
+            wpm : { type : Number, default : 0 },
+            acc : { type : Number, default : 0 },
+            consis : { type : Number, default : 0 },
+            combination : { type : Number, default : 0 },
+            id : { type : String, default : '' }
+        }
+    },
+    profileimage : {
+        originalname : { type : String, default : '' },
+        newname : { type : String, default : '' },
+        filepath : { type : String, default : '' },
+        updatedat : { type : Date, default : new Date() },
+    },
     top1minavg : {
         all : {
             avgwpm : { type : Number, default : 0 },

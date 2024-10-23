@@ -4,6 +4,7 @@ import AdminSignin from '../../component/feature/admin/feature/auth/AdminSignin'
 import Lobby from '../../component/feature/user/feature/lobby/Lobby';
 import TypingTestStats from '../../component/feature/user/feature/lobby/TypingTestStatistics';
 import LeaderBoard from '../../component/feature/user/feature/leaderBoard/LeaderBoard';
+import Certificate from '../../component/feature/user/shared/certificate/Certificate';
 
 
 const rootRoutes = [
@@ -18,6 +19,10 @@ const rootRoutes = [
     {
         path : 'leaderboard',
         element : <LeaderBoard />
+    },
+    {
+        path : 'certificate',
+        element : <Certificate />
     },
     {
         path : 'adminsignin',

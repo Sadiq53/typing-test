@@ -1,20 +1,33 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import Header from '../../../../shared/header/Header';
 import Footer from '../../../../shared/footer/Footer';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import Certificate from '../../shared/certificate/Certificate';
+import DownloadButton from '../../shared/certificate/DownloadCertificate';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+import DynamicAlert from '../../../../shared/Toast/DynamicAlert';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const TypingTestStats = () => {
 
+    const certificateRef = useRef();
+    const [alertDetail, setAlertDetail] = useState({
+        title : '',
+        message : '',
+        type : '',
+        navigateTo : '',
+        confirmBtn : false
+    })
+    const [showAlert, setShowAlert] = useState(false)
     let stats = localStorage.getItem('stats')
     stats = JSON.parse(stats)
     const navigate = useNavigate();
-
-    const {wpm, consistency, accuracy, correctChars, incorrectChars, extraChars, time} = stats;
-    console.log("WPM:", wpm, "Consistency:", consistency, "Accuracy:", accuracy);
+    const {wpm, consistency, accuracy, correctChars, incorrectChars, extraChars, time, level} = stats?.data;
+    // console.log("WPM:", wpm, "Consistency:", consistency, "Accuracy:", accuracy);
 
     const data = {
         labels: Array.from({ length: wpm.length }, (_, i) => i + 1), // X-axis label based on data length
@@ -77,6 +90,70 @@ const TypingTestStats = () => {
         }
     }
 
+    const handleDownload = () => {
+
+        if(localStorage.getItem('userToken')) {
+            const input = certificateRef.current;
+    
+        // Use html2canvas to capture the certificate as an image
+        html2canvas(input)
+        .then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF();
+            
+            // Set the PDF size based on the canvas
+            const imgWidth = 210; // Width in mm (A4 size)
+            const pageHeight = 295; // Height in mm (A4 size)
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+    
+            let position = 0;
+    
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+    
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+    
+            pdf.save('certificate.pdf'); // Save the PDF
+        })
+        .catch((error) => {
+            console.error('Error generating PDF:', error);
+        });
+        } else {
+            setShowAlert(true)
+            setAlertDetail({
+                title : 'Access Denied!',
+                type : 'error',
+                message : 'To Download Certificate Please Signup/Signin',
+                navigateTo : '/signup',
+                confirmBtn : false
+            })
+        }   
+    };
+
+    useEffect(()=>{
+        if(localStorage.getItem('newRecord')) {
+            setShowAlert(true)
+            setAlertDetail({
+                title : 'Congratulations!',
+                type : 'Success',
+                message : `You have broken your previous highest record in the ${time/60}-minute ${level} mode!`,
+                navigateTo : '',
+                confirmBtn : true
+            })
+        }
+    }, [])
+
+    const handleAlertClose = () => {
+        localStorage.removeItem('newRecord'); // Clear local storage
+        setShowAlert(false); // Set showAlert to false
+    };
+
     return(
         <>
             <Header />
@@ -106,7 +183,7 @@ const TypingTestStats = () => {
                                 </div>
                                 <div>
                                     <h4>Characters</h4>
-                                    <h1>{`${correctChars}/${incorrectChars}/${extraChars}`}</h1>
+                                    <div className='item'><span>Correct/Incorrect/Extra</span><h1>{`${correctChars}/${incorrectChars}/${extraChars}`}</h1></div>
                                 </div>
                                 <div>
                                     <h4>Consistency</h4>
@@ -120,14 +197,28 @@ const TypingTestStats = () => {
                         </div>
                         <div className="col-md-12 py-5">
                             <div className="below-graph-btn">
-                            <button><i className="fa-solid fa-download fa-xl" style={{ color: "#8c8c8c" }} /></button>
-                            <button onClick={repeatTest}><i className="fa-solid fa-repeat fa-xl" style={{ color: "#8c8c8c" }} /></button>
+                                <div className='item'><span>Download Certificate</span><DownloadButton onDownload={handleDownload} /></div>
+                                <div className='item'><span>Repeat Test</span><button onClick={repeatTest}><i className="fa-solid fa-repeat fa-xl" style={{ color: "#8c8c8c" }} /></button></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
             <Footer />
+
+            <div style={{position : 'absolute', left : '-100%', top : '28%' }} >
+                <Certificate ref={certificateRef} props={stats} />
+            </div>
+
+            <DynamicAlert
+            type={alertDetail.type}
+            title={alertDetail.title}
+            message={alertDetail.message}
+            trigger={showAlert} // This will trigger the alert
+            navigateTo={alertDetail.navigateTo}
+            confirmBtn={alertDetail.confirmBtn}
+            onClose={handleAlertClose} // Pass the onClose handler
+            />
         </>
     );
 };
