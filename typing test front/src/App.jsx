@@ -1,4 +1,3 @@
-import React from 'react'
 import AllRoutes from './config/AllRoutes';
 import { ChakraProvider } from '@chakra-ui/react';
 

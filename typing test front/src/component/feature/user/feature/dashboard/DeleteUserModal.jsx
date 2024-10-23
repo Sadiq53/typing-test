@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { handleDeleteUserAccount } from '../../../../../redux/UserDataSlice';
 import { useNavigate } from 'react-router-dom';

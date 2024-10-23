@@ -1,5 +1,5 @@
 import { useFormik } from 'formik'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import UserSignupSchema from '../../../../../schemas/UserSignupSchema'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleCreateUser, resetState } from '../../../../../redux/UserDataSlice'

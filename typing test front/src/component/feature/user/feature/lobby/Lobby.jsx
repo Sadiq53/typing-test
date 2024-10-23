@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Header from '../../../../shared/header/Header'
 import { NavLink, useNavigate } from 'react-router-dom';
-import TypingTestStatistics from './TypingTestStatistics';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleTest, resetState } from '../../../../../redux/UserDataSlice';
 import { dynamicToast } from '../../../../shared/Toast/DynamicToast'

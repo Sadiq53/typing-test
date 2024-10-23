@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Header from '../../../../shared/header/Header'
 import Footer from '../../../../shared/footer/Footer'
 import { useDispatch, useSelector } from 'react-redux'

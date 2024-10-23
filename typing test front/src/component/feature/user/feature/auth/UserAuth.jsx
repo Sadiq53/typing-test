@@ -1,7 +1,5 @@
-import React from 'react'
 import Header from '../../../../shared/header/Header'
 import Footer from '../../../../shared/footer/Footer'
-import { NavLink } from 'react-router-dom'
 import UserSignin from './UserSignin'
 import UserSignup from './UserSignup'
 import { GoogleOAuthProvider } from '@react-oauth/google'

@@ -1,11 +1,11 @@
 import './CertificateStyle.css'
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState, forwardRef } from 'react';
 
 import { useSelector } from 'react-redux';
 import Signature from '../../../../shared/svg/Signature';
 import LogoSvg from '../../../../shared/svg/LogoSvg';
 
-const Certificate = React.forwardRef((props, ref) => {
+const Certificate = forwardRef((props, ref) => {
 
     const [data, setData] = useState({
         wpm : '',

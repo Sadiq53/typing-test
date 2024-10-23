@@ -1,5 +1,5 @@
 import { useFormik } from 'formik'
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { passwordUpdateSchema } from '../../../../../schemas/UserUpdateSchema'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleUpdatePassword, resetState } from '../../../../../redux/UserDataSlice'

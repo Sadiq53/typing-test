@@ -1,6 +1,4 @@
 import { useGoogleLogin } from '@react-oauth/google';
-// import jwt_decode from 'jwt-decode';
-import * as jwt_decode from 'jwt-decode';
 import { useDispatch } from 'react-redux';
 import { handleSigninUserWithGoogle, handleSignupWithGoogle } from '../../../../../redux/UserDataSlice';
 
