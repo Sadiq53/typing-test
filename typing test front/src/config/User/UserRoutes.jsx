@@ -1,3 +1,4 @@
+import Blog from '../../component/feature/user/feature/Blog/Blog';
 import UserDashBoard from '../../component/feature/user/feature/dashboard/UserDashBoard';
 import LeaderBoard from '../../component/feature/user/feature/leaderBoard/LeaderBoard';
 import Lobby from '../../component/feature/user/feature/lobby/Lobby';
@@ -24,6 +25,10 @@ const userRoutes = [
     {
         path : 'signout/:type',
         element : <Signout />
+    },
+    {
+        path : 'blog',
+        element : <Blog />
     },
 ]
 

@@ -6,6 +6,7 @@ import rootRoutes from '../config/Root/RootRoutes'
 import adminRoutes from '../config/Admin/AdminRoutes'
 import userRoutes from '../config/User/UserRoutes'
 import UserAuth from '../component/feature/user/feature/auth/UserAuth'
+import AdminSignin from '../component/feature/admin/feature/auth/AdminSignin'
 
 const AllRoutes = () => {
 
@@ -58,8 +59,7 @@ const AllRoutes = () => {
             path : '/adminsignin',
             element : isUserTokenPresent() ? (
                 <Navigate to='/user' replace />
-            ) : (<RootModule />),
-            children : rootRoutes
+            ) : isAdminTokenPresent() ? (<Navigate to='/admin' />) : (<AdminSignin />)
         },
         {
             path : '/admin',

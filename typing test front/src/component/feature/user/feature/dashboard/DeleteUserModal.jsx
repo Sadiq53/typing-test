@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { handleDeleteUserAccount } from '../../../../../redux/UserDataSlice';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,9 @@ const DeleteUserModal = () => {
     const dispatch = useDispatch();
     const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled) 
     const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg) 
+    const isProcessing = useSelector(state => state.UserDataSlice.isProcessing) 
+    const processingMsg = useSelector(state => state.UserDataSlice.processingMsg) 
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate();
 
     const deleteConfirmation = () =>{
@@ -18,13 +21,22 @@ const DeleteUserModal = () => {
     useEffect(()=>{
         if(isFullfilled) {
             if(fullFillMsg?.type === 'delete') {
+                clsModal.current.click();
+                setIsLoading(false)
                 setTimeout(()=>{
                     navigate(`/user/signout/${'accountDelete'}`)
                 },10)
-                clsModal.current.click();
             }
         }
     }, [isFullfilled, fullFillMsg])
+
+    useEffect(()=>{
+        if(isProcessing) {
+            if(processingMsg?.type === 'delete') {
+                setIsLoading(true)
+            }
+        }
+    }, [isProcessing, processingMsg])
 
 
 
@@ -60,7 +72,14 @@ const DeleteUserModal = () => {
                                         Close
                                     </button>
                                     <button  onClick={deleteConfirmation} className="theme-btn-danger sm">
-                                        Delete
+                                        {
+                                            isLoading ? (<div class="wrapper-cs">
+                                                <span class="text">
+                                                    Deleting
+                                                </span>
+                                                <div class="dot-cs"></div>
+                                                </div>) : 'Delete'
+                                        }
                                     </button>
                                 </div>
                         </div>

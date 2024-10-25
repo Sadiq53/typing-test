@@ -11,7 +11,10 @@ const LeaderBoard = () => {
     const [onLoadLimit, setOnLoadLimit] = useState(50)
     const rawAllUserData = useSelector(state => state.UserDataSlice.allUserData)
     const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
+    const processingMsg = useSelector(state => state.UserDataSlice.processingMsg)
     const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
+    const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
+    const [isLoading, setIsLoading] = useState(false)
     const [displayData, setDisplayData] = useState([])
     const [timeFilter, setTimeFilter] = useState('1')
     const [levelFilter, setLevelFilter] = useState('all')
@@ -77,9 +80,21 @@ const LeaderBoard = () => {
 
     useEffect(()=>{
         if(isFullfilled) {
-            dispatch(resetState())
+            if(fullFillMsg?.type === 'leaderboard'){
+                setIsLoading(false)
+                dispatch(resetState())
+            }
         }
-    }, [isFullfilled])
+    }, [isFullfilled, fullFillMsg])
+
+    useEffect(()=>{
+        if(isProcessing) {
+            if(processingMsg?.type === 'leaderboard') {
+                setIsLoading(true)
+                dispatch(resetState())
+            }
+        }
+    }, [isProcessing, processingMsg])
 
   return (
     <>
@@ -90,7 +105,7 @@ const LeaderBoard = () => {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="leaderboard-head">
-                            <h1>All-Time Leaderboards </h1>
+                            <h1>All-Time Leaderboards  </h1>
                             <div className="filter">
                                 <div className="filter-btn">
                                     <button onClick={()=>handleFilterTime('1')} className={timeFilter === '1' ? 'active' : ''}>01 Min</button>
@@ -116,6 +131,13 @@ const LeaderBoard = () => {
                     <div className="col-md-12">
                         <div className="show-filter py-2">
                             <h1 className='font-active text-left'>0{timeFilter} Min {levelFilter} Mode</h1>
+                            {
+                                isLoading && (<div class="rl-loading-container">
+                                    <div class="rl-loading-thumb rl-loading-thumb-1"></div>
+                                    <div class="rl-loading-thumb rl-loading-thumb-2"></div>
+                                    <div class="rl-loading-thumb rl-loading-thumb-3"></div>
+                                </div>)
+                            }
                         </div>
                         <div className="leaderboard-table my-3">
                             <table className="">

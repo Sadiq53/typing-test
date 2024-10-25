@@ -1,4 +1,5 @@
 require('../config/DataBase')
+const { timeStamp } = require('console');
 const mongoose = require('mongoose');
 const { type } = require('os');
 
@@ -9,6 +10,12 @@ const UserSchema = mongoose.Schema({
     password : { type : String, default : '' },
     createdate : Date,
     accountid : String,
+    role : { type : String, default : 'user' },
+    googleId : { type : String, default : '' },
+    authType : { 
+        email : { type : Boolean, default : false },
+        google : { type : Boolean, default : false },
+    },
     highestrecord1min : {
         easy : {
             wpm : { type : Number, default : 0 },

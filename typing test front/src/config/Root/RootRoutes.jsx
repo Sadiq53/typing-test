@@ -1,10 +1,9 @@
-import UserSignin from '../../component/feature/user/feature/auth/UserSignin'
-import UserSignup from '../../component/feature/user/feature/auth/UserSignup'
 import AdminSignin from '../../component/feature/admin/feature/auth/AdminSignin'
 import Lobby from '../../component/feature/user/feature/lobby/Lobby';
 import TypingTestStats from '../../component/feature/user/feature/lobby/TypingTestStatistics';
 import LeaderBoard from '../../component/feature/user/feature/leaderBoard/LeaderBoard';
-import Certificate from '../../component/feature/user/shared/certificate/Certificate';
+import Blog from '../../component/feature/user/feature/Blog/Blog';
+import BlogInner from '../../component/feature/user/feature/Blog/BlogInner';
 
 
 const rootRoutes = [
@@ -21,8 +20,12 @@ const rootRoutes = [
         element : <LeaderBoard />
     },
     {
-        path : 'certificate',
-        element : <Certificate />
+        path : 'blog',
+        element : <Blog />
+    },
+    {
+        path : 'blog/:id',
+        element : <BlogInner />
     },
     {
         path : 'adminsignin',

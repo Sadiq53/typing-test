@@ -3,10 +3,14 @@ const mongoose = require('mongoose')
 
 const AdminSchema = mongoose.Schema({
 
-    name : String,
+    username : String,
     email : String,
-    contact : String,
-    password : String
+    password : String,
+    role : { type : String, default : 'admin' },
+    blockUser : [{
+        accountid : { type : String, default : '' }
+    }],
+
 
 }, { collection : "admindata" });
 

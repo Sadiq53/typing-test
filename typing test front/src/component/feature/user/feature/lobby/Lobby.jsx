@@ -7,22 +7,6 @@ import { dynamicToast } from '../../../../shared/Toast/DynamicToast'
 import { easyWords, generateParagraph, hardWords, mediumWords } from './ParagraphGenerater';
 
 
-const generateRandomParagraph = (difficulty) => {
-  const easy = "This is an easy sample sentence. Just relax and type.";
-  const medium = "Typing this medium-length text requires moderate attention.";
-  const hard = "The quick brown fox jumps over the lazy dog. Typing hard texts tests patience.";
-
-  switch (difficulty) {
-    case "easy":
-      return easy;
-    case "medium":
-      return medium;
-    case "hard":
-      return hard;
-    default:
-      return easy;
-  }
-};
 
 const Lobby = () => {
 
@@ -39,6 +23,7 @@ const Lobby = () => {
   const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
   const isError = useSelector(state => state.UserDataSlice.isError)
   const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
+  const [timeUp, setTimeUp] = useState(false)
   const [stats, setStats] = useState({
     wpm: [],
     accuracy: [],
@@ -118,6 +103,7 @@ const Lobby = () => {
           const newElapsedTime = prev + 1;
           if (newElapsedTime >= timeLimit) {
             setTimerRunning(false);
+            setTimeUp(true)
             setShowModal(true)
           }
           return newElapsedTime;
@@ -243,7 +229,7 @@ const Lobby = () => {
   // updation of finalStats-------------------------------------------------------------------
   useEffect(()=>{
     setFinalStats(stats)
-    console.log(stats)
+    // console.log(stats)
   },[stats])
   // updation of finalStats-------------------------------------------------------------------
   
@@ -484,15 +470,27 @@ const Lobby = () => {
           <h1>hello</h1>
         </div>
       </div> */}
-      {/* {
-        !hasFocus && (
+      {
+        timeUp && (
           <div className="blur-overlay" onClick={()=>{handleFocusContainer, setHasFocus(true), typingContainerRef.current.focus()}}>
           <div className="overlay-message">
-            Click anywhere to focus on the typing container
+            <h1>Test Over.....!</h1>
+            <div class="loading">
+          <svg class="orange">
+            <g fill="none">
+              <rect x="2" y="2" width="50" height="50" />
+            </g>
+          </svg>
+          <svg class="grey">
+            <g fill="none">
+              <rect x="5" y="5" width="44" height="44" stroke="#ccc" stroke-width="2"/>
+            </g>
+          </svg>
           </div>
           </div>
+        </div>
         )
-      } */}
+      }
     </>
   )
 }

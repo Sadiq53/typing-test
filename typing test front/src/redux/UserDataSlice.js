@@ -3,8 +3,8 @@ import axios from 'axios'
 import { USER_API_URL } from '../util/API_URL'
 
 const handleGetUserData = createAsyncThunk('handleGetUserData', async(ID) => {
-    const response = await axios.get(`${USER_API_URL}/${ID}`, { headers : { Authorization : ID } });
-    // console.log(response.data)
+    // console.log(ID)
+    const response = await axios.get(`${USER_API_URL}`, { headers : { Authorization : ID } });
     if(response.data.status === 200) {
         return response.data.userdata
     }
@@ -191,7 +191,7 @@ const handleDeleteUserAccount = createAsyncThunk('handleDeleteUserAccount', asyn
     const ID = localStorage.getItem('userToken')
     try{
         const response = await axios.delete(`${USER_API_URL}`, { headers : { Authorization : ID } })
-        console.log(response.data)
+        // console.log(response.data)
         if(response.data.status === 200) {
             let checkMsg = {
                 status : true,
@@ -248,6 +248,7 @@ const UserDataSlice = createSlice({
             state.isFullfilled = false;
             state.errorMsg = {},
             state.fullFillMsg = {}
+            state.processingMsg = {}
         },
         handleClearState : (state) => {
             state.userData = [];
@@ -290,6 +291,8 @@ const UserDataSlice = createSlice({
         });
         builder.addCase(handleSigninUser.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg.message = 'Fetching Data...'
+            state.processingMsg.type = 'signin'
         });
         builder.addCase(handleSigninUserWithGoogle.fulfilled, (state, action) => {
             if(action.payload.status) {
@@ -307,6 +310,8 @@ const UserDataSlice = createSlice({
         });
         builder.addCase(handleSigninUserWithGoogle.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg.message = 'Fetching Data...'
+            state.processingMsg.type = 'signin'
         });
         builder.addCase(handleCreateUser.fulfilled, (state, action) => {
             if(action.payload.status) {
@@ -324,6 +329,8 @@ const UserDataSlice = createSlice({
         });
         builder.addCase(handleCreateUser.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg.message = 'Fetching Data...'
+            state.processingMsg.type = 'signup'
         });
         builder.addCase(handleSignupWithGoogle.fulfilled, (state, action) => {
             if(action.payload.status) {
@@ -341,6 +348,8 @@ const UserDataSlice = createSlice({
         });
         builder.addCase(handleSignupWithGoogle.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg.message = 'Fetching Data...'
+            state.processingMsg.type = 'signup'
         });
         builder.addCase(handleUpdatePassword.fulfilled, (state, action) => {
             if(action?.payload) {
@@ -435,6 +444,8 @@ const UserDataSlice = createSlice({
         });
         builder.addCase(handleGetLeaderboardData.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg.message = 'Fetching LeaderBoard Data'
+            state.processingMsg.type = 'leaderboard'
         });
         builder.addCase(handleUploadProfile.fulfilled, (state, action) => {
             if(action.payload.status) {
@@ -470,6 +481,8 @@ const UserDataSlice = createSlice({
         });
         builder.addCase(handleDeleteUserAccount.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg.message = 'Deleting User'
+            state.processingMsg.type = 'delete'
         });
     }
 })

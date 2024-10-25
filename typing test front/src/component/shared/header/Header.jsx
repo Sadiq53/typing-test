@@ -3,13 +3,14 @@ import { NavLink } from 'react-router-dom'
 
 const Header = () => {
 
-    const [checkToken, setCheckToken] = useState(false);
+    const [checkUserToken, setCheckUserToken] = useState(false);
+    const [checkAdminToken, setCheckAdminToken] = useState(false);
 
     useEffect(()=> {
         if(localStorage.getItem('userToken')) {
-            setCheckToken(true)
-        } else {
-            setCheckToken(false)
+            setCheckUserToken(true)
+        } else if(localStorage.getItem('adminToken')) {
+            setCheckAdminToken(true)
         }
     }, [])
 
@@ -26,11 +27,11 @@ const Header = () => {
                 <div className="header">
                     <ul className="menu">
                     {
-                        checkToken ? (
+                        checkUserToken ? (
                             <>
                             <NavLink to='/user/lobby'><li>Start Live Test</li></NavLink>
                             <NavLink to='/user/leaderboard'><li>Leaderboard</li></NavLink>
-                            <NavLink to='/'><li>Blogs</li></NavLink>
+                            <NavLink to='/user/blog'><li>Blogs</li></NavLink>
                             <li className="dropdown">
                                 <NavLink to='/user'><i className="fa-solid fa-user"></i> &nbsp; User</NavLink>
                                 <ul className="dropdown-menu">
@@ -40,11 +41,24 @@ const Header = () => {
                                 </ul>
                             </li>
                             </>
+                        ) : checkAdminToken ? (
+                            <>
+                            <NavLink to='/admin/leaderboard'><li>Leaderboard</li></NavLink>
+                            <NavLink to='/admin/blog'><li>Blogs</li></NavLink>
+                            <li className="dropdown">
+                                <NavLink to='/admin/users'><i className="fa-solid fa-user"></i> &nbsp; User</NavLink>
+                                <ul className="dropdown-menu">
+                                    <NavLink to='/admin/add-user'><li>Add User</li></NavLink>
+                                    <NavLink to='/admin/delete-user'><li>Delete User</li></NavLink>
+                                    <NavLink to={`/admin/signout/${'isSignout'}`}><li>Logout</li></NavLink>
+                                </ul>
+                            </li>
+                            </>
                         ) : (
                             <>
                             <NavLink to='/'><li>Start Live Test</li></NavLink>
                             <NavLink to='/leaderboard'><li>Leaderboard</li></NavLink>
-                            <NavLink to='/'><li>Blogs</li></NavLink>
+                            <NavLink to='/blog'><li>Blogs</li></NavLink>
                             <NavLink to='/signup'><li><i className="fa-solid fa-user"></i> &nbsp; Login/Signup</li></NavLink>
                             </>
                         )

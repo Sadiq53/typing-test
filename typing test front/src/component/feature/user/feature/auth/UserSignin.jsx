@@ -19,6 +19,7 @@ const UserSignin = () => {
   const [schema, setSchema] = useState(usernameSchema); // Default to username schema
   const [inputType, setInputType] = useState('username'); // To store 'email' or 'username'
   const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
+  const processingMsg = useSelector(state => state.UserDataSlice.isProcessing)
   const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
   const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
   const isError = useSelector(state => state.UserDataSlice.isError)
@@ -59,10 +60,12 @@ const UserSignin = () => {
 
   useEffect(() => {
     if(isProcessing) {
-      setLoader(true)
-      dispatch(resetState())
-    } else setLoader(false)
-  }, [isProcessing])
+      if(processingMsg?.type === 'signin') {
+        setLoader(true)
+        dispatch(resetState())
+      } else setLoader(false)
+    } 
+  }, [isProcessing, processingMsg])
 
   useEffect(() => {
     if(isError) {

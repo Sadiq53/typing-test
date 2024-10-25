@@ -11,6 +11,7 @@ const UserSignup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate()
   const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
+  const processingMsg = useSelector(state => state.UserDataSlice.processingMsg)
   const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
   const isError = useSelector(state => state.UserDataSlice.isError)
   const errorMsg = useSelector(state => state.UserDataSlice.errorMsg)
@@ -40,10 +41,12 @@ const UserSignup = () => {
 
   useEffect(() => {
     if(isProcessing) {
-      setLoader(true)
-      dispatch(resetState())
-    } else setLoader(false)
-  }, [isProcessing])
+      if(processingMsg?.type === 'signup') {
+        setLoader(true)
+        dispatch(resetState())
+      } else setLoader(false)
+    } 
+  }, [isProcessing, processingMsg])
 
 
   useEffect(() => {

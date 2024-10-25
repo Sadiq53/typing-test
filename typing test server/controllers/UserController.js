@@ -16,7 +16,8 @@ const calculateAverage = (numbers) => {
 };
 
 // Directory to store uploaded files temporarily
-const uploadDir = path.join(__dirname, '..', 'assets', 'uploads');
+const uploadDir = path.resolve(__dirname, '../assets/uploads/');
+console.log(uploadDir)
 
 // Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {
@@ -53,10 +54,10 @@ const upload = multer({
 });
 
 
-route.get('/:id', async(req, res) => {
+route.get('/', async(req, res) => {
     // console.log(req.headers.authorization)
     if(req.headers.authorization){
-        let ID = jwt.decode(req.params.id, key)
+        let ID = jwt.decode(req.headers.authorization, key)
         // console.log(ID.id)
         let userData = await userModel.findOne({_id : ID?.id})
         if(userData) {
@@ -158,7 +159,7 @@ route.get('/dashdata/:limit/:type', async (req, res) => {
         };
     });
 
-    res.send({ status: 200, userData: filteredData, type: "pagination", message: "Leaderboard Data" });
+    res.send({ status: 200, userData: filteredData, type: "leaderboard", message: "Leaderboard Data" });
 });
 
 
@@ -222,7 +223,9 @@ route.post('/signup/google', async(req, res) => {
                     username : username,
                     email : email,
                     createdate : createdate,
-                    accountid : accountID()
+                    accountid : accountID(),
+                    googleId : token,
+                    authType : {google : true, email : false}
                 }
                 // console.log(finalData)
             await userModel.create(finalData)
@@ -248,7 +251,8 @@ route.post('/signup', async(req, res) => {
                 email : email,
                 password : sha(password),
                 createdate : createdate,
-                accountid : accountID()
+                accountid : accountID(),
+                authType : {google : false, email : true}
             }
             await userModel.create(finalData)
             const getUser = await userModel.findOne({ email : email })
