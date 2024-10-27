@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom'
-import { handleGetUserData } from '../redux/UserDataSlice';
+import { handleGetUserData, resetState } from '../redux/UserDataSlice';
 import PageDataLoader from '../component/shared/loader/PageDataLoader';
 
 const UserModule = () => {
