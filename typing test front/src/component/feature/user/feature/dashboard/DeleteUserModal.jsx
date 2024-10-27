@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { handleDeleteUserAccount } from '../../../../../redux/UserDataSlice';
 import { useNavigate } from 'react-router-dom';
+import ButtonLoader from '../../../../shared/loader/ButtonLoader';
 
 const DeleteUserModal = () => {
 
@@ -73,12 +74,7 @@ const DeleteUserModal = () => {
                                     </button>
                                     <button  onClick={deleteConfirmation} className="theme-btn-danger sm">
                                         {
-                                            isLoading ? (<div class="wrapper-cs">
-                                                <span class="text">
-                                                    Deleting
-                                                </span>
-                                                <div class="dot-cs"></div>
-                                                </div>) : 'Delete'
+                                            isLoading ? (<ButtonLoader props={'Deleting'} />) : 'Delete'
                                         }
                                     </button>
                                 </div>

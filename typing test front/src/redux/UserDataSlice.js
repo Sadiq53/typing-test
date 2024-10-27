@@ -58,9 +58,22 @@ const handleSigninUserWithGoogle = createAsyncThunk('handleSigninUserWithGoogle'
 const handleUpdatePassword = createAsyncThunk('handleUpdatePassword', async(formData) => {
     const ID = localStorage.getItem('userToken')
     const response = await axios.post(`${USER_API_URL}/updatepass/${ID}`, formData, { headers : { Authorization : ID } })
+    console.log(response.data)
     if(response.data.status === 200) {
-        return formData
-    } else return 
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type
+        }
+        return checkMsg
+    }
 })
 
 
@@ -164,7 +177,7 @@ const handleUploadProfile = createAsyncThunk('handleUploadProfile', async(formDa
             Authorization : ID
         },
         });
-        console.log(response.data)
+        // console.log(response.data)
         if(response.data.status === 200) {
             let checkMsg = {
                 status : true,
@@ -236,7 +249,8 @@ const initialState = {
     match1 : [],
     match3 : [],
     match5 : [],
-    allUserData : []
+    allUserData : [],
+    paragraphs : {}
 }
 
 const UserDataSlice = createSlice({
@@ -264,6 +278,7 @@ const UserDataSlice = createSlice({
                 state.match1 = action.payload.match_1;
                 state.match3 = action.payload.match_3;
                 state.match5 = action.payload.match_5;
+                state.paragraphs = action.payload.paragraphs;
                 state.isProcessing = false
                 state.isError = false
                 state.isFullfilled = true
@@ -352,16 +367,24 @@ const UserDataSlice = createSlice({
             state.processingMsg.type = 'signup'
         });
         builder.addCase(handleUpdatePassword.fulfilled, (state, action) => {
-            if(action?.payload) {
+            if(action.payload.status) {
                 state.isFullfilled = true
                 state.isProcessing = false
-            } else {
+                state.processingMsg = {}
+                state.isError = false
+                state.fullFillMsg.type = action.payload.type,
+                state.fullFillMsg.message = action.payload.message
+            } else { 
                 state.isProcessing = false
                 state.isError = true
+                state.errorMsg.message = action.payload.message
+                state.errorMsg.type = action.payload.type
             }
         });
         builder.addCase(handleUpdatePassword.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg.message = 'Updating Password...'
+            state.processingMsg.type = 'updatepassword'
         });
         builder.addCase(handleTest.fulfilled, (state, action) => {
             if (action.payload?.status) {

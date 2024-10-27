@@ -8,7 +8,6 @@ const path = require('path')
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'assets')))
-// app.use('/uploads', express.static(path.join(__dirname, 'assets', 'uploads')));
 app.use(express.urlencoded({ extended : true }))
 app.use(cors());
 app.use(routes)

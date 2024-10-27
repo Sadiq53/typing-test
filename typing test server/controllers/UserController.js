@@ -2,6 +2,7 @@ const route = require('express').Router();
 const jwt = require('jsonwebtoken');
 const sha = require('sha1')
 const userModel = require('../model/UserSchema')
+const adminModel = require('../model/AdminSchema')
 const key = require('../config/token_Keys');
 const randNum = require('random-number')
 const path = require('path');
@@ -16,8 +17,8 @@ const calculateAverage = (numbers) => {
 };
 
 // Directory to store uploaded files temporarily
-const uploadDir = path.resolve(__dirname, '../assets/uploads/');
-console.log(uploadDir)
+const uploadDir = path.resolve(__dirname, '../assets/uploads/profile');
+// console.log(uploadDir)
 
 // Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {
@@ -53,13 +54,13 @@ const upload = multer({
     }
 });
 
-
 route.get('/', async(req, res) => {
     // console.log(req.headers.authorization)
     if(req.headers.authorization){
         let ID = jwt.decode(req.headers.authorization, key)
         // console.log(ID.id)
         let userData = await userModel.findOne({_id : ID?.id})
+        const adminData = await adminModel.find({})
         if(userData) {
             userData = {
                 accountid : userData?.accountid,
@@ -76,7 +77,10 @@ route.get('/', async(req, res) => {
                 top1minavg : userData?.top1minavg,
                 top3minavg : userData?.top3minavg,
                 top5minavg : userData?.top5minavg, 
-                username : userData?.username
+                username : userData?.username,
+                isblock : userData?.isblocked?.status,
+                authType :userData?.authType,
+                paragraphs : adminData[0]?.paragraphs
             }
             res.send({ status : 200, userdata : userData })
         }else{
@@ -162,7 +166,6 @@ route.get('/dashdata/:limit/:type', async (req, res) => {
     res.send({ status: 200, userData: filteredData, type: "leaderboard", message: "Leaderboard Data" });
 });
 
-
 route.post('/signin/google', async(req, res) => {
     const token = Object.keys(req.body)[0];
     // Fetch user information from Google's Userinfo API
@@ -177,9 +180,11 @@ route.post('/signin/google', async(req, res) => {
     const isUserExist = await userModel.findOne({email : email})
     if(isUserExist) {
         if(email_verified) {
-            const ID = {id : isUserExist?._id};
-            const token = jwt.sign(ID, key)
-            res.send({ status : 200, token : token, message : "Logged in Successfully", type : 'signin' })
+            if(!isUserExist?.isblocked?.status) {
+                const ID = {id : isUserExist?._id};
+                const token = jwt.sign(ID, key)
+                res.send({ status : 200, token : token, message : "Logged in Successfully", type : 'signin' })
+            } else res.send({ status : 402, message : "Your Account is blocked", type : 'block-unblock' })
         }
     } else res.send({ status : 401, message : "Email ID is Invalid", type : 'signin' })
     
@@ -195,9 +200,11 @@ route.post('/signin', async(req, res) => {
     }
     if(isUserExist) {
         if(sha(password) === isUserExist?.password) {
-            const ID = {id : isUserExist?._id};
-            const token = jwt.sign(ID, key)
-            res.send({ status : 200, token : token, message : "Logged in Successfully", type : 'signin' })
+            if(!isUserExist?.isblocked.status) {
+                const ID = {id : isUserExist?._id};
+                const token = jwt.sign(ID, key)
+                res.send({ status : 200, token : token, message : "Logged in Successfully", type : 'signin' })
+            } else res.send({ status : 402, message : "Your Account is blocked", type : 'block-unblock' })
         } else res.send({ status : 402, message : "Password is Incorrect", type : 'signin' })
     } else res.send({ status : 401, message : "Email ID is Invalid", type : 'signin' })
 });
@@ -231,8 +238,8 @@ route.post('/signup/google', async(req, res) => {
             await userModel.create(finalData)
             const getUser = await userModel.findOne({ email : email })
             const ID = {id : getUser?._id};
-            const token = jwt.sign(ID, key)
-            res.send({ status : 200, token : token, message : "Signup Successfully", type : 'signup' })
+            const userToken = jwt.sign(ID, key)
+            res.send({ status : 200, token : userToken, message : "Signup Successfully", type : 'signup' })
             }
         } else res.send({ status : 402, message : "Email ID Exist", type : 'signup' }) 
 
@@ -270,10 +277,19 @@ route.post('/updatepass/:id', async(req, res) => {
         // console.log(ID.id, req.body )
         const { currentpassword, newpassword } = req.body;
         const findUser = await userModel.findOne({ _id : ID.id })
-        if(findUser) {
-            if(findUser?.password === sha(currentpassword)) {
-                await userModel.updateOne({ _id : ID?.id }, { password : sha(newpassword) })
-                res.send({ status : 200 })
+        if(currentpassword) {
+            if(findUser) {
+                if(findUser?.password === sha(currentpassword)) {
+                    await userModel.updateOne({ _id : ID?.id }, { password : sha(newpassword) })
+                    res.send({ status : 200, type : "updatepassword", message : "Password Updated Succefully" })
+                } else res.send({ status : 401, type : "updatepassword", message : "Current Password is Incorrect" })
+            }
+        } else {
+            if(findUser) {
+                if(findUser?.password === '') {
+                    await userModel.updateOne({ _id : ID?.id }, { password : sha(newpassword) })
+                    res.send({ status : 200, type : "updatepassword", message : "Password Added Succefully" })
+                }
             }
         }
     }

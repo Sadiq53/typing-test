@@ -10,6 +10,68 @@ const AdminSchema = mongoose.Schema({
     blockUser : [{
         accountid : { type : String, default : '' }
     }],
+    paragraphs: {
+        Min1: {
+            easy: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ],
+            medium: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ],
+            hard: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ]
+        },
+        Min3: {
+            easy: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ],
+            medium: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ],
+            hard: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ]
+        },
+        Min5: {
+            easy: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ],
+            medium: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ],
+            hard: [
+                {
+                    id: { type: String, required: true },
+                    para: { type: String, required: true }
+                }
+            ]
+        },
+    },
 
 
 }, { collection : "admindata" });

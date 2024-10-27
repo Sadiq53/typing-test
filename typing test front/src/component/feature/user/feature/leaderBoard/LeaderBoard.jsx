@@ -155,7 +155,7 @@ const LeaderBoard = () => {
                                         displayData?.map((value, index) => (
                                             <tr>
                                                 <td>{index+1}</td>
-                                                <td><div className='profile'><img src={value?.profile ? `${BASE_API_URL}/uploads/${value?.profile}` : "/assets/images/profile.png"}  alt="" />{value?.username}</div></td>
+                                                <td><div className='profile'><img src={value?.profile ? `${BASE_API_URL}/uploads/profile/${value?.profile}` : "/assets/images/profile.png"}  alt="" />{value?.username}</div></td>
                                                 <td>{Math.round(value?.avgWpm)}</td>
                                                 <td>{Math.round(value?.avgAcc)}</td>
                                                 <td>{Math.round(value?.avgConsis)}</td>

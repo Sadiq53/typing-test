@@ -202,6 +202,7 @@ useEffect(() => {
   
   // handle upload profile------------------------------------------------------------------------------
 
+
   return (
     <>
       <Header />
@@ -212,7 +213,7 @@ useEffect(() => {
               <div className="profile-layout">
                 <div className="profile-sec1">
                   <div className='profile-upload-main'>
-                    <img src={imagePath ? `${BASE_API_URL}/uploads/${imagePath}` : "/assets/images/profile.png"}  alt="" />
+                    <img src={imagePath ? `${BASE_API_URL}/uploads/profile/${imagePath}` : "/assets/images/profile.png"}  alt="" />
                     <div className='profile-upload'><button onClick={()=>profileRef?.current?.click()}><i className="fa-regular fa-upload fa-xl" style={{ color: "#71cac7" }} /></button></div>
                     <input type="file" ref={profileRef} onChange={handleFileChange} style={{visibility : 'hidden'}} />
                   </div>
@@ -268,13 +269,25 @@ useEffect(() => {
                           <i className="fa-regular text-idle fa-pen-to-square"></i>
                         </button>
                       </div>
-                      <input
-                        name="password"
-                        readOnly
-                        value={rawUserData?.password}
-                        type="password"
-                        placeholder="Current Password"
-                      />
+                      {
+                        rawUserData?.password ? (
+                          <input
+                            name="password"
+                            readOnly
+                            value={rawUserData?.password}
+                            type="password"
+                            placeholder="Current Password"
+                          />
+                        ) : (
+                          <input
+                            name="password"
+                            readOnly
+                            value="You Have not set Password"
+                            type="text"
+                            placeholder="Current Password"
+                          />
+                        )
+                      }
                     </div>
                   </div>
                 <div className="profile-sec3">
@@ -395,7 +408,7 @@ useEffect(() => {
         </div>
       </section>
       <Footer />
-      <UpdatePassModal />
+      <UpdatePassModal props={rawUserData?.password ? 'notEmpty' : 'isEmpty'} />
       <DeleteUserModal />
     </>
   )

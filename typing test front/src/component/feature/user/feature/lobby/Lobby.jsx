@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { handleTest, resetState } from '../../../../../redux/UserDataSlice';
 import { dynamicToast } from '../../../../shared/Toast/DynamicToast'
 import { easyWords, generateParagraph, hardWords, mediumWords } from './ParagraphGenerater';
+import DynamicAlert from '../../../../shared/Toast/DynamicAlert'
 
 
 
@@ -20,10 +21,22 @@ const Lobby = () => {
   const [timerRunning, setTimerRunning] = useState(false);
   const [currentParagraph, setCurrentParagraph] = useState();
   const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
+  const paragraphs = useSelector(state => state.UserDataSlice.paragraphs)
   const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
   const isError = useSelector(state => state.UserDataSlice.isError)
   const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
   const [timeUp, setTimeUp] = useState(false)
+  const [Min1, setMin1] = useState({})
+  const [Min3, setMin3] = useState({})
+  const [Min5, setMin5] = useState({})
+  const [alertDetail, setAlertDetail] = useState({
+    title : '',
+    message : '',
+    type : '',
+    navigateTo : '',
+    confirmBtn : false
+  })
+  const [showAlert, setShowAlert] = useState(false)
   const [stats, setStats] = useState({
     wpm: [],
     accuracy: [],
@@ -50,28 +63,54 @@ const Lobby = () => {
     level : ''
   })
 
-  // Function to generate paragraph based on duration and difficulty
-  const generateTypingTestParagraph = () => {
-    const wordsPerMinute = 70; // Average typing speed (can be adjusted)
-    const totalWords = wordsPerMinute * (timeLimit/60); // Total words to match the duration
-    
-    let wordArray;
-    if (difficulty === "easy") {
+  // Function to get a random index based on array length
+function getRandomIndex(array) {
+  return Math.floor(Math.random() * array.length);
+}
+
+// Function to generate paragraph based on duration and difficulty
+const generateTypingTestParagraph = () => {
+  const wordsPerMinute = 70; // Average typing speed (can be adjusted)
+  const totalWords = wordsPerMinute * (timeLimit / 60); // Total words to match the duration
+
+  let wordArray;
+  if (difficulty === "easy") {
       wordArray = easyWords;
-    } else if (difficulty === "medium") {
+  } else if (difficulty === "medium") {
       wordArray = mediumWords.concat(easyWords); // Mix easy and medium words
-    } else if (difficulty === "hard") {
+  } else if (difficulty === "hard") {
       wordArray = hardWords.concat(mediumWords).concat(easyWords); // Mix all words
-    }
-    
-    const newParagraph = generateParagraph(wordArray, totalWords);
-    setCurrentParagraph(newParagraph);
   }
 
-  useEffect(()=>{
-    generateTypingTestParagraph()
-  }, [difficulty, timeLimit, time])
-  
+  const newParagraph = generateParagraph(wordArray, totalWords);
+  setCurrentParagraph(newParagraph);
+};
+
+useEffect(() => {
+  // Update Min1, Min3, and Min5 values if they exist in `paragraphs`
+  setMin1(paragraphs?.Min1 || []);
+  setMin3(paragraphs?.Min3 || []);
+  setMin5(paragraphs?.Min5 || []);
+
+  const changeTime = {
+      60: 'Min1',
+      180: 'Min3',
+      300: 'Min5',
+  };
+  const timeField = changeTime[time];
+
+  // Check if a paragraph exists for the given time and difficulty
+  if (timeField && paragraphs?.[timeField]?.[difficulty]?.length > 0) {
+      // Pick a random paragraph from existing ones
+      const getIndex = getRandomIndex(paragraphs[timeField][difficulty]);
+      setCurrentParagraph(paragraphs[timeField][difficulty][getIndex]?.para);
+      console.log(paragraphs[timeField][difficulty][getIndex]?.para)
+  } else {
+      // If no paragraph exists, generate a new one
+      generateTypingTestParagraph();
+  }
+}, [paragraphs, time, difficulty]); // Dependencies: `paragraphs`, `time`, and `difficulty`
+
 
   // Focus input on load--------------------------------------------------------------------------
   useEffect(() => {
@@ -322,6 +361,27 @@ const Lobby = () => {
     }
   }, [])
 
+  useEffect(() => {
+    if(localStorage.getItem('isBlocked')) {
+      setShowAlert(true)
+      setAlertDetail({
+        title : 'Account Blocked!',
+        type : 'error',
+        message : `Your Account has been Blocked! Conatct to Admin`,
+        navigateTo : '',
+        confirmBtn : true
+      })
+      setTimeout(()=>{
+        localStorage.removeItem('isBlocked')
+        setShowAlert(false)
+      }, 1000)
+    }
+}, [])
+
+const handleAlertClose = () => {
+  setShowAlert(false); // Set showAlert to false
+};
+
   return (
     <>
       <Header />
@@ -403,14 +463,15 @@ const Lobby = () => {
                     onBlur={() => setHasFocus(false)}
                     >
                 <div style={{ fontSize: "30px" }}>
-                  {currentParagraph?.split("").map((char, index) => (
+                  {currentParagraph && typeof currentParagraph === "string" 
+                    ? currentParagraph?.split("").map((char, index) => (
                     <span
                       key={index}
                       className={`${userInput[index] === undefined ? 'text-light' : userInput[index] === char ? 'text-active' : 'text-wrong'} ${hasFocus && index === userInput?.length ? 'underline' : ''}`}
                     >
                       {char}
                     </span>
-                  ))}
+                  )) : null}
                   {hasFocus && userInput?.length < currentParagraph?.length && (
                     <span
                       style={{
@@ -464,15 +525,10 @@ const Lobby = () => {
           </div>
         </div>
       </section>
-
-      {/* <div className="sweet-alert">
-        <div className="alert-content">
-          <h1>hello</h1>
-        </div>
-      </div> */}
+      
       {
         timeUp && (
-          <div className="blur-overlay" onClick={()=>{handleFocusContainer, setHasFocus(true), typingContainerRef.current.focus()}}>
+          <div className="blur-overlay">
           <div className="overlay-message">
             <h1>Test Over.....!</h1>
             <div class="loading">
@@ -491,6 +547,16 @@ const Lobby = () => {
         </div>
         )
       }
+
+        <DynamicAlert
+          type={alertDetail.type}
+          title={alertDetail.title}
+          message={alertDetail.message}
+          trigger={showAlert} // This will trigger the alert
+          navigateTo={alertDetail.navigateTo}
+          confirmBtn={alertDetail.confirmBtn}
+          onClose={handleAlertClose} // Pass the onClose handler
+        />
     </>
   )
 }

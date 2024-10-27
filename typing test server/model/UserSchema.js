@@ -10,6 +10,10 @@ const UserSchema = mongoose.Schema({
     password : { type : String, default : '' },
     createdate : Date,
     accountid : String,
+    isblocked : {
+        status : { type : Boolean, default : false },
+        date : { type : Date, default : Date.now() }
+    },
     role : { type : String, default : 'user' },
     googleId : { type : String, default : '' },
     authType : { 

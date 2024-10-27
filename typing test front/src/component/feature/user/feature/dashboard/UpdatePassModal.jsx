@@ -1,50 +1,58 @@
-import { useFormik } from 'formik'
-import { useEffect, useRef } from 'react'
-import { passwordUpdateSchema } from '../../../../../schemas/UserUpdateSchema'
-import { useDispatch, useSelector } from 'react-redux'
-import { handleUpdatePassword, resetState } from '../../../../../redux/UserDataSlice'
+import { useFormik } from 'formik';
+import { useEffect, useRef, useState } from 'react';
+import { passwordUpdateSchema } from '../../../../../schemas/UserUpdateSchema';
+import { useDispatch, useSelector } from 'react-redux';
+import { handleUpdatePassword, resetState } from '../../../../../redux/UserDataSlice';
+import { dynamicToast } from '../../../../shared/Toast/DynamicToast';
 
-const UpdatePassModal = () => {
-
+const UpdatePassModal = ({ props }) => {
     const dispatch = useDispatch();
-    const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
-    const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
+    const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled);
+    const isProcessing = useSelector(state => state.UserDataSlice.isProcessing);
+    const processingMsg = useSelector(state => state.UserDataSlice.processingMsg);
+    const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg);
+
     const clsModal = useRef();
     const clrModal = useRef();
 
+    // Initial form values based on props
+    const initialValues = props === 'notEmpty' 
+        ? { currentpassword: '', newpassword: '', repassword: '' } 
+        : { newpassword: '', repassword: '' };
+
     const passwordForm = useFormik({
-        validationSchema : passwordUpdateSchema,
-        initialValues : {
-            currentpassword : '',
-            newpassword : '',
-            repassword : ''
-        },
-        onSubmit : (formData) => {
-            // console.log(formData)
-            dispatch(handleUpdatePassword(formData))
-        }   
-    })
-
-    useEffect(()=>{
-        if(isFullfilled){
-            clrModal.current.click();
-            setTimeout(()=>{
-                clsModal.current.click();
-                dispatch(resetState())
-            },10)
+        validationSchema: passwordUpdateSchema(props?.props === 'notEmpty'),
+        initialValues,
+        enableReinitialize: true,
+        onSubmit: (formData) => {
+            dispatch(handleUpdatePassword(formData));
         }
-    }, [isFullfilled])
+    });
 
-  return (
-    <>
+    useEffect(() => {
+        if (isFullfilled) {
+            if (fullFillMsg?.type === 'updatepassword') {
+                dynamicToast({ message: 'Password Updated Successfully!', icon: 'success' });
+                clrModal.current.click();
+                
+                setTimeout(() => {
+                    clsModal.current.click();
+                    dispatch(resetState());
+                    passwordForm.resetForm();  // Reset form fields here
+                }, 10);
+            }
+        }
+    }, [isFullfilled, dispatch, fullFillMsg]);
+
+    return (
         <div
-        className="modal fade"
-        id="updatepassword"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
-        tabIndex={-1}
-        aria-labelledby="updatepassword"
-        aria-hidden="true"
+            className="modal fade"
+            id="updatepassword"
+            data-bs-backdrop="static"
+            data-bs-keyboard="false"
+            tabIndex={-1}
+            aria-labelledby="updatepassword"
+            aria-hidden="true"
         >
             <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content bg-popup">
@@ -54,32 +62,69 @@ const UpdatePassModal = () => {
                                 <h4 className='font-active'>Update Password</h4>
                             </div>
                             <form onSubmit={passwordForm.handleSubmit}>
-                                <button style={{display : 'none'}} type='reset' ref={clrModal}></button>
+                                <button style={{ display: 'none' }} type='reset' ref={clrModal}></button>
+
                                 <div className="pass-body my-4">
+                                    {props === 'notEmpty' && (
+                                        <div className='profile-input my-3'>
+                                            <label htmlFor="currentpassword">Enter Current Password:</label>
+                                            <input
+                                                name='currentpassword'
+                                                type='password'
+                                                placeholder='Current Password'
+                                                className='bg-input'
+                                                onChange={passwordForm.handleChange}
+                                                onBlur={passwordForm.handleBlur}
+                                                value={passwordForm.values.currentpassword}
+                                            />
+                                            {passwordForm.touched.currentpassword && passwordForm.errors.currentpassword ? (
+                                                <div className="error-text text-danger">{passwordForm.errors.currentpassword}</div>
+                                            ) : null}
+                                        </div>
+                                    )}
                                     <div className='profile-input my-3'>
-                                        <label htmlFor="password">Enter Password :</label>
-                                        <input name='currentpassword' onChange={passwordForm.handleChange} className='bg-input' type='password' placeholder='Current Password' />
+                                        <label htmlFor="newpassword">Enter New Password:</label>
+                                        <input
+                                            name='newpassword'
+                                            type='password'
+                                            placeholder='Enter New Password'
+                                            className='bg-input'
+                                            onChange={passwordForm.handleChange}
+                                            onBlur={passwordForm.handleBlur}
+                                            value={passwordForm.values.newpassword}
+                                        />
+                                        {passwordForm.touched.newpassword && passwordForm.errors.newpassword ? (
+                                            <div className="error-text text-danger">{passwordForm.errors.newpassword}</div>
+                                        ) : null}
                                     </div>
                                     <div className='profile-input my-3'>
-                                        <label htmlFor="password">Enter New Password :</label>
-                                        <input name='newpassword' onChange={passwordForm.handleChange} className='bg-input' type='password' placeholder='Enter New Password' />
-                                    </div>
-                                    <div className='profile-input my-3'>
-                                        <label htmlFor="password">Confirm Password :</label>
-                                        <input name='repassword' onChange={passwordForm.handleChange} className='bg-input' type='password' placeholder='Confirm Password' />
+                                        <label htmlFor="repassword">Confirm Password:</label>
+                                        <input
+                                            name='repassword'
+                                            type='password'
+                                            placeholder='Confirm Password'
+                                            className='bg-input'
+                                            onChange={passwordForm.handleChange}
+                                            onBlur={passwordForm.handleBlur}
+                                            value={passwordForm.values.repassword}
+                                        />
+                                        {passwordForm.touched.repassword && passwordForm.errors.repassword ? (
+                                            <div className="error-text text-danger">{passwordForm.errors.repassword}</div>
+                                        ) : null}
                                     </div>
                                 </div>
+
                                 <div className="pass-footer">
                                     <button
-                                    type="button"
-                                    className="theme-btn sm bg-idle"
-                                    data-bs-dismiss="modal"
-                                    ref={clsModal}
+                                        type="button"
+                                        className="theme-btn sm bg-idle"
+                                        data-bs-dismiss="modal"
+                                        ref={clsModal}
                                     >
                                         Close
                                     </button>
-                                    <button type="submit" className="theme-btn sm">
-                                        Update
+                                    <button type="submit" className="theme-btn sm" disabled={isProcessing}>
+                                        {isProcessing && processingMsg?.type === 'updatepassword' ? "Updating..." : "Update"}
                                     </button>
                                 </div>
                             </form>
@@ -88,9 +133,7 @@ const UpdatePassModal = () => {
                 </div>
             </div>
         </div>
+    );
+};
 
-    </>
-  )
-}
-
-export default UpdatePassModal
+export default UpdatePassModal;

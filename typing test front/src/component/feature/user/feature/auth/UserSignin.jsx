@@ -69,11 +69,11 @@ const UserSignin = () => {
 
   useEffect(() => {
     if(isError) {
-      setTimeout(()=>{
-        dispatch(resetState())
-      }, 4000)
+      if(errorMsg?.type === 'block-unblock') {
+        
+      }
     }
-  }, [isError])
+  }, [isError, errorMsg])
 
   useEffect(() => {
     if(isFullfilled) {
