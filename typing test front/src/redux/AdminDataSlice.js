@@ -47,7 +47,7 @@ const handleSigninAdmin = createAsyncThunk('handleSigninAdmin', async(formData) 
     }
 });
 
-const handleGetALlUser = createAsyncThunk('handleGetALlUser', async() => {
+const handleGetAllUser = createAsyncThunk('handleGetAllUser', async() => {
     const ID = localStorage.getItem('adminToken')
     const response = await axios.get(`${ADMIN_API_URL}/get-user/${10}`, { headers : { Authorization : ID } })
     if(response.data.status === 200) {
@@ -337,7 +337,7 @@ const AdminDataSlice = createSlice({
             state.processingMsg.message = 'Fetching Data...'
             state.processingMsg.type = 'signin'
         });
-        builder.addCase(handleGetALlUser.fulfilled, (state, action) => {
+        builder.addCase(handleGetAllUser.fulfilled, (state, action) => {
             if(action.payload.status) {
                 state.isFullfilled = true
                 state.fullFillMsg.type = action.payload.type,
@@ -354,7 +354,7 @@ const AdminDataSlice = createSlice({
                 state.errorMsg.type = action.payload.type
             }
         });
-        builder.addCase(handleGetALlUser.pending, (state, action) => {
+        builder.addCase(handleGetAllUser.pending, (state, action) => {
             state.isProcessing = true
             state.processingMsg.message = 'Fetching Data...'
             state.processingMsg.type = 'userData'
@@ -582,5 +582,5 @@ const AdminDataSlice = createSlice({
 })
 
 export default AdminDataSlice.reducer;
-export {handleGetAdminData, handleSigninAdmin, handleDeleteParagraph, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleGetALlUser, handleUploadProfile, handleGetUser};
+export {handleGetAdminData, handleSigninAdmin, handleDeleteParagraph, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleGetAllUser, handleUploadProfile, handleGetUser};
 export const {resetState, handleClearState} = AdminDataSlice.actions
