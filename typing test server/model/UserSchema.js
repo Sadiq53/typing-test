@@ -168,7 +168,7 @@ const UserSchema = mongoose.Schema({
         avgwpm : { type : Number, default : 0 },
         avgacc : { type : Number, default : 0 },
         avgconsis : { type : Number, default : 0 },
-        matchdate : { type : Date, default : '' },
+        matchdate : { type : Date, default : new Date() },
         time : { type : Number, default : 0 },
         level : { type : String, default : '' },
         characters : { 
@@ -185,7 +185,7 @@ const UserSchema = mongoose.Schema({
         avgwpm : { type : Number, default : 0 },
         avgacc : { type : Number, default : 0 },
         avgconsis : { type : Number, default : 0 },
-        matchdate : { type : Date, default : '' },
+        matchdate : { type : Date, default : new Date() },
         time : { type : Number, default : 0 },
         level : { type : String, default : '' },
         characters : { 
@@ -202,7 +202,7 @@ const UserSchema = mongoose.Schema({
         avgwpm : { type : Number, default : 0 },
         avgacc : { type : Number, default : 0 },
         avgconsis : { type : Number, default : 0 },
-        matchdate : { type : Date, default : '' },
+        matchdate : { type : Date, default : new Date() },
         time : { type : Number, default : 0 },
         level : { type : String, default : '' },
         characters : { 

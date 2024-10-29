@@ -1186,6 +1186,11 @@ margin: 0;
     margin-bottom: 0;
 }
 
+.blog-content a{
+    color: #71CAC7 !important;
+    text-decoration: underline !important;
+}
+
 .blog-post a{
     color: #71CAC7;
     font-family: Inter;
@@ -1380,3 +1385,99 @@ margin: 0;
 }
 
 /* Custom Loader */
+
+/* Blog Editor */
+.blog-editor {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background: #fff;
+  }
+  
+  .blog-editor .header {
+    text-align: center;
+  }
+  
+  .blog-editor .ql-container {
+    height: 300px;
+  }
+  
+  .blog-editor button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4caf50; /* Green background */
+    color: white;              /* White text */
+    border: none;              /* No border */
+    border-radius: 4px;       /* Rounded corners */
+    cursor: pointer;           /* Pointer cursor on hover */
+  }
+  
+  .blog-editor button:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+
+  .blog-form-cs {
+    background-color:transparent ;
+    border: 1px solid #71CAC7;
+    border-radius: 20px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    align-items: start;
+  }
+  .blog-form-cs input{
+    background-color: #1f1d21;
+    border: 1px solid #71CAC7;
+    border-radius: 20px;
+    padding: 15px;
+    height: 50px;
+    flex-shrink: 0;
+    outline: none;
+    color: #fff;
+    font-family: Inter;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+  .blog-form-cs .featured-image-layout{
+    border: 1px solid #71CAC7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .blog-form-cs .featured-image-layout img{
+    width: 100%;
+  }
+
+  .blog-form-cs .font-active {
+    font-size: 18px !important;
+    margin-bottom: 10px;
+  }
+
+  .add-blog-btn{
+    border: 3px dashed #71CAC7;
+    border-radius: 20px;
+    padding: 20px;
+    color: #71CAC7;
+    font-family: Inter;
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+  }
+/* Blog Editor */
+
+.table-equal{
+    table-layout: fixed;
+}
+
+.table-equal td{
+    width: 33%;
+}

@@ -245,6 +245,82 @@ const handleDeleteParagraph = createAsyncThunk('handleDeleteParagraph', async(fo
     }
 })  
 
+const handleAddBlogPost = createAsyncThunk('handleAddBlogPost', async(data) => {
+    const ID = localStorage.getItem('adminToken')
+    const response = await axios.post(`${ADMIN_API_URL}/blog`, data, {
+        headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization : ID
+    },
+    })
+    if(response.data.status === 200) {
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type,
+            data : response.data.blog,
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type,
+            data : []
+        }
+        return checkMsg
+    }
+})
+
+const handleEditBlogPost = createAsyncThunk('handleEditBlogPost', async(data) => {
+    const ID = localStorage.getItem('adminToken')
+    const response = await axios.post(`${ADMIN_API_URL}/blog/edit`, data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization : ID
+        },
+    })
+    if(response.data.status === 200) {
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type,
+            data : response.data.blog,
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type,
+            data : []
+        }
+        return checkMsg
+    }
+})
+
+const handleDeleteBlogPost = createAsyncThunk('handleDeleteBlogPost', async(id) => {
+    const ID = localStorage.getItem('adminToken')
+    const response = await axios.delete(`${ADMIN_API_URL}/blog/delete/${id}`, { headers : { Authorization : ID } })
+    if(response.data.status === 200) {
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type,
+            data : id,
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type,
+            data : []
+        }
+        return checkMsg
+    }
+})
+
 const initialState = {
     isProcessing : false,
     isFullfilled : false,
@@ -281,7 +357,8 @@ const initialState = {
             medium : [],
             hard : []
         },
-    }
+    },
+    blog : []
 }
 
 const AdminDataSlice = createSlice({
@@ -302,9 +379,10 @@ const AdminDataSlice = createSlice({
     extraReducers : builder => {
         builder.addCase(handleGetAdminData.fulfilled, (state, action) => {
             if(action.payload.status) {
-                const { paragraphs } = action.payload.data
+                const { paragraphs, blog } = action.payload.data
                 state.adminData = action.payload.data
                 state.paragraphs = paragraphs
+                state.blog = blog
                 state.isDataPending = false
                 state.isError = false
                 state.isFullfilled = true
@@ -578,9 +656,99 @@ const AdminDataSlice = createSlice({
                 messsage : 'Deleting Paragraphs'
             }
         });
+        builder.addCase(handleAddBlogPost.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+                state.blog = action.payload?.data
+                // Reset error state
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });              
+        builder.addCase(handleAddBlogPost.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'blog',
+                messsage : 'Posting Blog'
+            }
+        });
+        builder.addCase(handleEditBlogPost.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+                state.blog = action.payload?.data
+                // Reset error state
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });              
+        builder.addCase(handleEditBlogPost.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'blog',
+                messsage : 'Updating Blog'
+            }
+        });
+        builder.addCase(handleDeleteBlogPost.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+                state.blog = state.blog?.filter(value => value._id !== action.payload?.data)
+                // Reset error state
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });              
+        builder.addCase(handleDeleteBlogPost.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'blogDelete',
+                messsage : 'deleting Blog'
+            }
+        });
     }
 })
 
 export default AdminDataSlice.reducer;
-export {handleGetAdminData, handleSigninAdmin, handleDeleteParagraph, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleGetAllUser, handleUploadProfile, handleGetUser};
+export {handleGetAdminData, handleSigninAdmin, handleDeleteBlogPost, handleDeleteParagraph, handleEditBlogPost, handleAddBlogPost, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleGetAllUser, handleUploadProfile, handleGetUser};
 export const {resetState, handleClearState} = AdminDataSlice.actions

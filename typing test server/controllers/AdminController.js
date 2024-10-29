@@ -12,17 +12,36 @@ const { v4: uuidv4 } = require('uuid'); // Import uuid for generating unique IDs
 
 // Directory to store uploaded files temporarily
 const uploadDir = path.resolve(__dirname, '../assets/uploads/profile');
+
+// Directory to store uploaded files temporarily
+const uploadDirFeaturedImage = path.resolve(__dirname, '../assets/uploads/featuredImage');
 // console.log(uploadDir)
 
 // Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
+} else if (!fs.existsSync(uploadDirFeaturedImage)) {
+    fs.mkdirSync(uploadDirFeaturedImage, { recursive: true });
 }
 
 // Multer storage configuration
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadDir); // Save the file to the upload directory
+    },
+    filename: function (req, file, cb) {
+        // Generate a unique name for the file (use timestamp + original extension)
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname); // Get the file extension
+        const newFilename = `${uniqueSuffix}${extension}`;
+        cb(null, newFilename); // Set the new filename
+    }
+});
+
+// Multer storage configuration
+const storageForFeaturedImage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDirFeaturedImage); // Save the file to the upload directory
     },
     filename: function (req, file, cb) {
         // Generate a unique name for the file (use timestamp + original extension)
@@ -48,6 +67,21 @@ const upload = multer({
     }
 });
 
+// Multer instance with limits and file type filter
+const uploadFeaturedImage = multer({
+    storage: storageForFeaturedImage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // Limit to 10MB
+    fileFilter: (req, file, cb) => {
+        // Allow only .jpeg, .jpg, .png file types
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only JPEG, JPG, and PNG are allowed.'), false);
+        }
+    }
+});
+
 route.get('/', async(req, res) => {
     // console.log(req.headers.authorization)
     if(req.headers.authorization){
@@ -56,7 +90,8 @@ route.get('/', async(req, res) => {
         adminData = {
             email : adminData?.email,
             username : adminData?.username,
-            paragraphs : adminData?.paragraphs
+            paragraphs : adminData?.paragraphs,
+            blog : adminData?.blog
         }
         if(adminData) {
             res.send({ status : 200, adminData : adminData })
@@ -206,7 +241,6 @@ route.post('/upload-profile/:username', upload.single('profile'), async (req, re
     }
 });
 
-
 route.post('/add-para', async (req, res) => {
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
@@ -289,10 +323,6 @@ route.post('/add-para', async (req, res) => {
     }
 });
 
-route.put('/', async(req, res) => {
-
-});
-
 route.delete('/:username', async (req, res) => {
     try {
         // Check for the presence of the Authorization header
@@ -368,6 +398,156 @@ route.post('/para', async (req, res) => {
         return res.status(403).json({ message: "Unauthorized access" });
     }
 });
+
+// Blog post route
+route.post('/blog', uploadFeaturedImage.single('featuredImage'), async (req, res) => {
+    if (req.headers.authorization) {
+        const ID = jwt.decode(req.headers.authorization, key);
+        const { title, content, date } = req.body;
+
+        const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
+        if (isThisAdmin) {
+            const blog = {
+                title: title,
+                content: content,
+                createdat: date,
+                featuredImage: {
+                    name: req.file?.filename,
+                    path: path.join(uploadDirFeaturedImage, req.file.filename)
+                }
+            };
+
+            // Push the new blog into the admin's blog array
+            await adminModel.updateOne({ _id: ID?.id }, { $push: { blog: blog } });
+
+            // Extract updated blog data
+            const extractBlogData = await adminModel.findOne({ _id: ID?.id });
+            res.send({
+                status: 200,
+                type: 'blog',
+                message: 'Blog Posted Successfully',
+                blog: extractBlogData?.blog
+            });
+        } else {
+            res.status(403).send({ status: 403, message: 'Unauthorized' });
+        }
+    } else {
+        res.status(401).send({ status: 401, message: 'Authorization token required' });
+    }
+});
+
+route.post('/blog/edit', uploadFeaturedImage.single('featuredImage'), async (req, res) => {
+    if (req.headers.authorization) {
+        const ID = jwt.decode(req.headers.authorization, key);
+        const { title, content, date, id } = req.body;
+
+        try {
+            const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
+            
+            if (!isThisAdmin) {
+                return res.status(403).send({ status: 403, message: 'Unauthorized' });
+            }
+
+            // Find the specific blog post within the admin's blog array
+            const blogPostIndex = isThisAdmin.blog.findIndex(blog => blog._id.toString() === id);
+            if (blogPostIndex === -1) {
+                return res.status(404).send({ status: 404, message: 'Blog post not found' });
+            }
+
+            const blogPost = isThisAdmin.blog[blogPostIndex];
+            
+            // Prepare the updated blog data, without changing the `featuredImage`
+            const updatedBlogData = {
+                ...blogPost._doc, // Use _doc to get the raw object without Mongoose methods
+                title,
+                content,
+                createdat: date
+            };
+
+            // If a new file is uploaded, handle the old image deletion and update `featuredImage`
+            if (req.file) {
+                const oldImagePath = blogPost.featuredImage?.path;
+                if (oldImagePath && fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath); // Delete the old image file
+                }
+                updatedBlogData.featuredImage = {
+                    name: req.file.filename,
+                    path: req.file.path
+                };
+            }
+
+            // Update the specific blog post in the blog array
+            isThisAdmin.blog[blogPostIndex] = updatedBlogData;
+
+            // Save the updated admin document
+            await isThisAdmin.save();
+
+            // Return the updated blog array
+            const extractBlogData = await adminModel.findOne({ _id: ID?.id });
+            res.send({
+                status: 200,
+                type: 'blog',
+                message: 'Blog updated successfully',
+                blog: extractBlogData?.blog
+            });
+        } catch (error) {
+            console.error('Error updating blog:', error);
+            res.status(500).send({ status: 500, message: 'Internal server error' });
+        }
+    } else {
+        res.status(401).send({ status: 401, message: 'Authorization token required' });
+    }
+});
+
+route.delete('/blog/delete/:blogId', async (req, res) => {
+    if (req.headers.authorization) {
+        const ID = jwt.decode(req.headers.authorization, key);
+        const { blogId } = req.params;
+
+        try {
+            const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
+            
+            if (!isThisAdmin) {
+                return res.status(403).send({ status: 403, message: 'Unauthorized' });
+            }
+
+            // Find the index of the blog post to delete
+            const blogPostIndex = isThisAdmin.blog.findIndex(blog => blog._id.toString() === blogId);
+            if (blogPostIndex === -1) {
+                return res.status(404).send({ status: 404, message: 'Blog post not found' });
+            }
+
+            const blogPost = isThisAdmin.blog[blogPostIndex];
+            
+            // If the blog post has a featured image, delete the image file
+            if (blogPost.featuredImage?.path && fs.existsSync(blogPost.featuredImage.path)) {
+                fs.unlinkSync(blogPost.featuredImage.path);
+            }
+
+            // Remove the blog post from the blog array
+            isThisAdmin.blog.splice(blogPostIndex, 1);
+
+            // Save the updated admin document
+            await isThisAdmin.save();
+
+            res.send({
+                status: 200,
+                message: 'Blog post deleted successfully',
+                type : 'blogDelete'
+            });
+        } catch (error) {
+            console.error('Error deleting blog post:', error);
+            res.status(500).send({ status: 500, message: 'Internal server error' });
+        }
+    } else {
+        res.status(401).send({ status: 401, message: 'Authorization token required' });
+    }
+});
+
+
+
+
+
 
 
 module.exports = route;
