@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import Header from '../../../../shared/header/Header'
-import Footer from '../../../../shared/footer/Footer'
 import { useDispatch, useSelector } from 'react-redux'
-import { handleGetLeaderboardData, resetState } from '../../../../../redux/UserDataSlice'
-import { BASE_API_URL } from '../../../../../util/API_URL'
+import { handleGetLeaderboardData, resetState } from '../../../redux/UserDataSlice';
+import Header from '../header/Header';
+import Footer from '../footer/Footer';
+
 
 const LeaderBoard = () => {
 

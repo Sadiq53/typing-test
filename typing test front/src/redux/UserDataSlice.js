@@ -2,6 +2,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from 'axios'
 import { USER_API_URL } from '../util/API_URL'
 
+const handleLocalDataCalling = createAsyncThunk('handleLocalDataCalling', async() => {
+    const response = await axios.get(`${USER_API_URL}/local`)
+    if(response.data.status === 200) {
+        return response.data.localData
+    }
+})
+
 const handleGetUserData = createAsyncThunk('handleGetUserData', async(ID) => {
     // console.log(ID)
     const response = await axios.get(`${USER_API_URL}`, { headers : { Authorization : ID } });
@@ -58,7 +65,7 @@ const handleSigninUserWithGoogle = createAsyncThunk('handleSigninUserWithGoogle'
 const handleUpdatePassword = createAsyncThunk('handleUpdatePassword', async(formData) => {
     const ID = localStorage.getItem('userToken')
     const response = await axios.post(`${USER_API_URL}/updatepass/${ID}`, formData, { headers : { Authorization : ID } })
-    console.log(response.data)
+    // console.log(response.data)
     if(response.data.status === 200) {
         let checkMsg = {
             status : true,
@@ -75,7 +82,6 @@ const handleUpdatePassword = createAsyncThunk('handleUpdatePassword', async(form
         return checkMsg
     }
 })
-
 
 const handleCreateUser = createAsyncThunk('handleCreateUser', async(formData) => {
     const response = await axios.post(`${USER_API_URL}/signup`, formData)
@@ -250,7 +256,8 @@ const initialState = {
     match3 : [],
     match5 : [],
     allUserData : [],
-    paragraphs : {}
+    paragraphs : {},
+    blog : [],
 }
 
 const UserDataSlice = createSlice({
@@ -269,6 +276,7 @@ const UserDataSlice = createSlice({
             state.match1 = [];
             state.match3 = [];
             state.match5 = [];
+            state.allUserData = [];
         }
     },
     extraReducers : builder => {
@@ -278,6 +286,20 @@ const UserDataSlice = createSlice({
                 state.match1 = action.payload.match_1;
                 state.match3 = action.payload.match_3;
                 state.match5 = action.payload.match_5;
+                state.isDataPending = false
+                state.isError = false
+                state.isFullfilled = true
+            } else {    
+                state.isError = true
+                state.isDataPending = false
+            }
+        });
+        builder.addCase(handleGetUserData.pending, (state, action) => {
+            state.isDataPending = true
+        });
+        builder.addCase(handleLocalDataCalling.fulfilled, (state, action) => {
+            if(action.payload) {
+                state.blog = action.payload.blog
                 state.paragraphs = action.payload.paragraphs;
                 state.isProcessing = false
                 state.isError = false
@@ -287,7 +309,7 @@ const UserDataSlice = createSlice({
                 state.isProcessing = false
             }
         });
-        builder.addCase(handleGetUserData.pending, (state, action) => {
+        builder.addCase(handleLocalDataCalling.pending, (state, action) => {
             state.isProcessing = true
         });
         builder.addCase(handleSigninUser.fulfilled, (state, action) => {
@@ -511,5 +533,5 @@ const UserDataSlice = createSlice({
 })
 
 export default UserDataSlice.reducer;
-export {handleGetUserData, handleSigninUser, handleCreateUser, handleUploadProfile, handleDeleteUserAccount, handleUpdatePassword, handleSignupWithGoogle, handleTest, handleGetLeaderboardData, handleSigninUserWithGoogle};
+export {handleGetUserData, handleSigninUser, handleLocalDataCalling, handleCreateUser, handleUploadProfile, handleDeleteUserAccount, handleUpdatePassword, handleSignupWithGoogle, handleTest, handleGetLeaderboardData, handleSigninUserWithGoogle};
 export const{ resetState, handleClearState } = UserDataSlice.actions

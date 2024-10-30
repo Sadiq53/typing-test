@@ -18,13 +18,16 @@ const UserDetail = () => {
     let matches3Min = rawUserData?.match_3 || []
     let matches5Min = rawUserData?.match_5 || []
     const isFullfilled = useSelector(state => state.AdminDataSlice.isFullfilled) 
+    const isProcessing = useSelector(state => state.AdminDataSlice.isProcessing) 
     const fullFillMsg = useSelector(state => state.AdminDataSlice.fullFillMsg) 
+    const processingMsg = useSelector(state => state.AdminDataSlice.processingMsg) 
     const [formattedDate, setFormattedDate] = useState();
     const [totalMatchesCompleted, setTotalMatchesCompleted] = useState(0);
     const [totalTimeOfMatches, setTotalTimeOfMatches] = useState(0);
     const [match1MinData, setMatch1MinData] = useState([])
     const [match3MinData, setMatch3MinData] = useState([])
     const [match5MinData, setMatch5MinData] = useState([])
+    const [loader, setLoader] = useState({state : false, for : ''})
     const [imagePath, setImagePath] = useState('');
     const profileRef = useRef();
   
@@ -82,7 +85,7 @@ const UserDetail = () => {
           console.error('Invalid date format:', rawDate);
         }
       }
-      console.log('Invalid date format:', rawUserData); 
+      // console.log('Invalid date format:', rawUserData); 
     }, [rawUserData]);
     // for setting time or converting it----------------------------------------------------
     
@@ -96,6 +99,7 @@ const UserDetail = () => {
       }
       
     }, [rawUserData, matches1Min, matches3Min, matches5Min])
+
     const updateMatchesData = (match) => {
       const splitFncName = {
         match1: matches1Min,
@@ -161,10 +165,23 @@ const UserDetail = () => {
     // update the matches data based on time seperation----------------------------------------------------
     
     useEffect(()=>{
-      if(isFullfilled) {
-        dispatch(resetState())
+      if(isProcessing) {
+        if(processingMsg?.type === 'block-unblock') {
+          setLoader({state : true, for : 'block-unblock'})
+          dispatch(resetState())
+        }
       }
-    }, [ isFullfilled ])
+    }, [ isProcessing, processingMsg ])
+
+    useEffect(()=>{
+      if(isFullfilled) {
+        if(fullFillMsg?.type === 'block-unblock') {
+          dynamicToast({ message: "Account Toggled Successfully!", icon: "success" });
+          setLoader({state : false, for : ''})
+          dispatch(resetState())
+        }
+      }
+    }, [ isFullfilled, fullFillMsg ])
     
     // handle upload profile------------------------------------------------------------------------------
   
@@ -298,6 +315,9 @@ const UserDetail = () => {
                     </div>
                   </div>
                 <div className="profile-sec3">
+                  {
+                    loader.useState && loader.for === 'block-unblock' ? (<i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#71CAC7" }} />) : null
+                  }
                   {
                     rawUserData?.isblock ? (
                       <button onClick={blockUser} className="theme-btn p-10-15 bg-idle width-100">Unblock {rawUserData?.username}</button>

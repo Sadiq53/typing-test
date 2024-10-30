@@ -6,6 +6,7 @@ import { BASE_API_URL } from "../../../../../../util/API_URL";
 import { NavLink } from "react-router-dom";
 import { dynamicToast } from "../../../../../shared/Toast/DynamicToast";
 import StateCircleLoader from "../../../../../shared/loader/StateCircleLoader";
+import DeleteUserModal from "../modals/DeleteUserModal";
 
 const AllUsers = () => {
     const dispatch = useDispatch();
@@ -15,24 +16,22 @@ const AllUsers = () => {
     const isProcessing = useSelector((state) => state.AdminDataSlice.isProcessing);
     const processingMsg = useSelector((state) => state.AdminDataSlice.processingMsg);
     const [loader, setLoader] = useState(false);
+    const [deleteUsername, setDeleteUsername] = useState('')
 
     useEffect(() => {
         dispatch(handleGetAllUser());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (localStorage.getItem("accountDelete")) {
-            dynamicToast({ message: "Account Deleted Successfully", icon: "info" });
-            setTimeout(() => {
-                localStorage.removeItem("accountDelete");
-            }, 3500);
-        }
-    }, []);
+    
 
     useEffect(() => {
         if (isFullfilled) {
             if (fullFillMsg?.type === "delete" || fullFillMsg?.type === "userData") {
                 setLoader(false);
+            }
+            if(fullFillMsg?.type === 'block-unblock') {
+                dynamicToast({ message: "Account Toggled Successfully!", icon: "success" });
+                dispatch(resetState())
             }
             dispatch(resetState());
         }
@@ -43,6 +42,10 @@ const AllUsers = () => {
             setLoader(true);
             dispatch(resetState());
         }
+        if(processingMsg?.type === 'block-unblock') {
+            dispatch(resetState())
+        }
+        // dispatch(resetState());
     }, [isProcessing, processingMsg, dispatch]);
 
     const blockUser = (username) => {
@@ -111,11 +114,9 @@ const AllUsers = () => {
                                                     </button>
                                                 </td>
                                                 <td>
-                                                    <NavLink to="">
-                                                        <button>
+                                                        <button onClick={()=>setDeleteUsername(value.username)} data-bs-toggle="modal" data-bs-target="#deleteaccount">
                                                             <i className="fa-solid fa-user-xmark fa-lg"></i>
                                                         </button>
-                                                    </NavLink>
                                                 </td>
                                             </tr>
                                         ))}
@@ -128,6 +129,7 @@ const AllUsers = () => {
             </section>
 
             {loader && <StateCircleLoader />}
+            <DeleteUserModal props={deleteUsername} />
         </>
     );
 };

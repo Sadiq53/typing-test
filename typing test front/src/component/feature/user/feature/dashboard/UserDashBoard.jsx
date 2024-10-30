@@ -312,96 +312,102 @@ useEffect(() => {
                     <h2>{totalTimeOfMatches}</h2>
                   </div>
                 </div>
-                <div className="stacs">
-                  <div>
-                    <h4>Easy Level</h4>
-                    <p>Total Test</p>
-                    <p>Average WPM</p>
-                    <p>Average Accuracy</p>
-                    <p>Average Consistency</p>
+                <NavLink to={`/user/matches/${'easy'}`}>
+                  <div className="stacs">
+                    <div>
+                      <h4>Easy Level</h4>
+                      <p>Total Test</p>
+                      <p>Average WPM</p>
+                      <p>Average Accuracy</p>
+                      <p>Average Consistency</p>
+                    </div>
+                    <div>
+                      <h4>1 Min</h4>
+                      <p>{match1MinData?.easyMatches || 0}</p>
+                      <p>{Math.round(match1MinData?.data?.easy?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match1MinData?.data?.easy?.avgacc) || 0} %</p>
+                      <p>{Math.round(match1MinData?.data?.easy?.avgconsis) || 0} %</p>
+                    </div>
+                    <div>
+                      <h4>3 Min</h4>
+                      <p>{match3MinData?.easyMatches || 0}</p>
+                      <p>{Math.round(match3MinData?.data?.easy?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match3MinData?.data?.easy?.avgacc) || 0} %</p>
+                      <p>{Math.round(match3MinData?.data?.easy?.avgconsis) || 0} %</p>
+                    </div>
+                    <div>
+                      <h4>5 Min</h4>
+                      <p>{match5MinData?.easyMatches || 0}</p>
+                      <p>{Math.round(match5MinData?.data?.easy?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match5MinData?.data?.easy?.avgacc) || 0} %</p>
+                      <p>{Math.round(match5MinData?.data?.easy?.avgconsis) || 0} %</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4>1 Min</h4>
-                    <p>{match1MinData?.easyMatches || 0}</p>
-                    <p>{Math.round(match1MinData?.data?.easy?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match1MinData?.data?.easy?.avgacc) || 0} %</p>
-                    <p>{Math.round(match1MinData?.data?.easy?.avgconsis) || 0} %</p>
+                </NavLink>
+                <NavLink to={`/user/matches/${'medium'}`}>
+                  <div className="stacs">
+                    <div>
+                      <h4>Medium Level</h4>
+                      <p>Total Test</p>
+                      <p>Average WPM</p>
+                      <p>Average Accuracy</p>
+                      <p>Average Consistency</p>
+                    </div>
+                    <div>
+                      <h4>1 Min</h4>
+                      <p>{match1MinData?.mediumMatches || 0}</p>
+                      <p>{Math.round(match1MinData?.data?.medium?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match1MinData?.data?.medium?.avgacc) || 0} %</p>
+                      <p>{Math.round(match1MinData?.data?.medium?.avgconsis) || 0} %</p>
+                    </div>
+                    <div>
+                      <h4>3 Min</h4>
+                      <p>{match3MinData?.mediumMatches || 0}</p>
+                      <p>{Math.round(match3MinData?.data?.medium?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match3MinData?.data?.medium?.avgacc) || 0} %</p>
+                      <p>{Math.round(match3MinData?.data?.medium?.avgconsis) || 0} %</p>
+                    </div>
+                    <div>
+                      <h4>5 Min</h4>
+                      <p>{match5MinData?.mediumMatches || 0}</p>
+                      <p>{Math.round(match5MinData?.data?.medium?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match5MinData?.data?.medium?.avgacc) || 0} %</p>
+                      <p>{Math.round(match5MinData?.data?.medium?.avgconsis) || 0} %</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4>3 Min</h4>
-                    <p>{match3MinData?.easyMatches || 0}</p>
-                    <p>{Math.round(match3MinData?.data?.easy?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match3MinData?.data?.easy?.avgacc) || 0} %</p>
-                    <p>{Math.round(match3MinData?.data?.easy?.avgconsis) || 0} %</p>
+                </NavLink>
+                <NavLink to={`/user/matches/${'hard'}`}>
+                  <div className="stacs">
+                    <div>
+                      <h4>Hard Level</h4>
+                      <p>Total Test</p>
+                      <p>Average WPM</p>
+                      <p>Average Accuracy</p>
+                      <p>Average Consistency</p>
+                    </div>
+                    <div>
+                      <h4>1 Min</h4>
+                      <p>{match1MinData?.hardMatches || 0}</p>
+                      <p>{Math.round(match1MinData?.data?.hard?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match1MinData?.data?.hard?.avgacc) || 0} %</p>
+                      <p>{Math.round(match1MinData?.data?.hard?.avgconsis) || 0} %</p>
+                    </div>
+                    <div>
+                      <h4>3 Min</h4>
+                      <p>{match3MinData?.hardMatches || 0}</p>
+                      <p>{Math.round(match3MinData?.data?.hard?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match3MinData?.data?.hard?.avgacc) || 0} %</p>
+                      <p>{Math.round(match3MinData?.data?.hard?.avgconsis) || 0} %</p>
+                    </div>
+                    <div>
+                      <h4>5 Min</h4>
+                      <p>{match5MinData?.hardMatches || 0}</p>
+                      <p>{Math.round(match5MinData?.data?.hard?.avgwpm) || 0} Per Min</p>
+                      <p>{Math.round(match5MinData?.data?.hard?.avgacc) || 0} %</p>
+                      <p>{Math.round(match5MinData?.data?.hard?.avgconsis) || 0} %</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4>5 Min</h4>
-                    <p>{match5MinData?.easyMatches || 0}</p>
-                    <p>{Math.round(match5MinData?.data?.easy?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match5MinData?.data?.easy?.avgacc) || 0} %</p>
-                    <p>{Math.round(match5MinData?.data?.easy?.avgconsis) || 0} %</p>
-                  </div>
-                </div>
-                <div className="stacs">
-                  <div>
-                    <h4>Medium Level</h4>
-                    <p>Total Test</p>
-                    <p>Average WPM</p>
-                    <p>Average Accuracy</p>
-                    <p>Average Consistency</p>
-                  </div>
-                  <div>
-                    <h4>1 Min</h4>
-                    <p>{match1MinData?.mediumMatches || 0}</p>
-                    <p>{Math.round(match1MinData?.data?.medium?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match1MinData?.data?.medium?.avgacc) || 0} %</p>
-                    <p>{Math.round(match1MinData?.data?.medium?.avgconsis) || 0} %</p>
-                  </div>
-                  <div>
-                    <h4>3 Min</h4>
-                    <p>{match3MinData?.mediumMatches || 0}</p>
-                    <p>{Math.round(match3MinData?.data?.medium?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match3MinData?.data?.medium?.avgacc) || 0} %</p>
-                    <p>{Math.round(match3MinData?.data?.medium?.avgconsis) || 0} %</p>
-                  </div>
-                  <div>
-                    <h4>5 Min</h4>
-                    <p>{match5MinData?.mediumMatches || 0}</p>
-                    <p>{Math.round(match5MinData?.data?.medium?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match5MinData?.data?.medium?.avgacc) || 0} %</p>
-                    <p>{Math.round(match5MinData?.data?.medium?.avgconsis) || 0} %</p>
-                  </div>
-                </div>
-                <div className="stacs">
-                  <div>
-                    <h4>Hard Level</h4>
-                    <p>Total Test</p>
-                    <p>Average WPM</p>
-                    <p>Average Accuracy</p>
-                    <p>Average Consistency</p>
-                  </div>
-                  <div>
-                    <h4>1 Min</h4>
-                    <p>{match1MinData?.hardMatches || 0}</p>
-                    <p>{Math.round(match1MinData?.data?.hard?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match1MinData?.data?.hard?.avgacc) || 0} %</p>
-                    <p>{Math.round(match1MinData?.data?.hard?.avgconsis) || 0} %</p>
-                  </div>
-                  <div>
-                    <h4>3 Min</h4>
-                    <p>{match3MinData?.hardMatches || 0}</p>
-                    <p>{Math.round(match3MinData?.data?.hard?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match3MinData?.data?.hard?.avgacc) || 0} %</p>
-                    <p>{Math.round(match3MinData?.data?.hard?.avgconsis) || 0} %</p>
-                  </div>
-                  <div>
-                    <h4>5 Min</h4>
-                    <p>{match5MinData?.hardMatches || 0}</p>
-                    <p>{Math.round(match5MinData?.data?.hard?.avgwpm) || 0} Per Min</p>
-                    <p>{Math.round(match5MinData?.data?.hard?.avgacc) || 0} %</p>
-                    <p>{Math.round(match5MinData?.data?.hard?.avgconsis) || 0} %</p>
-                  </div>
-                </div>
+                </NavLink>
               </div>
             </div>
           </div>

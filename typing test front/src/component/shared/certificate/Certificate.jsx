@@ -2,8 +2,8 @@ import './CertificateStyle.css'
 import  { useEffect, useState, forwardRef } from 'react';
 
 import { useSelector } from 'react-redux';
-import Signature from '../../../../shared/svg/Signature';
-import LogoSvg from '../../../../shared/svg/LogoSvg';
+import Signature from '../svg/Signature';
+import LogoSvg from '../svg/LogoSvg';
 
 const Certificate = forwardRef((props, ref) => {
 

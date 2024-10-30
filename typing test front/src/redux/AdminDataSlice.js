@@ -544,6 +544,7 @@ const AdminDataSlice = createSlice({
             // Check if the payload indicates a successful operation
             if (action.payload.status) {
                 const { username, responseData } = action.payload.data;
+                console.log("profileData : ", action.payload.data)
         
                 // Set fulfillment state and message
                 state.isFullfilled = true;
@@ -558,7 +559,7 @@ const AdminDataSlice = createSlice({
                 // Update profile image in allUserData for the specific user
                 state.allUserData = state.allUserData.map((user) =>
                     user.username === username
-                        ? { ...user, profile: responseData.newname } // Make sure responseData has the correct property
+                        ? { ...user, profile: responseData?.newname } // Make sure responseData has the correct property
                         : user
                 );
         

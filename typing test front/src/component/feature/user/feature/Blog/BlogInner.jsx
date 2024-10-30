@@ -1,33 +1,66 @@
+import { useParams } from "react-router-dom"
 import Footer from "../../../../shared/footer/Footer"
 import Header from "../../../../shared/header/Header"
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { BASE_API_URL } from "../../../../../util/API_URL";
 
 
 const BlogInner = () => {
+
+    const param = useParams();
+    const blogData = useSelector(state => state.UserDataSlice.blog);
+    const [displayData, setDisplayData] = useState([]);
+    const [formattedDate, setFormattedDate] = useState();
+
+
+    useEffect(()=>{
+        const filteredData = blogData?.filter(value => value._id === param?.id)
+        setDisplayData(filteredData[0])
+    }, [blogData, param])
+
+    useEffect(() => {
+        if (displayData?.createdat) {
+          // Try converting the date string to a JavaScript Date object
+          const rawDate = displayData.createdat;
+          
+          // Check if the rawDate is valid and then parse it
+            const parsedDate = new Date(rawDate);
+            
+            if (!isNaN(parsedDate)) {
+              // Format the valid date to '04 Oct 2024' format
+              setFormattedDate(
+                new Intl.DateTimeFormat('en-GB', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                }).format(parsedDate)
+              );
+            } else {
+              console.error('Invalid date format:', rawDate);
+            }
+          }
+          console.log('Invalid date format:', displayData); 
+        }, [displayData]);
+
   return (
     <>
         <Header />
-
         <section>
             <div className="container py-5">
                 <div className="row">
                     <div className="col-md-12">
                         <div className="blog-header">
-                            <h1 className="heading">Heading Goes Here</h1>
-                            <h className="post-time">Posted : 5 Days ago</h>
+                            <h1 className="heading">{displayData?.title}</h1>
+                            <h className="post-time">Posted : {formattedDate}</h>
                         </div>
-                        <div className="blog-banner my-4"><img src="/assets/images/blog-banner.png" alt="" /></div>
-                        <div className="blog-content my-4">
-                        This document provides guidelines on how to display a Sign in with Google button on your website or app. Your website or app must follow these guidelines to complete the app verification process.
-                        Our Google Identity Services SDKs render a Sign in with Google button that always adheres to the most recent Google branding guidelines. They are the recommended way to display the Sign in with Google button on your website or app. For cases where you are not able to use the Google-rendered button option, you can render an HTML button element, download our pre-approved branding assets or optionally create a custom Sign in with Google button.
-                        Render HTML Button Element
-                        We provide an HTML configurator that allows you to customize the appearance of the Sign in with Google button. You can then download an HTML and CSS snippet that will render the button on your website.
-                        Generate HTML Button Element
+                        <div className="blog-banner my-4"><img src={`${BASE_API_URL}/uploads/featuredImage/${displayData?.featuredImage?.name}`} alt="" /></div>
+                        <div className="blog-content my-4" dangerouslySetInnerHTML={{ __html: displayData?.content }}>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
         <Footer />
     </>
   )

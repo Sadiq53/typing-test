@@ -2,9 +2,15 @@ import Header from "../../../../shared/header/Header"
 import Footer from "../../../../shared/footer/Footer"
 import { NavLink } from "react-router-dom"
 import BlogPost from "./BlogPost"
+import {useSelector} from 'react-redux'
 
 
 const Blog = () => {
+
+    const blogData = useSelector(state => state.UserDataSlice.blog)
+
+
+
   return (
     <>
         <Header />
@@ -17,7 +23,9 @@ const Blog = () => {
                             <h1 className="font-active text-left">Blogs</h1>
                         </div>
                         <div className="blog-layout mt-5">
-                            <BlogPost  />
+                            {
+                                blogData && blogData?.map(value => <BlogPost props={value} />)
+                            }
                         </div>
                     </div>
                 </div>

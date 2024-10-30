@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { handleDeleteUserAccount } from '../../../../../../redux/AdminDataSlice';
+import { dynamicToast } from '../../../../../shared/Toast/DynamicToast';
 
 const DeleteUserModal = (props) => {
 
@@ -21,7 +22,7 @@ const DeleteUserModal = (props) => {
     useEffect(()=>{
         if(isFullfilled) {
             if(fullFillMsg?.type === 'delete') {
-                localStorage.setItem('accountDelete', true)
+                dynamicToast({ message: "Account Deleted Successfully", icon: "info" });
                 clsModal.current.click();
                 setIsLoading(false)
                 setTimeout(()=>{

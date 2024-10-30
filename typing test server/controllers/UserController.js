@@ -54,6 +54,15 @@ const upload = multer({
     }
 });
 
+route.get('/local', async(req, res) => {
+    const adminData = await adminModel.find({})
+    const localData = {
+        paragraphs : adminData[0]?.paragraphs,
+        blog : adminData[0]?.blog
+    }
+    res.send({ status : 200, localData : localData})
+})
+
 route.get('/', async(req, res) => {
     // console.log(req.headers.authorization)
     if(req.headers.authorization){
@@ -80,7 +89,8 @@ route.get('/', async(req, res) => {
                 username : userData?.username,
                 isblock : userData?.isblocked?.status,
                 authType :userData?.authType,
-                paragraphs : adminData[0]?.paragraphs
+                paragraphs : adminData[0]?.paragraphs,
+                blog : adminData[0]?.blog
             }
             res.send({ status : 200, userdata : userData })
         }else{

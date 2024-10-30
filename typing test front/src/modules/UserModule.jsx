@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom'
-import { handleGetUserData, resetState } from '../redux/UserDataSlice';
+import { handleGetUserData, handleLocalDataCalling, resetState } from '../redux/UserDataSlice';
 import PageDataLoader from '../component/shared/loader/PageDataLoader';
 
 const UserModule = () => {
@@ -19,6 +19,9 @@ const UserModule = () => {
         }
     }, [])
 
+    useEffect(()=>{
+        dispatch(handleLocalDataCalling())
+    }, [])  
     
     useEffect(()=>{
         const ID = localStorage.getItem('userToken')

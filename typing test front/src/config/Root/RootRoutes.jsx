@@ -1,7 +1,7 @@
 import AdminSignin from '../../component/feature/admin/feature/auth/AdminSignin'
 import Lobby from '../../component/feature/user/feature/lobby/Lobby';
 import TypingTestStats from '../../component/feature/user/feature/lobby/TypingTestStatistics';
-import LeaderBoard from '../../component/feature/user/feature/leaderBoard/LeaderBoard';
+import LeaderBoard from '../../component/shared/leaderBoard/LeaderBoard';
 import Blog from '../../component/feature/user/feature/Blog/Blog';
 import BlogInner from '../../component/feature/user/feature/Blog/BlogInner';
 

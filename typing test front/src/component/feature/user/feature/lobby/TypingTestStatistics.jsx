@@ -4,11 +4,11 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import Header from '../../../../shared/header/Header';
 import Footer from '../../../../shared/footer/Footer';
 import { useNavigate } from 'react-router-dom';
-import Certificate from '../../shared/certificate/Certificate';
-import DownloadButton from '../../shared/certificate/DownloadCertificate';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import DynamicAlert from '../../../../shared/Toast/DynamicAlert';
+import Certificate from '../../../../shared/certificate/Certificate';
+import DownloadButton from '../../../../shared/certificate/DownloadCertificate';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 

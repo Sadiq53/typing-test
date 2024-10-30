@@ -11,11 +11,14 @@ const { v4: uuidv4 } = require('uuid'); // Import uuid for generating unique IDs
 
 
 // Directory to store uploaded files temporarily
-const uploadDir = path.resolve(__dirname, '../assets/uploads/profile');
+// const uploadDir = path.resolve(__dirname, '../assets/uploads/profile');
+const uploadDir = 'assets/uploads/profile';
+// console.log(uploadDir)
 
 // Directory to store uploaded files temporarily
-const uploadDirFeaturedImage = path.resolve(__dirname, '../assets/uploads/featuredImage');
-// console.log(uploadDir)
+// const uploadDirFeaturedImage = path.resolve(__dirname, '../assets/uploads/featuredImage');
+const uploadDirFeaturedImage = 'assets/uploads/featuredImage';
+// console.log(uploadDirFeaturedImage)
 
 // Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {

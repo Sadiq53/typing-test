@@ -2,10 +2,11 @@ import BlogEditor from '../../component/feature/admin/feature/blog/BlogEditor';
 import BlogPage from '../../component/feature/admin/feature/blog/BlogPage';
 import BlogView from '../../component/feature/admin/feature/blog/BlogView';
 import AdminDashBoard from '../../component/feature/admin/feature/dashboard/AdminDashBoard'
+import LeaderBoard from '../../component/shared/leaderBoard/LeaderBoard';
 import Paragraphs from '../../component/feature/admin/feature/paragraphs/Paragraphs';
 import AllUsers from '../../component/feature/admin/feature/users/allUsers/AllUsers';
 import UserDetail from '../../component/feature/admin/feature/users/viewUsers/UserDetail';
-import UserMatches from '../../component/feature/admin/feature/users/viewUsers/UserMatches';
+import UserMatches from '../../component/shared/detailedMatches/UserMatches';
 import Signout from '../../component/shared/auth/Signout';
 
 const adminRoutes = [
@@ -16,6 +17,10 @@ const adminRoutes = [
     {
         path : 'users',
         element : <AllUsers />
+    },
+    {
+        path : 'leaderboard',
+        element : <LeaderBoard />
     },
     {
         path : 'paragraphs',
