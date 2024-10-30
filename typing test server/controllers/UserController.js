@@ -17,7 +17,8 @@ const calculateAverage = (numbers) => {
 };
 
 // Directory to store uploaded files temporarily
-const uploadDir = path.resolve(__dirname, '../assets/uploads/profile');
+// const uploadDir = path.resolve(__dirname, '../assets/uploads/profile');
+const uploadDir = 'assets/uploads/profile';
 // console.log(uploadDir)
 
 // Ensure the upload directory exists
