@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
+import GoogleADs from '../googleAds/GoogleADs';
 
 const Header = () => {
 
@@ -11,12 +12,12 @@ const Header = () => {
         <>
             <div className="container py-5">
                 <div className="row align-items-center">
-                    <div className="col-md-6">
+                    <div className="col-md-6 col-12">
                         <div className="header">
                             <img src="/assets/images/logo.svg" alt="" />
                         </div>
                     </div>
-                    <div className="col-md-6">
+                    <div className="col-md-6 col-12">
                         <div className="header">
                             <ul className="menu">
                                 {
@@ -60,6 +61,7 @@ const Header = () => {
                             </ul>
                         </div>
                     </div>
+                    <div className="col-md-12 col-12"><GoogleADs /></div>
                 </div>
             </div>
         </>

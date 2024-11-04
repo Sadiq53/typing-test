@@ -76,13 +76,18 @@ const AdminSchema = mongoose.Schema({
         {
             title : { type : String, default : '' },
             content : { type : String, default : '' },
+            description : { type : String, default : '' },
+            status : { type : String, default : '' },
+            category : { type : Array, default : [] },
+            tags : { type : Array, default : [] },
             createdat : { type : Date, default : Date.now() },
             featuredImage : {
                 name : { type : String, default : '' },
                 path : { type : String, default : '' }
             }
         }
-    ]
+    ],
+    blogCategory : { type : Array, default : [] }
 
 
 }, { collection : "admindata" });

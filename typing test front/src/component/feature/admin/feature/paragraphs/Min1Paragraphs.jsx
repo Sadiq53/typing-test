@@ -156,25 +156,27 @@ const Min1Paragraphs = (props) => {
     return (
         <>
             <section>
-                <div className="container">
+                <div className="container pb-5">
                     <div className="row">
                         <div className="col-md-12">
                             <div className="para-layout">
-                                <h1 className='font-active text-left'>Set Paragraphs For {timeFilter}Min {levelFilter} Mode</h1>
+                                <h1 className='font-active text-left'>Set Paragraphs For {timeFilter} Min {levelFilter} Mode</h1>
                                 {displayData?.map((value, index) => (
-                                    <div className="add-para" key={index}>
-                                        <form onSubmit={UpdateParaForm.handleSubmit}>
-                                            <textarea
-                                                className="para-writer"
-                                                readOnly={editableIndex !== index}
-                                                name={value.id}
-                                                onChange={UpdateParaForm.handleChange}
-                                                value={UpdateParaForm.values[value.id] || ''}
-                                            />
+                                    
+                                        <form className='display-para-sec' onSubmit={UpdateParaForm.handleSubmit}>
+                                            <div className="add-para" key={index}>
+                                                <textarea
+                                                    className="para-writer"
+                                                    readOnly={editableIndex !== index}
+                                                    name={value.id}
+                                                    onChange={UpdateParaForm.handleChange}
+                                                    value={UpdateParaForm.values[value.id] || ''}
+                                                />
+                                            </div>
                                             <div className='para-btns'>
                                             {editableIndex === index ? (
                                                 <button type='submit' className='btn'>
-                                                    <i className="fa-solid fa-check fa-xl" style={{ color: "#71cac7" }} />
+                                                    <i className="fa-solid fa-check fa-md" style={{ color: "#71cac7" }} />
                                                 </button>
                                             ) : (
                                                 <button
@@ -185,15 +187,15 @@ const Min1Paragraphs = (props) => {
                                                         handleEditToggle(index); // Toggle edit mode
                                                     }}
                                                 >
-                                                    <i className="fa-solid fa-pen fa-lg" style={{ color: "#71cac7" }} />
+                                                    <i className="fa-solid fa-pen fa-sm" style={{ color: "#71cac7" }} />
                                                 </button>
                                             )}
                                                 <button type='button' className='btn' onClick={() => handleDelete(value.id)}>
-                                                    <i className="fa-solid fa-trash fa-lg" style={{ color: "#d41111" }} />
+                                                    <i className="fa-solid fa-trash fa-sm" style={{ color: "#d41111" }} />
                                                 </button>
                                             </div>
                                         </form>
-                                    </div>
+                                    
                                 ))}
                                 <form className='form' onSubmit={addParaForm.handleSubmit}>
                                     {textareas.map((textarea, index) => (
@@ -209,7 +211,7 @@ const Min1Paragraphs = (props) => {
                                                     setTextareas(newTextareas);
                                                     addParaForm.setFieldValue(`paragraphs[${index}].para`, e.target.value);
                                                 }}
-                                                placeholder="Start typing..."
+                                                placeholder="Set a Paragraph..."
                                                 value={textarea.para}
                                             />
                                             {addParaForm.errors.paragraphs && addParaForm.errors.paragraphs[index]?.para && (
@@ -218,7 +220,7 @@ const Min1Paragraphs = (props) => {
                                         </div>
                                     ))}
                                     <div className='add-more-para'>
-                                        <button type='submit' className='add-para-btn'>{loader ? (<ButtonLoader props={'Adding Paragraphs'} />) : 'Add Paragraphs'}</button>
+                                        <button type='submit' className='add-para-btn'>{loader ? (<ButtonLoader props={'Uploading Paragraph'} />) : 'Upload Paragraph'}</button>
                                         <div>
                                             <button type='button' className='theme-btn' onClick={handleDeleteLast}>
                                                 <i className="fa-solid fa-trash-can fa-lg" style={{ color: "#d41111" }} />

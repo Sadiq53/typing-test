@@ -258,6 +258,7 @@ const initialState = {
     allUserData : [],
     paragraphs : {},
     blog : [],
+    blogCategory : []
 }
 
 const UserDataSlice = createSlice({
@@ -301,6 +302,7 @@ const UserDataSlice = createSlice({
             if(action.payload) {
                 state.blog = action.payload.blog
                 state.paragraphs = action.payload.paragraphs;
+                state.blogCategory = action.payload.blogCategory
                 state.isProcessing = false
                 state.isError = false
                 state.isFullfilled = true

@@ -55,14 +55,31 @@ const upload = multer({
     }
 });
 
-route.get('/local', async(req, res) => {
-    const adminData = await adminModel.find({})
-    const localData = {
-        paragraphs : adminData[0]?.paragraphs,
-        blog : adminData[0]?.blog
+route.get('/local', async (req, res) => {
+    try {
+        const adminData = await adminModel.find({}).lean(); // Use .lean() for better performance if you don't need Mongoose documents
+
+        // Check if adminData exists and has at least one item
+        if (!adminData.length) {
+            return res.status(404).send({ status: 404, message: 'No admin data found' });
+        }
+
+        const blogData = adminData[0]?.blog || []; // Fallback to an empty array if blog is undefined
+        const filteredBlogData = blogData.filter(value => value.status === 'Published'); // Filter published blogs
+        
+        const localData = {
+            paragraphs: adminData[0]?.paragraphs || [], // Fallback to empty array if paragraphs is undefined
+            blog: filteredBlogData,
+            blogCategory: adminData[0]?.blogCategory || [] // Fallback to empty array if blogCategory is undefined
+        };
+
+        res.status(200).send({ status: 200, localData }); // Send successful response
+    } catch (error) {
+        console.error(error); // Log the error for debugging
+        res.status(500).send({ status: 500, message: 'Internal server error' }); // Handle server errors
     }
-    res.send({ status : 200, localData : localData})
-})
+});
+
 
 route.get('/', async(req, res) => {
     // console.log(req.headers.authorization)
@@ -90,8 +107,6 @@ route.get('/', async(req, res) => {
                 username : userData?.username,
                 isblock : userData?.isblocked?.status,
                 authType :userData?.authType,
-                paragraphs : adminData[0]?.paragraphs,
-                blog : adminData[0]?.blog
             }
             res.send({ status : 200, userdata : userData })
         }else{

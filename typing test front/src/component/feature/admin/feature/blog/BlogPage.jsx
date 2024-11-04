@@ -27,17 +27,20 @@ const BlogPage = () => {
                 <div className="container py-5">
                     <div className="row">
                         <div className="col-md-12">
-                            <NavLink to="/admin/blog-add" className="add-blog-btn">
-                                Add Blog <i className="fa-duotone fa-solid fa-plus fa-xl"></i>
-                            </NavLink>
+                            <div className="d-flex justify-content-between">
+                                <h1 className="font-active">View/Edit Our Blogs</h1>
+                                <NavLink to="/admin/blog-add" className="add-para-btn">
+                                    Add Blog <i className="fa-duotone fa-solid fa-plus fa-md" style={{color : "#15131A"}}></i>
+                                </NavLink>
+                            </div>
                         </div>
                         <div className="col-md-12 mt-5">
                             <div className="leaderboard-table my-3">
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Title</th>
+                                            <th>S.No.</th>
+                                            <th>Blog Title</th>
                                             <th>Edit</th>
                                             <th>Delete</th>
                                         </tr>
@@ -47,8 +50,8 @@ const BlogPage = () => {
                                             <tr key={index}>
                                                     <td>{index + 1}</td>
                                                     <td><NavLink to={`/admin/blog/${value._id}`}>{value.title}</NavLink></td>
-                                                    <td><NavLink to={`/admin/blog-add/${value._id}`}><i className="fa-regular  fa-pen-to-square fa-xl"></i></NavLink></td>
-                                                    <td><button onClick={()=>setGetBlogId(value._id)} data-bs-toggle="modal" data-bs-target="#deleteblog"><i class="fa-solid fa-trash fa-xl"></i></button></td>
+                                                    <td><NavLink to={`/admin/blog-add/${value._id}`}><i className="fa-regular  fa-pen-to-square fa-lg"></i></NavLink></td>
+                                                    <td><button onClick={()=>setGetBlogId(value._id)} data-bs-toggle="modal" data-bs-target="#deleteblog"><i class="fa-solid fa-trash fa-lg"></i></button></td>
                                                 </tr>
                                         ))}
                                     </tbody>

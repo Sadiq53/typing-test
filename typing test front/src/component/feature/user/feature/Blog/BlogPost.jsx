@@ -4,7 +4,7 @@ import { BASE_API_URL } from "../../../../../util/API_URL"
 
 const BlogPost = (props) => {
   
-  const {title, createdat, featuredImage, _id} = props?.props
+  const {title, createdat, featuredImage, _id, description} = props?.props
   const isToken = localStorage.getItem('userToken')
   const [formattedDate, setFormattedDate] = useState();
 
@@ -38,8 +38,7 @@ const BlogPost = (props) => {
             <div className="blog-img"><NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><img src={`${BASE_API_URL}/uploads/featuredImage/${featuredImage?.name}`} alt="" /></NavLink></div>
             <div className="blog-content">
                 <NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><h1>{title}</h1></NavLink>
-                <p>Lorem Ipsum is simply dummy text of the 
-                    printing and typesetting industry.</p>
+                <p>{description}</p>
             </div>
             <NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}>Read More...</NavLink>
         </div>

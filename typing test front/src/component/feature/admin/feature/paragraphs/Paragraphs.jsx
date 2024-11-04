@@ -33,20 +33,65 @@ const Paragraphs = () => {
                 <div className="row">
                     <div className="col-md-12">
                     <div className="leaderboard-head admin">
-                            <div className="filter">
-                                <div className="filter-btn">
-                                    <button onClick={()=>handleFilterTime('1')} className={timeFilter === '1' ? 'active' : ''}>01 Min</button>
-                                    <button onClick={()=>handleFilterTime('3')} className={timeFilter === '3' ? 'active' : ''}>03 Min</button>
-                                    <button onClick={()=>handleFilterTime('5')} className={timeFilter === '5' ? 'active' : ''}>05 Min</button>
-                                </div>
-                            </div>
-                            <div className="filter">
-                                <div className="filter-btn">
-                                    <button onClick={()=>handleFilterLevel('easy')} className={levelFilter === 'easy' ? 'active' : ''}>Easy</button>
-                                    <button onClick={()=>handleFilterLevel('medium')} className={levelFilter === 'medium' ? 'active' : ''}>Medium</button>
-                                    <button onClick={()=>handleFilterLevel('hard')} className={levelFilter === 'hard' ? 'active' : ''}>Hard</button>
-                                </div>
-                            </div>
+                        <div className='lobby-menu'>
+                            <ul className='switcher'>
+                                <li>Time :</li>
+                                <li>
+                                    <button
+                                        onClick={()=>handleFilterTime('1')}
+                                        className={timeFilter === '1' ? 'active' : ''}
+                                    >
+                                    01 Min
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        onClick={()=>handleFilterTime('3')}
+                                        className={timeFilter === '3' ? 'active' : ''}
+                                    >
+                                    03 Min
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        onClick={()=>handleFilterTime('5')}
+                                        className={timeFilter === '5' ? 'active' : ''}
+                                    >
+                                    05 Min
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div className='lobby-menu'>
+                            <ul className='switcher'>
+                                <li>Level :</li>
+                                <li>
+                                    <button
+                                    onClick={()=>handleFilterLevel('easy')}
+                                    className={levelFilter === 'easy' ? 'active' : ''}
+                                    >
+                                    Easy
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                    onClick={()=>handleFilterLevel('medium')}
+                                    className={levelFilter === 'medium' ? 'active' : ''}
+                                    >
+                                    Medium
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                    onClick={()=>handleFilterLevel('hard')}
+                                    className={levelFilter === 'hard' ? 'active' : ''}
+                                    >
+                                    Hard
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        
                         </div>
                     </div>
                 </div>
