@@ -552,8 +552,9 @@ route.delete('/', async (req, res) => {
 // Route to save FCM token
 route.post("/save-token", async (req, res) => {
     const { token, userId } = req.body;
+    let ID = jwt.decode(userId, key)
     try {
-        await notificationModel.updateOne({ userId }, { fcmToken: token }, { upsert: true });
+        await notificationModel.updateOne({ userId : ID?.id }, { fcmToken: token });
         res.sendStatus(200);
     } catch (error) {
         console.error("Error saving token:", error);
