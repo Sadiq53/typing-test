@@ -176,7 +176,7 @@ route.post('/para', async (req, res) => {
 // Route to send notification to all users
 route.post("/send-notification", async (req, res) => {
     const { title, message } = req.body;
-
+    
     try {
         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
         const tokens = users.map((user) => user.fcmToken);
