@@ -3,7 +3,9 @@ const jwt = require('jsonwebtoken');
 const sha = require('sha1')
 const adminModel = require('../model/AdminSchema')
 const userModel = require('../model/UserSchema')
+const notificationModel = require('../model/NotificationSchema')
 const key = require('../config/token_Keys');
+const admin = require("firebase-admin");
 
 
 route.use('/blog', require('./sub-controllers/BlogController'))
@@ -170,6 +172,30 @@ route.post('/para', async (req, res) => {
         return res.status(403).json({ message: "Unauthorized access" });
     }
 });
+
+// Route to send notification to all users
+route.post("/send-notification", async (req, res) => {
+    const { title, message } = req.body;
+
+    try {
+        const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
+        const tokens = users.map((user) => user.fcmToken);
+    
+        const payload = {
+            notification: {
+            title,
+            body: message
+            }
+        };
+
+        const response = await admin.messaging().sendToDevice(tokens, payload);
+        res.status(200).json({ success: true, message: "Notification sent", response });
+    } catch (error) {
+        console.error("Error sending notification:", error);
+        res.status(500).json({ success: false, error });
+    }
+});
+
 
 
 

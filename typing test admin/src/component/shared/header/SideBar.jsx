@@ -124,6 +124,25 @@ const SideBar = () => {
             </li>
             {/* LEADERBOARD PART */}
 
+            {/* LEADERBOARD PART */}
+            <li className="nav-small-cap">
+                <i className="ti ti-dots nav-small-cap-icon fs-4" />
+                <span className="hide-menu">Notification</span>
+            </li>
+            <li className="sidebar-item">
+                <NavLink
+                className="sidebar-link"
+                to='/admin/push-notification'
+                aria-expanded="false"
+                >
+                <span>
+                    <i class="fa-duotone fa-solid fa-envelope"></i>
+                </span>
+                <span className="hide-menu">Push Notification</span>
+                </NavLink>
+            </li>
+            {/* LEADERBOARD PART */}
+
             {/* AUTH PART */}
             <li className="nav-small-cap">
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />

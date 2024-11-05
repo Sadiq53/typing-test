@@ -1,6 +1,5 @@
 const route = require('express').Router();
 const jwt = require('jsonwebtoken');
-const admin = require("firebase-admin");
 const sha = require('sha1')
 const userModel = require('../model/UserSchema')
 const adminModel = require('../model/AdminSchema')
@@ -10,6 +9,7 @@ const randNum = require('random-number')
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const admin = require("firebase-admin");
 const serviceAccount = require("../config/typing-test-57f38-firebase-adminsdk-owp3i-648f3d8c6c.json");
 
 admin.initializeApp({
@@ -550,7 +550,7 @@ route.delete('/', async (req, res) => {
 });
 
 // Route to save FCM token
-app.post("/save-token", async (req, res) => {
+route.post("/save-token", async (req, res) => {
     const { token, userId } = req.body;
     try {
         await notificationModel.updateOne({ userId }, { fcmToken: token }, { upsert: true });
@@ -561,28 +561,6 @@ app.post("/save-token", async (req, res) => {
     }
 });
 
-// Route to send notification to all users
-app.post("/send-notification", async (req, res) => {
-    const { title, message } = req.body;
-
-    try {
-        const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
-        const tokens = users.map((user) => user.fcmToken);
-    
-        const payload = {
-            notification: {
-            title,
-            body: message
-            }
-        };
-
-        const response = await admin.messaging().sendToDevice(tokens, payload);
-        res.status(200).json({ success: true, message: "Notification sent", response });
-    } catch (error) {
-        console.error("Error sending notification:", error);
-        res.status(500).json({ success: false, error });
-    }
-});
 
 
 

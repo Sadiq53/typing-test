@@ -874,3 +874,14 @@
 .p-35{
     padding: 35px !important;
 }
+
+.notification-layout{
+    box-shadow: rgb(0 0 0 / 11%) 0px 0px 8px 0px;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px;
+}

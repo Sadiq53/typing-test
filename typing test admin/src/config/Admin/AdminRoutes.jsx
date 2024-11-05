@@ -9,6 +9,7 @@ import UserDetail from '../../component/feature/users/viewUsers/UserDetail';
 import UserMatches from '../../component/shared/detailedMatches/UserMatches';
 import Signout from '../../component/shared/auth/Signout';
 import CreateUser from '../../component/feature/users/addUsers/CreateUser';
+import Notification from '../../component/feature/notification/Notification';
 
 const adminRoutes = [
     {
@@ -54,6 +55,10 @@ const adminRoutes = [
     {
         path : 'users/matches/:level',
         element : <UserMatches />
+    },
+    {
+        path : 'push-notification',
+        element : <Notification />
     },
     {
         path : 'signout/:type',
