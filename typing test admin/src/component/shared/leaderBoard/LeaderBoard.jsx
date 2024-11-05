@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleGetLeaderboardData, resetState } from '../../../redux/UserDataSlice';
-import Header from '../header/Header';
-import Footer from '../footer/Footer';
 import { NavLink } from 'react-router-dom';
 
 
