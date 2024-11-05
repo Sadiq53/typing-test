@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const sha = require('sha1')
 const adminModel = require('../../model/AdminSchema')
 const userModel = require('../../model/UserSchema')
+const notificationModel = require('../../model/NotificationSchema')
 const key = require('../../config/token_Keys');
 const path = require('path');
 const fs = require('fs');
@@ -109,6 +110,7 @@ route.post('/add', async(req, res) => {
                 }
                 await userModel.create(finalData)
                 const getUser = await userModel.findOne({ email : email })
+                await notificationModel.create({userId : getUser?._id, fcmToken : ''})
                 res.send({ status : 200, message : "Account Created Successfully", type : 'signup', userData : getUser })
             } else res.send({ status : 402, message : "Email ID Exist", type : 'signup' }) 
         } else res.send({ status : 402, message : "username exist", type : 'signup' })
