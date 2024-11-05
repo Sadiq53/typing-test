@@ -35,7 +35,7 @@ const Blog = () => {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="blog-main-header">
-                            <h1 className="font-active text-left">{category === 'all' ? 'Blog' : `${category}`}</h1>
+                            <h1 className="font-active m-0 text-left">{category === 'all' ? 'Blog' : `${category}`}</h1>
                             <div className="select-container">
                                 <select onChange={(event)=>setCategory(event.target.value)} className="form-control">
                                     <option value='all'>Select Category</option>

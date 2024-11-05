@@ -126,7 +126,7 @@ const LeaderBoard = () => {
         </section>
 
         <section>
-            <div className="container py-5">
+            <div className="container p-custom">
                 <div className="row">
                     <div className="col-md-12">
                         <div className="show-filter py-2">

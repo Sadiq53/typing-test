@@ -387,73 +387,69 @@ const handleAlertClose = () => {
       <Header />
       <section className='lobby-area'>
         <div className="container">
-          <div className="row align-items-center">
-            <div className="col-md-4">
-              <div className='lobby-menu'>
-                <ul>
-                  <li>Time :</li>
-                  <li>
-                    <button
-                      onClick={() => handleTime(60)}
-                      className={time === 60 ? 'active' : ''}
-                    >
-                      01 Min
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleTime(180)}
-                      className={time === 180 ? 'active' : ''}
-                    >
-                      03 Min
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleTime(300)}
-                      className={time === 300 ? 'active' : ''}
-                    >
-                      05 Min
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="lobby-menu text-center">
-                <h4 className={`${timerRunning ? 'text-active' : 'text-idle'}`}>{timeLimit - elapsedTime > 0 ? convertSecondsToFormattedTime(timeLimit - elapsedTime) : 0}</h4>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className='lobby-menu'>
-                <ul>
-                  <li>Level :</li>
-                  <li>
-                    <button
-                      onClick={() => handleDifficultyChange('easy')}
-                      className={difficulty === 'easy' ? 'active' : ''}
-                    >
-                      Easy
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleDifficultyChange('medium')}
-                      className={difficulty === 'medium' ? 'active' : ''}
-                    >
-                      Medium
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handleDifficultyChange('hard')}
-                      className={difficulty === 'hard' ? 'active' : ''}
-                    >
-                      Hard
-                    </button>
-                  </li>
-                </ul>
-              </div>
+          <div className="row custom-align">
+            <div className="cutom-lobby-head">
+                <div className='lobby-menu'>
+                  <ul>
+                    <li>Time :</li>
+                    <li>
+                      <button
+                        onClick={() => handleTime(60)}
+                        className={time === 60 ? 'active' : ''}
+                      >
+                        01 Min
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleTime(180)}
+                        className={time === 180 ? 'active' : ''}
+                      >
+                        03 Min
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleTime(300)}
+                        className={time === 300 ? 'active' : ''}
+                      >
+                        05 Min
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+                <div className="lobby-menu text-center">
+                  <h4 className={`${timerRunning ? 'text-active' : 'text-idle'}`}>{timeLimit - elapsedTime > 0 ? convertSecondsToFormattedTime(timeLimit - elapsedTime) : 0}</h4>
+                </div>
+                <div className='lobby-menu'>
+                  <ul>
+                    <li>Level :</li>
+                    <li>
+                      <button
+                        onClick={() => handleDifficultyChange('easy')}
+                        className={difficulty === 'easy' ? 'active' : ''}
+                      >
+                        Easy
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDifficultyChange('medium')}
+                        className={difficulty === 'medium' ? 'active' : ''}
+                      >
+                        Medium
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => handleDifficultyChange('hard')}
+                        className={difficulty === 'hard' ? 'active' : ''}
+                      >
+                        Hard
+                      </button>
+                    </li>
+                  </ul>
+                </div>
             </div>
             <div className="col-md-12">
               <div className="typing-area" 
@@ -492,7 +488,7 @@ const handleAlertClose = () => {
               </div>
               <div className='reset'><button onClick={resetTest}><i className="fa-solid fa-arrow-rotate-right text-active"></i> <span className='text-idle'>Start Over</span></button></div>
             </div>
-            <div className="row align-end">
+            <div className="row align-items-center">
               <div className="col-md-7">
                 <div className="status">
                   <div>
@@ -509,7 +505,7 @@ const handleAlertClose = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-5 d-flex justify-content-end">
+              <div className="col-md-5 custom-footer-lobby">
                 <div className='width-80'>
                   <div className="footer">
                     <ul>

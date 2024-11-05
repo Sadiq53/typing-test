@@ -154,11 +154,12 @@ const TypingTestStats = () => {
         setShowAlert(false); // Set showAlert to false
     };
 
+
     return(
         <>
             <Header />
             <section>
-                <div className="container py-5">
+                <div className="container p-custom">
                     <div className="row align-items-center py-4">
                         <div className="col-md-2">
                             <div className="statistics-layout">
@@ -173,9 +174,9 @@ const TypingTestStats = () => {
                             </div>
                         </div>
                         <div className="col-md-10 ">
-                        <Line data={data} options={options}  height={30} width={"100%"}  />
+                        <Line data={data} options={options}  height={window.innerWidth <= 767 ? 100 : 30} width={"100%"}  />
                         </div>
-                        <div className="col-md-12 py-5">
+                        <div className="col-md-12 p-custom">
                             <div className="below-graph">
                                 <div>
                                     <h4>Test Type</h4>
@@ -195,7 +196,7 @@ const TypingTestStats = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-12 py-5">
+                        <div className="col-md-12 p-custom">
                             <div className="below-graph-btn">
                                 <div className='item'><span>Download Certificate</span><DownloadButton onDownload={handleDownload} /></div>
                                 <div className='item'><span>Repeat Test</span><button onClick={repeatTest}><i className="fa-solid fa-repeat fa-xl" style={{ color: "#8c8c8c" }} /></button></div>
@@ -206,7 +207,7 @@ const TypingTestStats = () => {
             </section>
             <Footer />
 
-            <div style={{position : 'absolute', left : '-100%', top : '28%' }} >
+            <div style={{position : 'absolute', left : '-260%', top : '28%' }} >
                 <Certificate ref={certificateRef} props={stats} />
             </div>
 
