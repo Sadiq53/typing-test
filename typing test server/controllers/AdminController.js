@@ -173,28 +173,51 @@ route.post('/para', async (req, res) => {
     }
 });
 
-// Route to send notification to all users
 route.post("/send-notification", async (req, res) => {
     const { title, message } = req.body;
     
     try {
+        // Retrieve users with valid FCM tokens
         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
         const tokens = users.map((user) => user.fcmToken);
-    
+
+        if (tokens.length === 0) {
+            return res.status(400).json({ success: false, message: "No valid FCM tokens found" });
+        }
+
+        // Create the notification payload
         const payload = {
             notification: {
-            title,
-            body: message
-            }
+                title,
+                body: message,
+            },
         };
 
-        const response = await admin.messaging().sendToDevice(tokens, payload);
-        res.status(200).json({ success: true, message: "Notification sent", response });
+        // Send notification to each token
+        const responses = await Promise.all(tokens.map(async (token) => {
+            return await admin.messaging().sendEachForMulticast({
+                tokens: [token],
+                ...payload
+            });
+        }));
+
+        // Collect failed tokens and responses
+        const failedTokens = responses
+            .filter((response) => !response.success)
+            .map((_, idx) => tokens[idx]);
+
+        if (failedTokens.length > 0) {
+            console.log("Failed tokens:", failedTokens);
+        }
+
+        res.status(200).json({ success: true, message: "Notification sent", failedTokens });
     } catch (error) {
         console.error("Error sending notification:", error);
-        res.status(500).json({ success: false, error });
+        res.status(500).json({ success: false, error: error.message });
     }
 });
+
+
 
 
 
