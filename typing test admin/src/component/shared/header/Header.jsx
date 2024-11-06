@@ -42,7 +42,7 @@ const Header = () => {
                     aria-expanded="false"
                 >
                     <img
-                    src="../assets/images/profile/user-1.jpg"
+                    src="/assets/images/profile/user-1.jpg"
                     alt=""
                     width={35}
                     height={35}

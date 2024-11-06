@@ -265,34 +265,34 @@ const UserDetail = () => {
                 <div className="profile-head">
                   <h1>Personal Information</h1>
                 </div>
-                <div className="profile-content">
-                  <div>
-                    <label>Username</label>
-                    <h6>{rawUserData?.username}</h6>
-                  </div>
-                  <div>
-                    <label>Account ID</label>
-                    <h6>{rawUserData?.accountid}</h6>
-                  </div>
-                  <div>
-                    <label>Email ID</label>
-                    <h6>{rawUserData?.email}</h6>
-                  </div>
-                </div>
-                <div className="profile-content">
-                  <div>
-                    <label>Joined </label>
-                    <h6>{formattedDate}</h6>
-                  </div>
-                  <div>
-                    <label>Role</label>
-                    <h6>User</h6>
-                  </div>
-                  <div>
-                    <label>Password</label> <br />
-                      <button className="btn" type="button" data-bs-toggle="modal" data-bs-target="#updatepassword">
-                        <i className="fa-regular text-idle fa-pen-to-square"></i>
-                      </button>
+                <div className="width-100">
+                  <div className="profile-content">
+                    <div>
+                      <label>Username</label>
+                      <h6>{rawUserData?.username}</h6>
+                    </div>
+                    <div>
+                      <label>Account ID</label>
+                      <h6>{rawUserData?.accountid}</h6>
+                    </div>
+                    <div>
+                      <label>Email ID</label>
+                      <h6>{rawUserData?.email}</h6>
+                    </div>
+                    <div>
+                      <label>Joined </label>
+                      <h6>{formattedDate}</h6>
+                    </div>
+                    <div>
+                      <label>Role</label>
+                      <h6>User</h6>
+                    </div>
+                    <div>
+                      <label>Password</label> <br />
+                        <button className="btn" type="button" data-bs-toggle="modal" data-bs-target="#updatepassword">
+                          <i className="fa-regular text-idle fa-pen-to-square"></i>
+                        </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -316,104 +316,128 @@ const UserDetail = () => {
                 </div>
               </div>
               <NavLink to={`/admin/users/matches/${'easy'}`}>
-                <div className="profile-card data my-4">
-                  <div className="profile-content">
-                    <div>
-                      <label className="pb-3">Easy Level</label>
-                      <h6>Total Test</h6>
-                      <h6>Average WPM</h6>
-                      <h6>Average Accuracy</h6>
-                      <h6>Average Consistency</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">1 Min</label>
-                        <h6>{match1MinData?.easyMatches || 0}</h6>
-                        <h6>{Math.round(match1MinData?.data?.easy?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match1MinData?.data?.easy?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match1MinData?.data?.easy?.avgconsis) || 0} %</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">3 Min</label>
-                      <h6>{match3MinData?.easyMatches || 0}</h6>
-                        <h6>{Math.round(match3MinData?.data?.easy?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match3MinData?.data?.easy?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match3MinData?.data?.easy?.avgconsis) || 0} %</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">5 Min</label>
-                      <h6>{match5MinData?.easyMatches || 0}</h6>
-                        <h6>{Math.round(match5MinData?.data?.easy?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match5MinData?.data?.easy?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match5MinData?.data?.easy?.avgconsis) || 0} %</h6>
-                    </div>
+                <div className="profile-card my-4">
+                  <div className="profile-content width-100">
+                  <table className='width-100'>
+                      <thead>
+                        <tr>
+                          <th>Easy Level</th>
+                          <th>1 Min</th>
+                          <th>3 Min</th>
+                          <th>5 Min</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Total Test</td>
+                          <td>{match1MinData?.easyMatches || 0}</td>
+                          <td>{match3MinData?.easyMatches || 0}</td>
+                          <td>{match5MinData?.easyMatches || 0}</td>
+                        </tr>
+                        <tr>
+                          <td>Average WPM</td>
+                          <td>{Math.round(match1MinData?.data?.easy?.avgwpm) || 0} Per Min</td>
+                          <td>{Math.round(match3MinData?.data?.easy?.avgwpm) || 0} Per Min</td>
+                          <td>{Math.round(match5MinData?.data?.easy?.avgwpm) || 0} Per Min</td>
+                        </tr>
+                        <tr>
+                          <td>Average Accuracy</td>
+                          <td>{Math.round(match1MinData?.data?.easy?.avgacc) || 0} %</td>
+                          <td>{Math.round(match3MinData?.data?.easy?.avgacc) || 0} %</td>
+                          <td>{Math.round(match5MinData?.data?.easy?.avgacc) || 0} %</td>
+                        </tr>
+                        <tr>
+                          <td>Average Consistency</td>
+                          <td>{Math.round(match1MinData?.data?.easy?.avgconsis) || 0} %</td>
+                          <td>{Math.round(match3MinData?.data?.easy?.avgconsis) || 0} %</td>
+                          <td>{Math.round(match5MinData?.data?.easy?.avgconsis) || 0} %</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </NavLink>
               <NavLink to={`/admin/users/matches/${'medium'}`}>
-                <div className="profile-card data my-4">
-                  <div className="profile-content">
-                    <div>
-                      <label className="pb-3">Medium Level</label>
-                      <h6>Total Test</h6>
-                      <h6>Average WPM</h6>
-                      <h6>Average Accuracy</h6>
-                      <h6>Average Consistency</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">1 Min</label>
-                        <h6>{match1MinData?.mediumMatches || 0}</h6>
-                        <h6>{Math.round(match1MinData?.data?.medium?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match1MinData?.data?.medium?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match1MinData?.data?.medium?.avgconsis) || 0} %</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">3 Min</label>
-                      <h6>{match3MinData?.mediumMatches || 0}</h6>
-                        <h6>{Math.round(match3MinData?.data?.medium?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match3MinData?.data?.medium?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match3MinData?.data?.medium?.avgconsis) || 0} %</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">5 Min</label>
-                      <h6>{match5MinData?.mediumMatches || 0}</h6>
-                        <h6>{Math.round(match5MinData?.data?.medium?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match5MinData?.data?.medium?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match5MinData?.data?.medium?.avgconsis) || 0} %</h6>
-                    </div>
+                <div className="profile-card my-4">
+                  <div className="profile-content width-100">
+                  <table className='width-100'>
+                      <thead>
+                        <tr>
+                          <th>Medium Level</th>
+                          <th>1 Min</th>
+                          <th>3 Min</th>
+                          <th>5 Min</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Total Test</td>
+                          <td>{match1MinData?.mediumMatches || 0}</td>
+                          <td>{match3MinData?.mediumMatches || 0}</td>
+                          <td>{match5MinData?.mediumMatches || 0}</td>
+                        </tr>
+                        <tr>
+                          <td>Average WPM</td>
+                          <td>{Math.round(match1MinData?.data?.medium?.avgwpm) || 0} Per Min</td>
+                          <td>{Math.round(match3MinData?.data?.medium?.avgwpm) || 0} Per Min</td>
+                          <td>{Math.round(match5MinData?.data?.medium?.avgwpm) || 0} Per Min</td>
+                        </tr>
+                        <tr>
+                          <td>Average Accuracy</td>
+                          <td>{Math.round(match1MinData?.data?.medium?.avgacc) || 0} %</td>
+                          <td>{Math.round(match3MinData?.data?.medium?.avgacc) || 0} %</td>
+                          <td>{Math.round(match5MinData?.data?.medium?.avgacc) || 0} %</td>
+                        </tr>
+                        <tr>
+                          <td>Average Consistency</td>
+                          <td>{Math.round(match1MinData?.data?.medium?.avgconsis) || 0} %</td>
+                          <td>{Math.round(match3MinData?.data?.medium?.avgconsis) || 0} %</td>
+                          <td>{Math.round(match5MinData?.data?.medium?.avgconsis) || 0} %</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </NavLink>
               <NavLink to={`/admin/users/matches/${'hard'}`}>
-                <div className="profile-card data my-4">
-                  <div className="profile-content">
-                    <div>
-                      <label className="pb-3">Hard Level</label>
-                      <h6>Total Test</h6>
-                      <h6>Average WPM</h6>
-                      <h6>Average Accuracy</h6>
-                      <h6>Average Consistency</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">1 Min</label>
-                        <h6>{match1MinData?.hardMatches || 0}</h6>
-                        <h6>{Math.round(match1MinData?.data?.hard?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match1MinData?.data?.hard?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match1MinData?.data?.hard?.avgconsis) || 0} %</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">3 Min</label>
-                      <h6>{match3MinData?.hardMatches || 0}</h6>
-                        <h6>{Math.round(match3MinData?.data?.hard?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match3MinData?.data?.hard?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match3MinData?.data?.hard?.avgconsis) || 0} %</h6>
-                    </div>
-                    <div>
-                      <label className="pb-3">5 Min</label>
-                      <h6>{match5MinData?.hardMatches || 0}</h6>
-                        <h6>{Math.round(match5MinData?.data?.hard?.avgwpm) || 0} Per Min</h6>
-                        <h6>{Math.round(match5MinData?.data?.hard?.avgacc) || 0} %</h6>
-                        <h6>{Math.round(match5MinData?.data?.hard?.avgconsis) || 0} %</h6>
-                    </div>
+                <div className="profile-card my-4">
+                  <div className="profile-content width-100">
+                  <table className='width-100'>
+                      <thead>
+                        <tr>
+                          <th>Hard Level</th>
+                          <th>1 Min</th>
+                          <th>3 Min</th>
+                          <th>5 Min</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Total Test</td>
+                          <td>{match1MinData?.hardMatches || 0}</td>
+                          <td>{match3MinData?.hardMatches || 0}</td>
+                          <td>{match5MinData?.hardMatches || 0}</td>
+                        </tr>
+                        <tr>
+                          <td>Average WPM</td>
+                          <td>{Math.round(match1MinData?.data?.hard?.avgwpm) || 0} Per Min</td>
+                          <td>{Math.round(match3MinData?.data?.hard?.avgwpm) || 0} Per Min</td>
+                          <td>{Math.round(match5MinData?.data?.hard?.avgwpm) || 0} Per Min</td>
+                        </tr>
+                        <tr>
+                          <td>Average Accuracy</td>
+                          <td>{Math.round(match1MinData?.data?.hard?.avgacc) || 0} %</td>
+                          <td>{Math.round(match3MinData?.data?.hard?.avgacc) || 0} %</td>
+                          <td>{Math.round(match5MinData?.data?.hard?.avgacc) || 0} %</td>
+                        </tr>
+                        <tr>
+                          <td>Average Consistency</td>
+                          <td>{Math.round(match1MinData?.data?.hard?.avgconsis) || 0} %</td>
+                          <td>{Math.round(match3MinData?.data?.hard?.avgconsis) || 0} %</td>
+                          <td>{Math.round(match5MinData?.data?.hard?.avgconsis) || 0} %</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </NavLink>

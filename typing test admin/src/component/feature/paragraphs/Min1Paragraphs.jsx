@@ -224,11 +224,11 @@ const Min1Paragraphs = (props) => {
                                         <div>
                                             <button type='button' className='theme-btn' onClick={handleDeleteLast}>
                                                 <i className="fa-solid fa-trash-can fa-lg" style={{ color: "#d41111" }} />
-                                                &nbsp; Delete
+                                                &nbsp; {window.innerWidth <= 767 ? "" : "Delete"}
                                             </button>
                                             <button type='button' className='theme-btn' onClick={handleAddMore}>
                                                 <i className="fa-solid fa-plus-large fa-lg" style={{ color: "#71cac7" }} />
-                                                &nbsp; Add More
+                                                &nbsp; {window.innerWidth <= 767 ? "" : "Add More"}
                                             </button>
                                         </div>
                                     </div>

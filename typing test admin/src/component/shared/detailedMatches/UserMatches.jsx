@@ -9,13 +9,7 @@ const UserMatches = () => {
     const param = useParams();
     const { level } = param;
     
-    const rawUserData = useSelector(state => {
-        if(localStorage.getItem('userToken')) {
-            return state.UserDataSlice.userData;
-        } else {
-            return state.AdminDataSlice.userData;
-        }
-    });
+    const rawUserData = useSelector(state => state.AdminDataSlice.userData);
 
     const [matchData, setMatchData] = useState({ match1: [], match3: [], match5: [] });
     const [displayData, setDisplayData] = useState([]);
@@ -27,7 +21,7 @@ const UserMatches = () => {
         const match1 = rawUserData?.match_1?.filter(value => value.level === level) || [];
         const match3 = rawUserData?.match_3?.filter(value => value.level === level) || [];
         const match5 = rawUserData?.match_5?.filter(value => value.level === level) || [];
-
+        console.log(rawUserData)
         setMatchData({ match1, match3, match5 });
         setDisplayData(match1);
     }, [rawUserData, level]);
@@ -150,7 +144,7 @@ const UserMatches = () => {
             </section>
 
 
-            <div style={{ position: 'absolute', left: '-100%', top: '28%' }}>
+            <div style={{ position: 'absolute', left: '-300%', top: '28%' }}>
                 <Certificate ref={certificateRef} props={stats} />
             </div>
         </>

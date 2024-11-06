@@ -8,7 +8,7 @@ const SideBar = () => {
         <div>
         <div className="brand-logo d-flex align-items-center justify-content-between">
             <NavLink to='/admin' className="text-nowrap logo-img">
-            <img src="./assets/images/logo 2.svg" width={180} alt="" />
+            <img src="/assets/images/logo 2.svg" width={180} alt="" />
             </NavLink>
             <div
             className="close-btn d-xl-none d-block sidebartoggler cursor-pointer"

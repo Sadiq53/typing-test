@@ -64,59 +64,61 @@ const Lobby = () => {
   })
 
   // Function to get a random index based on array length
-function getRandomIndex(array) {
-  return Math.floor(Math.random() * array.length);
-}
-
-// Function to generate paragraph based on duration and difficulty
-const generateTypingTestParagraph = () => {
-  const wordsPerMinute = 70; // Average typing speed (can be adjusted)
-  const totalWords = wordsPerMinute * (timeLimit / 60); // Total words to match the duration
-
-  let wordArray;
-  if (difficulty === "easy") {
-      wordArray = easyWords;
-  } else if (difficulty === "medium") {
-      wordArray = mediumWords.concat(easyWords); // Mix easy and medium words
-  } else if (difficulty === "hard") {
-      wordArray = hardWords.concat(mediumWords).concat(easyWords); // Mix all words
+  function getRandomIndex(array) {
+    return Math.floor(Math.random() * array.length);
   }
 
-  const newParagraph = generateParagraph(wordArray, totalWords);
-  setCurrentParagraph(newParagraph);
-};
+  // Function to generate paragraph based on duration and difficulty
+  const generateTypingTestParagraph = () => {
+    const wordsPerMinute = 70; // Average typing speed (can be adjusted)
+    const totalWords = wordsPerMinute * (timeLimit / 60); // Total words to match the duration
 
-useEffect(() => {
-  // Update Min1, Min3, and Min5 values if they exist in `paragraphs`
-  setMin1(paragraphs?.Min1 || []);
-  setMin3(paragraphs?.Min3 || []);
-  setMin5(paragraphs?.Min5 || []);
+    let wordArray;
+    if (difficulty === "easy") {
+        wordArray = easyWords;
+    } else if (difficulty === "medium") {
+        wordArray = mediumWords.concat(easyWords); // Mix easy and medium words
+    } else if (difficulty === "hard") {
+        wordArray = hardWords.concat(mediumWords).concat(easyWords); // Mix all words
+    }
 
-  const changeTime = {
-      60: 'Min1',
-      180: 'Min3',
-      300: 'Min5',
+    const newParagraph = generateParagraph(wordArray, totalWords);
+    setCurrentParagraph(newParagraph);
   };
-  const timeField = changeTime[time];
 
-  // Check if a paragraph exists for the given time and difficulty
-  if (timeField && paragraphs?.[timeField]?.[difficulty]?.length > 0) {
-      // Pick a random paragraph from existing ones
-      const getIndex = getRandomIndex(paragraphs[timeField][difficulty]);
-      setCurrentParagraph(paragraphs[timeField][difficulty][getIndex]?.para);
-      console.log(paragraphs[timeField][difficulty][getIndex]?.para)
-  } else {
-      // If no paragraph exists, generate a new one
-      generateTypingTestParagraph();
-  }
-}, [paragraphs, time, difficulty]); // Dependencies: `paragraphs`, `time`, and `difficulty`
+  useEffect(() => {
+    // Update Min1, Min3, and Min5 values if they exist in `paragraphs`
+    setMin1(paragraphs?.Min1 || []);
+    setMin3(paragraphs?.Min3 || []);
+    setMin5(paragraphs?.Min5 || []);
+
+    const changeTime = {
+        60: 'Min1',
+        180: 'Min3',
+        300: 'Min5',
+    };
+    const timeField = changeTime[time];
+
+    // Check if a paragraph exists for the given time and difficulty
+    if (timeField && paragraphs?.[timeField]?.[difficulty]?.length > 0) {
+        // Pick a random paragraph from existing ones
+        const getIndex = getRandomIndex(paragraphs[timeField][difficulty]);
+        setCurrentParagraph(paragraphs[timeField][difficulty][getIndex]?.para);
+        console.log(paragraphs[timeField][difficulty][getIndex]?.para)
+    } else {
+        // If no paragraph exists, generate a new one
+        generateTypingTestParagraph();
+    }
+  }, [paragraphs, time, difficulty]); // Dependencies: `paragraphs`, `time`, and `difficulty`
 
 
   // Focus input on load--------------------------------------------------------------------------
   useEffect(() => {
-    if(typingAreaRef.current){
-      typingAreaRef.current.focus();
-      setHasFocus(true)
+    if(hasFocus) {
+      if(typingAreaRef.current){
+        typingAreaRef.current.focus();
+        typingAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
   }, [hasFocus]);
   // Focus input on load--------------------------------------------------------------------------
@@ -131,7 +133,7 @@ useEffect(() => {
 
     // Return the formatted time
     return `${minutes}:${formattedSeconds}`;
-};
+  };
   //convert the timeer in proper format---------------------------------------------------------------
 
   // Update elapsed time and stop timer if time limit is reached------------------------------------
@@ -261,7 +263,7 @@ useEffect(() => {
     extraChars,
     // missedChars
   }));
-};
+  };
   // Calculate and update statistics-------------------------------------------------------------------
   
   
@@ -277,9 +279,9 @@ useEffect(() => {
     setStats((prevStats) => ({
       ...prevStats,   // Spread the previous stats object
       level: difficulty,  // Update the 'level' property
-      time: time         // Update the 'time' property
+      time: timeLimit         // Update the 'time' property
     }));
-  }, [difficulty, time])
+  }, [difficulty, timeLimit])
   // updation Difficulty in stats-------------------------------------------------------------------
   
   // After test Done-------------------------------------------------------------------
@@ -290,6 +292,7 @@ useEffect(() => {
         date : new Date()
       }
       localStorage.setItem('stats', JSON.stringify(result))
+      localStorage.setItem('matchHistory', JSON.stringify({time : result.data.time, level : result.data.level}))
       if(localStorage.getItem('userToken')) {
           dispatch(handleTest(result))
       } else {
@@ -328,7 +331,7 @@ useEffect(() => {
       time: 0,
       level : ''
     });
-    typingAreaRef.current.focus();
+    typingAreaRef.current.blur();
   };
   // Reset the typing test-----------------------------------------------------------------------------
   
@@ -378,6 +381,20 @@ useEffect(() => {
     }
 }, [])
 
+  useEffect(() => {
+    if(localStorage.getItem('matchHistory')) {
+      let data = localStorage.getItem('matchHistory')
+      data = JSON.parse(data)
+      const { time, level } = data
+      setTime(time)
+      setTimeLimit(time)
+      setDifficulty(level)
+      setTime(()=>{
+        localStorage.removeItem('matchHistory')
+      }, 1000)
+    }
+  }, [])
+
 const handleAlertClose = () => {
   setShowAlert(false); // Set showAlert to false
 };
@@ -387,7 +404,13 @@ const handleAlertClose = () => {
       <Header />
       <section className='lobby-area'>
         <div className="container">
-          <div className="row custom-align">
+          <div 
+            className="row custom-align"
+            style={{
+              transition: 'transform 0.3s ease', 
+              transform: hasFocus ? 'translateY(-50%)' : 'none',
+            }}
+          >
             <div className="cutom-lobby-head">
                 <div className='lobby-menu'>
                   <ul>
@@ -395,7 +418,7 @@ const handleAlertClose = () => {
                     <li>
                       <button
                         onClick={() => handleTime(60)}
-                        className={time === 60 ? 'active' : ''}
+                        className={timeLimit === 60 ? 'active' : ''}
                       >
                         01 Min
                       </button>
@@ -403,7 +426,7 @@ const handleAlertClose = () => {
                     <li>
                       <button
                         onClick={() => handleTime(180)}
-                        className={time === 180 ? 'active' : ''}
+                        className={timeLimit === 180 ? 'active' : ''}
                       >
                         03 Min
                       </button>
@@ -411,7 +434,7 @@ const handleAlertClose = () => {
                     <li>
                       <button
                         onClick={() => handleTime(300)}
-                        className={time === 300 ? 'active' : ''}
+                        className={timeLimit === 300 ? 'active' : ''}
                       >
                         05 Min
                       </button>

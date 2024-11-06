@@ -7,8 +7,6 @@ const fs = require('fs');
 const multer = require('multer');
 
 
-
-
 // Directory to store uploaded files temporarily
 const uploadDirFeaturedImage = path.resolve(__dirname, '../../assets/uploads/featuredImage');
 // console.log(uploadDirFeaturedImage)
@@ -47,38 +45,6 @@ const uploadFeaturedImage = multer({
     }
 });
 
-route.get('/', async (req, res) => {
-    const page = parseInt(req.query.page) || 1; // Default to page 1
-    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
-    const skip = (page - 1) * limit;
-
-    try {
-        // Find the admin document
-        const admin = await adminModel.findOne();
-
-        if (!admin || !admin.blog) {
-            return res.status(404).json({ status: 404, message: 'No blogs found' });
-        }
-
-        // Filter and paginate blogs within the blog array
-        const publishedBlogs = admin.blog;
-        const totalBlogs = publishedBlogs.length;
-
-        // Paginate the filtered blogs
-        const paginatedBlogs = publishedBlogs.slice(skip, skip + limit);
-
-        res.status(200).json({
-            status: 200,
-            data: paginatedBlogs,
-            totalBlogs,
-            currentPage: page,
-            totalPages: Math.ceil(totalBlogs / limit),
-        });
-    } catch (error) {
-        console.error('Error fetching blogs:', error);
-        res.status(500).json({ status: 500, message: 'Internal server error' });
-    }
-});
 
 // Blog post route
 route.post('/', uploadFeaturedImage.single('featuredImage'), async (req, res) => {
@@ -123,6 +89,39 @@ route.post('/', uploadFeaturedImage.single('featuredImage'), async (req, res) =>
         }
     } else {
         res.status(401).send({ status: 401, message: 'Authorization token required' });
+    }
+});
+
+route.get('/', async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // Default to page 1
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const skip = (page - 1) * limit;
+
+    try {
+        // Find the admin document
+        const admin = await adminModel.findOne();
+
+        if (!admin || !admin.blog) {
+            return res.status(404).json({ status: 404, message: 'No blogs found' });
+        }
+
+        // Filter and paginate blogs within the blog array
+        const publishedBlogs = admin.blog;
+        const totalBlogs = publishedBlogs.length;
+
+        // Paginate the filtered blogs
+        const paginatedBlogs = publishedBlogs.slice(skip, skip + limit);
+
+        res.status(200).json({
+            status: 200,
+            data: paginatedBlogs,
+            totalBlogs,
+            currentPage: page,
+            totalPages: Math.ceil(totalBlogs / limit),
+        });
+    } catch (error) {
+        console.error('Error fetching blogs:', error);
+        res.status(500).json({ status: 500, message: 'Internal server error' });
     }
 });
 

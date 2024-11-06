@@ -124,16 +124,15 @@
 }
 
 .profile-card.data .profile-content{
-    display: flex;
+    display: grid;
     justify-content: flex-start;
     align-items: center;
     gap: 50px;
     width: 100%;
+    grid-template-columns: 1fr 1fr 1fr;
 }
 
-.profile-card.data .profile-content div{
-    width: 20%;
-}
+
 
 .profile-btn{
     display: flex;
@@ -727,6 +726,9 @@
 .width-70{
     width: 70% !important;
 }
+.width-100{
+    width: 100% !important;
+}
 
 .blog-category{
     display: grid;
@@ -885,3 +887,28 @@
     justify-content: center;
     gap: 20px;
 }
+
+.profile-content table th, .profile-content table td{
+    padding: 10px;
+}
+
+.profile-content table th{
+    color: #8c8c8c;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    text-transform: capitalize;
+    margin: 0;
+}
+.profile-content table td{
+    color: #000;
+    text-align: center;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-align: left !important;
+    margin: 0;
+}
+

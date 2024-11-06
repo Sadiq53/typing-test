@@ -31,7 +31,7 @@ const AdminDashBoard = () => {
         <section>
             <div className="container pt-7">
                 <div className="row">
-                    <div className="col-sm-3 col-lg-3 col-xl-3">
+                    <div className="col-sm-3 col-6 col-lg-3 col-xl-3">
                         <NavLink
                             to='/admin/users'
                             className="p-4 text-center bg-light-primary card shadow-none rounded-2"
@@ -47,7 +47,7 @@ const AdminDashBoard = () => {
                             <h4 className="fw-semibold text-primary mb-0">{adminData?.userCount}</h4>
                         </NavLink>
                     </div>
-                    <div className="col-sm-3 col-lg-3 col-xl-3">
+                    <div className="col-sm-3 col-6 col-lg-3 col-xl-3">
                         <NavLink
                             to='/admin/blog'
                             className="p-4 text-center bg-light-warning card shadow-none rounded-2"
@@ -63,7 +63,7 @@ const AdminDashBoard = () => {
                             <h4 className="fw-semibold text-warning mb-0">{adminData?.blogCount}</h4>
                         </NavLink>
                     </div>
-                    <div className="col-sm-3 col-lg-3 col-xl-3">
+                    <div className="col-sm-3 col-6 col-lg-3 col-xl-3">
                         <NavLink
                             to='/admin/users'
                             className="p-4 text-center bg-light-info card shadow-none rounded-2"
@@ -79,7 +79,7 @@ const AdminDashBoard = () => {
                             <h4 className="fw-semibold text-info mb-0">{adminData?.block?.length}</h4>
                         </NavLink>
                     </div>
-                    <div className="col-sm-3 col-lg-3 col-xl-3">
+                    <div className="col-sm-3 col-6 col-lg-3 col-xl-3">
                         <NavLink
                             to='/admin/paragraphs'
                             className="p-4 text-center bg-light-danger card shadow-none rounded-2"
