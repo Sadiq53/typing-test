@@ -173,59 +173,50 @@ route.post('/para', async (req, res) => {
     }
 });
 
+// Route to send notification to all users
 route.post("/send-notification", async (req, res) => {
     const { title, message } = req.body;
     
     try {
-        // Retrieve users with valid FCM tokens
         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
         const tokens = users.map((user) => user.fcmToken);
-        
-        if (tokens.length === 0) {
-            return res.status(400).json({ success: false, message: "No valid FCM tokens found" });
-        }
-
-        // Create the notification payload
+    
         const payload = {
             notification: {
                 title,
-                body: message,
-            },
+                body: message
+            }
         };
 
-        // Send notification to each token
-        const responses = await admin.messaging().sendEachForMulticast({
-            tokens,
-            ...payload,
+        // Send notifications to each device
+        const response = await admin.messaging().sendEachForMulticast({
+            tokens: tokens,
+            notification: payload.notification
         });
 
-        // Check for failed tokens and log errors
+        // Check for individual failed tokens
         const failedTokens = [];
-        responses.responses.forEach((response, idx) => {
-            if (!response.success) {
-                const failedToken = tokens[idx];
-                failedTokens.push(failedToken);
-
-                // Optional: Remove invalid tokens from database
-                if (response.error.code === 'messaging/invalid-registration-token' ||
-                    response.error.code === 'messaging/registration-token-not-registered') {
-                    notificationModel.updateOne({ fcmToken: failedToken }, { $unset: { fcmToken: "" } })
-                        .then(() => console.log(`Removed invalid token: ${failedToken}`))
-                        .catch((err) => console.error("Error removing token:", err));
-                }
+        response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+                failedTokens.push(tokens[idx]);
+                console.error("Error sending to token:", tokens[idx], resp.error);
             }
         });
 
         res.status(200).json({ 
-            success: true, 
-            message: "Notification sent", 
-            failedTokens 
+            success: true,
+            message: "Notification processed with possible individual failures.",
+            failedTokens: failedTokens,
+            successCount: response.successCount,
+            failureCount: response.failureCount
         });
+
     } catch (error) {
         console.error("Error sending notification:", error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
 
 
 
