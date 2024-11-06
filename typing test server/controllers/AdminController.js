@@ -195,10 +195,10 @@ route.post("/send-notification", async (req, res) => {
 
         // Send notifications to each device
         const response = await admin.messaging().sendEachForMulticast({
-            tokens: tokens,
-            notification: payload.notification
+            notification: payload.notification,
+            tokens: tokens
         });
-        console.log(response)
+
         // Check for individual failed tokens
         const failedTokens = [];
         response.responses.forEach((resp, idx) => {
