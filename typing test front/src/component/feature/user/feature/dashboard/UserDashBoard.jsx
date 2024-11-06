@@ -208,7 +208,7 @@ useEffect(() => {
       <Header />
       <section className='user-profile py-5'>
         <div className="container">
-          <div className="row align-items-center">
+          <div className="row">
             <div className="col-md-4">
               <div className="profile-layout">
                 <div className="profile-sec1">
@@ -300,13 +300,13 @@ useEffect(() => {
               <div className="profile-stacs">
                 <div className="stacs">
                   <div>
-                    <h4>Test Started</h4>
+                    <h4>Test Completed</h4>
                     <h2>{totalMatchesCompleted}</h2>
                   </div>
-                  <div>
+                  {/* <div>
                     <h4>Test Completed</h4>
                     <h2>26</h2>
-                  </div>
+                  </div> */}
                   <div>
                     <h4>Time Typing</h4>
                     <h2>{totalTimeOfMatches}</h2>
