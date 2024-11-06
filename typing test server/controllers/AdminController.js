@@ -6,7 +6,7 @@ const userModel = require('../model/UserSchema')
 const notificationModel = require('../model/NotificationSchema')
 const key = require('../config/token_Keys');
 const admin = require("firebase-admin");
-const serviceAccount = require("../config/typing-test-57f38-firebase-adminsdk-owp3i-648f3d8c6c.json");
+const serviceAccount = require("../config/typing-test-57f38-firebase-adminsdk-owp3i-0afe1c5063.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -198,7 +198,7 @@ route.post("/send-notification", async (req, res) => {
             tokens: tokens,
             notification: payload.notification
         });
-
+        console.log(response)
         // Check for individual failed tokens
         const failedTokens = [];
         response.responses.forEach((resp, idx) => {
