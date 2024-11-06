@@ -12,6 +12,9 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+// const credential = admin.credential.cert(serviceAccount);
+
+
 
 route.use('/blog', require('./sub-controllers/BlogController'))
 route.use('/users', require('./sub-controllers/UsersController'))
@@ -195,8 +198,8 @@ route.post("/send-notification", async (req, res) => {
 
         // Send notifications to each device
         const response = await admin.messaging().sendEachForMulticast({
+            tokens: tokens,
             notification: payload.notification,
-            tokens: tokens
         });
 
         // Check for individual failed tokens
