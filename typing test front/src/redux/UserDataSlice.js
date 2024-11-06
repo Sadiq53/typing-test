@@ -39,6 +39,7 @@ const handleSigninUser = createAsyncThunk('handleSigninUser', async(formData) =>
         return checkMsg
     }
 })
+
 const handleSigninUserWithGoogle = createAsyncThunk('handleSigninUserWithGoogle', async(UserInfo) => {
     const response = await axios.post(`${USER_API_URL}/signin/google`, UserInfo)
     // console.log(response.data)

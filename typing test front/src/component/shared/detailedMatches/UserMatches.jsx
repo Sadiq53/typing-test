@@ -93,7 +93,7 @@ const UserMatches = () => {
         <>
             <Header />
             <section>
-                <div className="container">
+                <div className="container py-5">
                     <div className="row">
                         <div className="col-md-12">
                             <div className="leaderboard-head">
@@ -116,31 +116,39 @@ const UserMatches = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {displayData.map((value, index) => {
-                                                const rawDate = value.matchdate;
-                                                const parsedDate = new Date(rawDate);
-                                                let formatDate;
-                                                if (!isNaN(parsedDate)) {
-                                                    formatDate = new Intl.DateTimeFormat('en-GB', {
-                                                        day: '2-digit',
-                                                        month: 'short',
-                                                        year: 'numeric',
-                                                    }).format(parsedDate);
-                                                } else {
-                                                    console.error('Invalid date format:', rawDate);
-                                                }
-                                                return (
-                                                    <tr key={index}>
-                                                        <td>{index + 1}</td>
-                                                        <td>{formatDate}</td>
-                                                        <td>
-                                                            <button onClick={() => handleUpdateData(value)}>
-                                                                <i className="fa-solid fa-download fa-xl" />
-                                                            </button>
-                                                        </td>
+                                            {
+                                                displayData?.length !== 0 ? displayData.map((value, index) => {
+                                                    const rawDate = value.matchdate;
+                                                    const parsedDate = new Date(rawDate);
+                                                    let formatDate;
+                                                    if (!isNaN(parsedDate)) {
+                                                        formatDate = new Intl.DateTimeFormat('en-GB', {
+                                                            day: '2-digit',
+                                                            month: 'short',
+                                                            year: 'numeric',
+                                                        }).format(parsedDate);
+                                                    } else {
+                                                        console.error('Invalid date format:', rawDate);
+                                                    }
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td>{index + 1}</td>
+                                                            <td>{formatDate}</td>
+                                                            <td>
+                                                                <button onClick={() => handleUpdateData(value)}>
+                                                                    <i className="fa-solid fa-download fa-xl" />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }) : (
+                                                    <tr>
+                                                        <td>No Match Played</td>
+                                                        <td>No Match Played</td>
+                                                        <td>No Match Played</td>
                                                     </tr>
-                                                );
-                                            })}
+                                                )
+                                            }
                                         </tbody>
                                     </table>
                                 </div>

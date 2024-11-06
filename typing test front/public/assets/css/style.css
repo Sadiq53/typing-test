@@ -985,6 +985,7 @@ margin: 0;
     /* border: 1px solid #71CAC7; */
     border-radius: 10px;
     overflow: hidden;
+    min-height: 250px;
 }
 
 .swal2-popup{

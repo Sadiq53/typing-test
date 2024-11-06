@@ -19,7 +19,7 @@ const UserSignin = () => {
   const [schema, setSchema] = useState(usernameSchema); // Default to username schema
   const [inputType, setInputType] = useState('username'); // To store 'email' or 'username'
   const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
-  const processingMsg = useSelector(state => state.UserDataSlice.isProcessing)
+  const processingMsg = useSelector(state => state.UserDataSlice.processingMsg)
   const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
   const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
   const isError = useSelector(state => state.UserDataSlice.isError)
@@ -63,7 +63,7 @@ const UserSignin = () => {
       if(processingMsg?.type === 'signin') {
         setLoader(true)
         dispatch(resetState())
-      } else setLoader(false)
+      }
     } 
   }, [isProcessing, processingMsg])
 
@@ -125,7 +125,7 @@ const UserSignin = () => {
           <div><input type='checkbox' /> <label className='font-idle'> &nbsp; Remember Me</label></div>
           <NavLink to='' className='font-idle'>Forgot Password?</NavLink>
         </div>
-        <button type='submit' className='theme-btn lg width-90'>Sign In  { loader ? <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> : null }</button>
+        <button type='submit' className='theme-btn lg width-90'>Sign In  { loader && <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> }</button>
         <div className='width-90'><p className='font-idle text-center'>or</p></div>
         <div className='d-flex justify-content-center width-90'>
           <GoogleAuth props={'Sign In'} />

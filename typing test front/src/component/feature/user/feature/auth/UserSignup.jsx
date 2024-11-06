@@ -44,7 +44,7 @@ const UserSignup = () => {
       if(processingMsg?.type === 'signup') {
         setLoader(true)
         dispatch(resetState())
-      } else setLoader(false)
+      }
     } 
   }, [isProcessing, processingMsg])
 
@@ -76,13 +76,19 @@ const UserSignup = () => {
         }
         <div className='auth-input my-4'>
           <div className="auth">
-          <input  type="text" name='username' onChange={signupForm.handleChange} placeholder='User Name' />
-          <i className="fa-solid fa-user fa-sm" style={{ color: "#8c8c8c" }} />
+            <input  type="text" name='username' onChange={signupForm.handleChange} placeholder='User Name' />
+            <i className="fa-solid fa-user fa-sm" style={{ color: "#8c8c8c" }} />
           </div>
+          {
+            signupForm.errors.username && signupForm.touched.username && (<small className='text-danger'>{signupForm.errors.username}</small>)
+          }
           <div className="auth">
-          <input  type="email" name='email' onChange={signupForm.handleChange} placeholder='Email Address' />
-          <i class="fa-solid fa-envelope fa-sm" style={{color : '#8c8c8c'}}></i>
+            <input  type="email" name='email' onChange={signupForm.handleChange} placeholder='Email Address' />
+            <i class="fa-solid fa-envelope fa-sm" style={{color : '#8c8c8c'}}></i>
           </div>
+          {
+            signupForm.errors.email && signupForm.touched.email && (<small className='text-danger'>{signupForm.errors.email}</small>)
+          }
           <div className="auth">
             <input
               type={eye.pass ? "text" : "password"}
@@ -101,6 +107,9 @@ const UserSignup = () => {
               )}
             </button>
           </div>
+          {
+            signupForm.errors.password && signupForm.touched.password && (<small className='text-danger'>{signupForm.errors.password}</small>)
+          }
 
           <div className="auth">
             <input
@@ -120,6 +129,9 @@ const UserSignup = () => {
               )}
             </button>
           </div>
+          {
+            signupForm.errors.repassword && signupForm.touched.repassword && (<small className='text-danger'>{signupForm.errors.repassword}</small>)
+          }
           <button type='submit' className='theme-btn lg width-90'>Sign Up { loader ? <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> : null }</button>
           <div className='width-90'><p className='font-idle text-center'>or</p></div>
           <div className='d-flex justify-content-center width-90'>
