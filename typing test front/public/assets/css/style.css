@@ -493,13 +493,19 @@ margin: 0;
     background: #71CAC7;
     color: #15131A;
     font-family: Inter;
-    font-size: 22px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
     text-transform: capitalize;
-    padding: 18px 40px;
+    padding: 15px 30px;
     text-align: center;
+}
+button.google-sign-btn img {
+    width: 25px;
+}
+.auth-input input::placeholder{
+    font-size: 16px;
 }
 
 .theme-btn.sm{
@@ -533,7 +539,7 @@ margin: 0;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 20px;
+    /* padding: 20px; */
 }
 
 .stacs table th, .stacs table td{
@@ -570,6 +576,12 @@ margin: 0;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    border: 1px solid transparent;
+    transition: 0.5s all;
+}
+.profile-stacs>a:hover .stacs.mob {
+    border: 1px solid #71cac7;
+    box-shadow: 0px 0px 20px -6px #71cac757;
 }
 .profile-stacs .stacs h4{
     color: #71CAC7;
@@ -659,12 +671,12 @@ margin: 0;
     border-radius: 10px;
     background: #1F1D21;
     width: 90%;
-    height: 65px;
+    height: 55px;
     flex-shrink: 0;
     outline: none;
     color: #FFF;
     font-family: Inter;
-    font-size: 18px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -676,12 +688,12 @@ margin: 0;
 .auth-input .auth input{
     background-color: transparent;
     width: 90%;
-    height: 65px;
+    height: 55px;
     flex-shrink: 0;
     outline: none;
     color: #FFF;
     font-family: Inter;
-    font-size: 18px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -704,16 +716,16 @@ margin: 0;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    padding: 18px !important;
+    padding: 15px 20px !important;
     color: #FFF;
     border-radius: 50px;
     font-family: Inter;
-    font-size: 18px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     padding: 2px 20px;
-    border: 2px solid #71CAC7;
+    border: 1px solid #71CAC7;
 }
 .stats-layout{
     position: fixed;
