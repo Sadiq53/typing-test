@@ -9,12 +9,7 @@ const randNum = require('random-number')
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
-const admin = require("firebase-admin");
-const serviceAccount = require("../config/typing-test-57f38-firebase-adminsdk-owp3i-648f3d8c6c.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
 
 
 const calculateAverage = (numbers) => {
