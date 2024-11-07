@@ -192,7 +192,7 @@ route.post("/send-notification", async (req, res) => {
         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
         const tokens = users.map((user) => user.fcmToken);
 
-        const responseNew = await admin.messaging().sendToDevice(tokens[0], {
+        const responseNew = await admin.messaging().sendEachForMulticast(tokens[0], {
             notification: {
                 title: "Test Notification",
                 body: "This is a test message from the server"
