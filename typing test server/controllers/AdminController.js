@@ -6,12 +6,13 @@ const userModel = require('../model/UserSchema')
 const notificationModel = require('../model/NotificationSchema')
 const key = require('../config/token_Keys');
 const admin = require("firebase-admin");
-const serviceAccount = require("../config/typing-test-57f38-firebase-adminsdk-owp3i-0afe1c5063.json");
+// const serviceAccount = require("../config/typing-test-57f38-firebase-adminsdk-owp3i-efefc0e96b.json");
+
 
     // Check if already initialized to prevent re-initialization issues
     if (!admin.apps.length) {
         admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
+            credential: admin.credential.cert(process.env.firebase_Credentials),
         });
     } else {
         console.log('Firebase already initialized');
@@ -191,14 +192,6 @@ route.post("/send-notification", async (req, res) => {
     try {
         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
         const tokens = users.map((user) => user.fcmToken);
-
-        const responseNew = await admin.messaging().sendEachForMulticast(tokens[0], {
-            notification: {
-                title: "Test Notification",
-                body: "This is a test message from the server"
-            }
-        });
-        console.log("Single Device Test Response:", responseNew);
     
         const payload = {
             notification: {
