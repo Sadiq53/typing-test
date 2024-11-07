@@ -44,6 +44,8 @@ const Lobby = () => {
     correctChars: 0,
     incorrectChars: 0,
     extraChars: 0,
+    isCompleted : false,
+    timeOfCompletion : 0,
     // missedChars : 0,
     time: 0,
     level : ''
@@ -58,6 +60,8 @@ const Lobby = () => {
     correctChars: 0,
     incorrectChars: 0,
     extraChars: 0,
+    isCompleted : false,
+    timeOfCompletion : 0,
     // missedChars : 0,
     time: 0,
     level : ''
@@ -185,7 +189,9 @@ const Lobby = () => {
   let currentStreak = 0; 
   let longestStreak = 0;
   // let missedChars = 0;
-  let isTestCompleted = false;
+  let isCompleted = false;
+  let timeOfCompletion = 0;
+
 
   // Track correct, incorrect, and extra characters
   [...currentParagraph].forEach((char, index) => {
@@ -227,6 +233,9 @@ const Lobby = () => {
 
   // Determine if the paragraph is completed by checking if the sum of correct and incorrect characters matches `currentParagraph` length
   isCompleted = (correctChars + incorrectChars) >= currentParagraph.length;
+  if(isCompleted) {
+    timeOfCompletion = timeLimit - elapsedTime
+  }
 
   // Correctly calculate accuracy as the percentage of correct chars out of total chars typed (ignoring extra chars)
   const totalTypedChars = correctChars + incorrectChars; // Total meaningful input

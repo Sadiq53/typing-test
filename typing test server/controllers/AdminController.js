@@ -9,7 +9,7 @@ const admin = require("firebase-admin");
 const serviceAccount = require("../config/typing-test-57f38-firebase-adminsdk-owp3i-0afe1c5063.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert(serviceAccount)
 });
 
 
@@ -183,40 +183,44 @@ route.post('/para', async (req, res) => {
 // Route to send notification to all users
 route.post("/send-notification", async (req, res) => {
     const { title, message } = req.body;
+
+    console.log("title", title, "message", message)
     
     try {
-        const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
-        const tokens = users.map((user) => user.fcmToken);
-    
-        const payload = {
-            notification: {
-                title,
-                body: message
-            }
-        };
+        if(title) {
+            const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
+            const tokens = users.map((user) => user.fcmToken);
+        
+            const payload = {
+                notification: {
+                    title,
+                    body: message
+                }
+            };
 
-        // Send notifications to each device
-        const response = await admin.messaging().sendEachForMulticast({
-            tokens: tokens,
-            notification: payload.notification,
-        });
+            // Send notifications to each device
+            const response = await admin.messaging().sendEachForMulticast({
+                tokens: tokens,
+                notification: payload.notification,
+            });
 
-        // Check for individual failed tokens
-        const failedTokens = [];
-        response.responses.forEach((resp, idx) => {
-            if (!resp.success) {
-                failedTokens.push(tokens[idx]);
-                console.error("Error sending to token:", tokens[idx], resp.error);
-            }
-        });
+            // Check for individual failed tokens
+            const failedTokens = [];
+            response.responses.forEach((resp, idx) => {
+                if (!resp.success) {
+                    failedTokens.push(tokens[idx]);
+                    console.error("Error sending to token:", tokens[idx], resp.error);
+                }
+            });
 
-        res.status(200).json({ 
-            success: true,
-            message: "Notification processed with possible individual failures.",
-            failedTokens: failedTokens,
-            successCount: response.successCount,
-            failureCount: response.failureCount
-        });
+            res.status(200).json({ 
+                success: true,
+                message: "Notification processed with possible individual failures.",
+                failedTokens: failedTokens,
+                successCount: response.successCount,
+                failureCount: response.failureCount
+            });
+        }
 
     } catch (error) {
         console.error("Error sending notification:", error);
