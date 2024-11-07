@@ -6,13 +6,13 @@ const userModel = require('../model/UserSchema')
 const notificationModel = require('../model/NotificationSchema')
 const key = require('../config/token_Keys');
 const admin = require("firebase-admin");
-// const serviceAccount = require("../config/typing-test-57f38-firebase-adminsdk-owp3i-efefc0e96b.json");
+const serviceAccount = require("../config/credentialForFirebase.json");
 
 
     // Check if already initialized to prevent re-initialization issues
     if (!admin.apps.length) {
         admin.initializeApp({
-            credential: admin.credential.cert(process.env.firebase_Credentials),
+            credential: admin.credential.cert(serviceAccount),
         });
     } else {
         console.log('Firebase already initialized');
