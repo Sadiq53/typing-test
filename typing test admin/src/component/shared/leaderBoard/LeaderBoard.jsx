@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { handleGetLeaderboardData, resetState } from '../../../redux/UserDataSlice';
 import { NavLink } from 'react-router-dom';
+import { BASE_API_URL } from '../../../util/API_URL';
 
 
 const LeaderBoard = () => {
