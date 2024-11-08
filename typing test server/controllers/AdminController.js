@@ -8,32 +8,18 @@ const key = require('../config/token_Keys');
 const admin = require("firebase-admin");
 require('dotenv').config();  // Load environment variables from .env
 
-
 const serviceAccount = {
-    "type": "service_account",
-    "project_id": "typing-test-57f38",
-    "private_key_id": "8bbf09d18a4ec9e88243bc8c8404e23ddae660be",
-    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCoDzH4XU/SCWUh\nDyHQHr+cIGsyKUjCoEv2Q6f8ubjWmhd4Yb9NuSWWiNuInI4vPyYN6Nru+CvHZ3D/\nDep4MOxcQ2jD/zlcRfkV+P/BiXWBzyUHg3rJ6sgk5YYQ/rTNb3jawJoIDTtjbe+7\n0OnyB+HtQciaZX5+ztvxfUa2awPEpqDy7mYOpBvB+d/fnxrk2XzX6dM7qhD6sa4q\n6wNLnTML5cEX4DPjnCXcIEPG5qvO469d3WwsqpZ8GI1sWINW/5CahObMcmW8q047\nfCGpeLSvnxpC43LFbLcPbZ2cgshjT8tCM9bjaGER0UX4WcfNyTK5LCE7xBuhbnll\nfJHoHHRrAgMBAAECggEALMf3wb1jgo0cVGXK1cELv5dn2PLlP28lLpaykYYPeaeP\nr3UkW5qFKIqJLOrCfFZwVm6AwAKC79xhYKUdoC8xHBieNvOwHiVLDQ7PX4u4MwG2\nVT00n88ey64ZPjgQh1k3s9p0cMbN11247qvpWqO9ENJhmLqIrVODieKe0AbN9z0b\nwW9JxJ2tHALhs/ix+JAKahPGsWYImSH7FgNNnpIgTbzJLGazOEtydaXYsWeZpa/s\njhaTylM3Ej//Ndklyv81LYhekHdfjhocdkp5V+V3LJCQZWaVIdB7xLNuZYg4s0pD\nfPWpeCcxS+wXFTPUi6pywyiCNrDDSJFIa72R9zafSQKBgQDthlKMSAet4cuAHVtv\n6K0gQnYvPH+IZOKXleMSITmxqP3/CgUaGgbuiNuuIPcwHxj0pKNWL4tIZCXIiRkJ\n0UEZqIgdvkTm7OT2+HAkG3k0NKWRl2jpZWNX+nFu3K13FUERJoiUo/OA3+JA8s9T\nUi467AoUIjHCDe7tVYFivyrkJQKBgQC1IadewRAvZrZNPveorgIgtl/TAeWW8voF\n2w3XMNA1O139HWHXpL+OeZkizSzCZnTV33UE5aq586o2T57xa8CpN3r896HZF8mW\nRwkBWJiXN4eor9U2f7E3A8HWC3tzeAdEvYXmYQvr3MVE45rvoW1XVCxHMV1P3d9g\neqxzthPJTwKBgQCKdzyWFMONRUz5waN1SKHsZXI6NT1viMhjb/hwsDfO7uIrFG9G\n+RdDZTsTdppDTk2hCH1Dl/HNYLx5/BpBk+AskgfPtwS5zi3oH4pYMj/lBC/lAOwi\n630PY6tO4oypGBXXZqxGYpFodpuSGzprq0PSC5oQhKKXKsI3TxpfM2xQlQKBgQCA\njBzLS3sgGOYCVlDPPoc2DhhdmTgGc/RrGXZuJS9ux+5BR4v7zelAxR2gLDq60JnU\ne10CF7iddcdz+ffUYGN/9GbthxUvDAm+BDXo5aaNkxRM7FUF84OihqEXNljrruCB\nsXuI75DVWH4MEPgRXuBJnOw7rlYJ622vfABNsofCUwKBgH7zlu5giGD+AAJdMGbr\n54dbs4atB5/jmue/jHE7gFXWJDagqyLeQy1IAVeThKZ8RV9VOjBqqfT80ipg0B7y\nHuRHghHrG20/roNGI/t6OSPiQ0fbhkY8bRZ/ywdT05mV39hB9+AJW/jDRCdIbR6a\nKfbewWEBAcAgvV9nJ35/Mq0V\n-----END PRIVATE KEY-----\n",
-    "client_email": "firebase-adminsdk-owp3i@typing-test-57f38.iam.gserviceaccount.com",
-    "client_id": "110011254614305091777",
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-    "token_uri": "https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-owp3i%40typing-test-57f38.iam.gserviceaccount.com",
-    "universe_domain": "googleapis.com"
-  }
-// const serviceAccount = {
-//     type: 'service_account',
-//     project_id: process.env.FIREBASE_PROJECT_ID,
-//     private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-//     private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Correctly replace escaped \n
-//     client_email: process.env.FIREBASE_CLIENT_EMAIL,
-//     client_id: process.env.FIREBASE_CLIENT_ID,
-//     auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-//     token_uri: 'https://oauth2.googleapis.com/token',
-//     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-//     client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
-// };
+    type: 'service_account',
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+    private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'), // Correctly replace escaped \n
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    client_id: process.env.FIREBASE_CLIENT_ID,
+    auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+    token_uri: 'https://oauth2.googleapis.com/token',
+    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+    client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
+};
 
 
     // Check if already initialized to prevent re-initialization issues
