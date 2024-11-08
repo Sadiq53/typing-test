@@ -14,6 +14,7 @@ const Lobby = () => {
   const [time, setTime] = useState(60);
   const [userInput, setUserInput] = useState("");
   const typingAreaRef = useRef(null);
+  const containerRef = useRef(null);
   const [hasFocus, setHasFocus] = useState(false);
   const [difficulty, setDifficulty] = useState("easy");
   const [timeLimit, setTimeLimit] = useState(60); // Default 30 seconds
@@ -108,7 +109,7 @@ const Lobby = () => {
         // Pick a random paragraph from existing ones
         const getIndex = getRandomIndex(paragraphs[timeField][difficulty]);
         setCurrentParagraph(paragraphs[timeField][difficulty][getIndex]?.para);
-        console.log(paragraphs[timeField][difficulty][getIndex]?.para)
+        // console.log(paragraphs[timeField][difficulty][getIndex]?.para)
     } else {
         // If no paragraph exists, generate a new one
         generateTypingTestParagraph();
@@ -164,6 +165,7 @@ const Lobby = () => {
     const newDifficulty = e;
     // console.log(newDifficulty)
     setDifficulty(newDifficulty);
+    typingAreaRef.current.focus();
   };
   // Handle paragraph difficulty change----------------------------------------------------------
 
@@ -231,12 +233,6 @@ const Lobby = () => {
     }
   }
 
-  // Determine if the paragraph is completed by checking if the sum of correct and incorrect characters matches `currentParagraph` length
-  isCompleted = (correctChars + incorrectChars) >= currentParagraph.length;
-  if(isCompleted) {
-    timeOfCompletion = timeLimit - elapsedTime
-  }
-
   // Correctly calculate accuracy as the percentage of correct chars out of total chars typed (ignoring extra chars)
   const totalTypedChars = correctChars + incorrectChars; // Total meaningful input
   const accuracy = ((correctChars / totalTypedChars) * 100).toFixed(2);
@@ -266,6 +262,14 @@ const Lobby = () => {
   //   }
   // }
 
+  // Count only non-space characters in `currentParagraph`
+  const nonSpaceCharCount = currentParagraph.replace(/ /g, "").length;
+
+  // Determine if the paragraph is completed by checking if correct and incorrect characters typed match the non-space characters
+  isCompleted = (correctChars + incorrectChars) >= nonSpaceCharCount;
+  timeOfCompletion = elapsedTime;
+
+
   setStats((prevStats) => ({
     ...prevStats,
     wpm: [...prevStats.wpm, parseFloat(wpm)], // Append the new WPM value
@@ -274,16 +278,26 @@ const Lobby = () => {
     correctChars,
     incorrectChars,
     extraChars,
+    isCompleted,
+    timeOfCompletion
     // missedChars
   }));
   };
   // Calculate and update statistics-------------------------------------------------------------------
   
-  
+  // Eyes on the Completion of test before selected Time-------------------------------------------------
+  useEffect(()=>{
+    if(stats.isCompleted){
+        setTimerRunning(false);
+        setTimeUp(true)
+        setShowModal(true)
+    }
+  }, [stats])
+  // Eyes on the Completion of test before selected Time-------------------------------------------------
+
   // updation of finalStats-------------------------------------------------------------------
   useEffect(()=>{
     setFinalStats(stats)
-    // console.log(stats)
   },[stats])
   // updation of finalStats-------------------------------------------------------------------
   
@@ -341,6 +355,8 @@ const Lobby = () => {
       incorrectChars: 0,
       extraChars: 0,
       // missedChars : 0,
+      isCompleted : false,
+      timeOfCompletion : 0,
       time: 0,
       level : ''
     });
@@ -356,8 +372,24 @@ const Lobby = () => {
     //   time: value     // Update the 'time' property
     // }));    
     setTimeLimit(Number(value))
+    typingAreaRef.current.focus();
   }
   // set the selected time in stats-----------------------------------------------------------------------------
+
+  // Click outside handler to set focus off when clicking outside typing area------------------------
+  const handleClickOutside = (event) => {
+    if (containerRef.current && !containerRef.current.contains(event.target)) {
+      setHasFocus(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  // Click outside handler to set focus off when clicking outside typing area------------------------
 
   useEffect(()=>{
     if(localStorage.getItem('isSignout')) {
@@ -424,68 +456,70 @@ const handleAlertClose = () => {
               transform: hasFocus ? 'translateY(-50%)' : 'none',
             }}
           >
-            <div className="cutom-lobby-head">
-                <div className='lobby-menu'>
-                  <ul>
-                    <li>Time :</li>
-                    <li>
-                      <button
-                        onClick={() => handleTime(60)}
-                        className={timeLimit === 60 ? 'active' : ''}
-                      >
-                        01 Min
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleTime(180)}
-                        className={timeLimit === 180 ? 'active' : ''}
-                      >
-                        03 Min
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleTime(300)}
-                        className={timeLimit === 300 ? 'active' : ''}
-                      >
-                        05 Min
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-                <div className="lobby-menu text-center">
-                  <h4 className={`${timerRunning ? 'text-active' : 'text-idle'}`}>{timeLimit - elapsedTime > 0 ? convertSecondsToFormattedTime(timeLimit - elapsedTime) : 0}</h4>
-                </div>
-                <div className='lobby-menu'>
-                  <ul>
-                    <li>Level :</li>
-                    <li>
-                      <button
-                        onClick={() => handleDifficultyChange('easy')}
-                        className={difficulty === 'easy' ? 'active' : ''}
-                      >
-                        Easy
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleDifficultyChange('medium')}
-                        className={difficulty === 'medium' ? 'active' : ''}
-                      >
-                        Medium
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        onClick={() => handleDifficultyChange('hard')}
-                        className={difficulty === 'hard' ? 'active' : ''}
-                      >
-                        Hard
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+            <div ref={containerRef} className="cutom-lobby-head">
+              <div className='lobby-menu'>
+                <ul>
+                  <li>Time :</li>
+                  <li>
+                    <button
+                      onMouseDown={(e) => { e.preventDefault(); handleTime(60); }}
+                      className={timeLimit === 60 ? 'active' : ''}
+                    >
+                      01 Min
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onMouseDown={(e) => { e.preventDefault(); handleTime(180); }}
+                      className={timeLimit === 180 ? 'active' : ''}
+                    >
+                      03 Min
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onMouseDown={(e) => { e.preventDefault(); handleTime(300); }}
+                      className={timeLimit === 300 ? 'active' : ''}
+                    >
+                      05 Min
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              <div className="lobby-menu text-center">
+                <h4 className={`${timerRunning ? 'text-active' : 'text-idle'}`}>
+                  {timeLimit - elapsedTime > 0 ? convertSecondsToFormattedTime(timeLimit - elapsedTime) : 0}
+                </h4>
+              </div>
+              <div className='lobby-menu'>
+                <ul>
+                  <li>Level :</li>
+                  <li>
+                    <button
+                      onMouseDown={(e) => { e.preventDefault(); handleDifficultyChange('easy'); }}
+                      className={difficulty === 'easy' ? 'active' : ''}
+                    >
+                      Easy
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onMouseDown={(e) => { e.preventDefault(); handleDifficultyChange('medium'); }}
+                      className={difficulty === 'medium' ? 'active' : ''}
+                    >
+                      Medium
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onMouseDown={(e) => { e.preventDefault(); handleDifficultyChange('hard'); }}
+                      className={difficulty === 'hard' ? 'active' : ''}
+                    >
+                      Hard
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
             <div className="col-md-12">
               <div className="typing-area" 
@@ -562,7 +596,7 @@ const handleAlertClose = () => {
         timeUp && (
           <div className="blur-overlay">
           <div className="overlay-message">
-            <h1>Test Over.....!</h1>
+            <h1>{stats.isCompleted ? 'Test Completed' : 'Test Over'}.....!</h1>
             <div class="loading">
           <svg class="orange">
             <g fill="none">

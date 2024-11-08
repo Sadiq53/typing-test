@@ -1,89 +1,105 @@
 const route = require('express').Router();
 const jwt = require('jsonwebtoken');
-const adminModel = require('../../model/AdminSchema')
+const adminModel = require('../../model/AdminSchema');
 const key = require('../../config/token_Keys');
 const path = require('path');
-const fs = require('fs');
+const AWS = require('aws-sdk');
 const multer = require('multer');
+require('dotenv').config();
 
-
-// Directory to store uploaded files temporarily
-const uploadDirFeaturedImage = path.resolve(__dirname, '../../assets/uploads/featuredImage');
-// console.log(uploadDirFeaturedImage)
-
-// Ensure the upload directory exists
-if (!fs.existsSync(uploadDirFeaturedImage)) {
-    fs.mkdirSync(uploadDirFeaturedImage, { recursive: true });
-}
-
-// Multer storage configuration
-const storageForFeaturedImage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDirFeaturedImage); // Save the file to the upload directory
-    },
-    filename: function (req, file, cb) {
-        // Generate a unique name for the file (use timestamp + original extension)
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname); // Get the file extension
-        const newFilename = `${uniqueSuffix}${extension}`;
-        cb(null, newFilename); // Set the new filename
-    }
+// Initialize S3 client
+const s3Client = new AWS.S3({
+    region: process.env.AWS_REGION,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 
-// Multer instance with limits and file type filter
-const uploadFeaturedImage = multer({
-    storage: storageForFeaturedImage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // Limit to 10MB
-    fileFilter: (req, file, cb) => {
-        // Allow only .jpeg, .jpg, .png file types
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type. Only JPEG, JPG, and PNG are allowed.'), false);
-        }
-    }
-});
+// Multer setup to handle file uploads to memory
+const storageForFeaturedImage = multer.memoryStorage();
+const upload = multer({ storage: storageForFeaturedImage }).single('featuredImage');
 
+// Function to delete an existing image from S3
+const deleteImageFromS3 = async (imageKey) => {
+    if (!imageKey) {
+        console.log("No imageKey provided, skipping deletion.");
+        return;
+    }
+
+    try {
+        await s3Client.deleteObject({
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: imageKey,
+        }).promise();
+        console.log("Existing profile image deleted from S3 successfully.");
+    } catch (error) {
+        console.error("Error deleting image from S3:", error);
+    }
+};
 
 // Blog post route
-route.post('/', uploadFeaturedImage.single('featuredImage'), async (req, res) => {
-    console.log(req.body);
+route.post('/', upload, async (req, res) => {
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
         const { title, content, date, description, status, category, tags } = req.body;
 
         const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
         if (isThisAdmin) {
-            const newBlog = {
-                title: title,
-                content: content,
-                status: status,
-                tags: JSON.parse(tags),
-                category: JSON.parse(category),
-                createdat: date,
-                description: description,
-                featuredImage: {
-                    name: req.file?.filename,
-                    path: path.join(uploadDirFeaturedImage, req.file.filename)
+            try {
+                let s3ImageUrl = '';
+                let imageName = '';
+
+                if (req.file) {
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                    const extension = path.extname(req.file.originalname);
+                    imageName = `profile/${uniqueSuffix}${extension}`;
+
+                    // Upload image directly to S3
+                    await s3Client.upload({
+                        Bucket: process.env.AWS_BUCKET_NAME,
+                        Key: imageName,
+                        Body: req.file.buffer,
+                        ContentType: req.file.mimetype,
+                        ACL: 'public-read',
+                    }).promise();
+
+                    // Construct the URL of the uploaded image
+                    s3ImageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${imageName}`;
                 }
-            };
 
-            // Push the new blog into the admin's blog array and retrieve only the new entry
-            const updateResult = await adminModel.findOneAndUpdate(
-                { _id: ID?.id },
-                { $push: { blog: newBlog } },
-                { new: true, projection: { "blog": { $slice: -1 } } }
-            );
+                // Create a new blog object with the image URL
+                const newBlog = {
+                    title,
+                    content,
+                    status,
+                    tags: JSON.parse(tags),
+                    category: JSON.parse(category),
+                    createdat: date,
+                    description,
+                    featuredImage: {
+                        name: req.file?.originalname || null,
+                        path: s3ImageUrl, // Save the S3 URL in the database
+                    }
+                };
 
-            const latestBlog = updateResult.blog[0]; // Only the newly added blog
+                // Push the new blog into the admin's blog array and retrieve only the new entry
+                const updateResult = await adminModel.findOneAndUpdate(
+                    { _id: ID?.id },
+                    { $push: { blog: newBlog } },
+                    { new: true, projection: { "blog": { $slice: -1 } } }
+                );
 
-            res.send({
-                status: 200,
-                type: 'blog',
-                message: 'Blog Posted Successfully',
-                blog: latestBlog
-            });
+                const latestBlog = updateResult.blog[0]; // Only the newly added blog
+
+                res.send({
+                    status: 200,
+                    type: 'blog',
+                    message: 'Blog Posted Successfully',
+                    blog: latestBlog
+                });
+            } catch (error) {
+                console.error('Error uploading to S3:', error);
+                res.status(500).send({ status: 500, message: 'Error uploading to S3' });
+            }
         } else {
             res.status(403).send({ status: 403, message: 'Unauthorized' });
         }
@@ -92,50 +108,17 @@ route.post('/', uploadFeaturedImage.single('featuredImage'), async (req, res) =>
     }
 });
 
-route.get('/', async (req, res) => {
-    const page = parseInt(req.query.page) || 1; // Default to page 1
-    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
-    const skip = (page - 1) * limit;
-
-    try {
-        // Find the admin document
-        const admin = await adminModel.findOne();
-
-        if (!admin || !admin.blog) {
-            return res.status(404).json({ status: 404, message: 'No blogs found' });
-        }
-
-        // Filter and paginate blogs within the blog array
-        const publishedBlogs = admin.blog;
-        const totalBlogs = publishedBlogs.length;
-
-        // Paginate the filtered blogs
-        const paginatedBlogs = publishedBlogs.slice(skip, skip + limit);
-
-        res.status(200).json({
-            status: 200,
-            data: paginatedBlogs,
-            totalBlogs,
-            currentPage: page,
-            totalPages: Math.ceil(totalBlogs / limit),
-        });
-    } catch (error) {
-        console.error('Error fetching blogs:', error);
-        res.status(500).json({ status: 500, message: 'Internal server error' });
-    }
-});
-
-route.post('/edit', uploadFeaturedImage.single('featuredImage'), async (req, res) => {
+route.post('/edit', upload, async (req, res) => {
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
-        const { title, content, date, id, description, status } = req.body;
+        const { title, content, date, id, description, status, category, tags } = req.body;
 
         // Parse `category` and `tags` fields from JSON.stringify format
-        let category = [];
-        let tags = [];
+        let parsedCategory = [];
+        let parsedTags = [];
         try {
-            category = JSON.parse(req.body.category);
-            tags = JSON.parse(req.body.tags);
+            parsedCategory = JSON.parse(category);
+            parsedTags = JSON.parse(tags);
         } catch (parseError) {
             console.error('Error parsing category or tags:', parseError);
             return res.status(400).send({ status: 400, message: 'Invalid format for category or tags' });
@@ -148,7 +131,7 @@ route.post('/edit', uploadFeaturedImage.single('featuredImage'), async (req, res
                 return res.status(403).send({ status: 403, message: 'Unauthorized' });
             }
 
-            // Find the specific blog post within the admin's blog array
+            // Find the specific blog post using the ID from the body
             const blogPostIndex = isThisAdmin.blog.findIndex(blog => blog._id.toString() === id);
             if (blogPostIndex === -1) {
                 return res.status(404).send({ status: 404, message: 'Blog post not found' });
@@ -156,37 +139,47 @@ route.post('/edit', uploadFeaturedImage.single('featuredImage'), async (req, res
 
             const blogPost = isThisAdmin.blog[blogPostIndex];
             
-            // Prepare the updated blog data, without changing the `featuredImage`
             const updatedBlogData = {
-                ...blogPost._doc, // Use _doc to get the raw object without Mongoose methods
+                ...blogPost._doc,
                 title,
                 content,
                 description,
-                category,
+                category: parsedCategory,
                 status,
-                tags,
+                tags: parsedTags,
                 createdat: date
             };
 
-            // If a new file is uploaded, handle the old image deletion and update `featuredImage`
             if (req.file) {
                 const oldImagePath = blogPost.featuredImage?.path;
-                if (oldImagePath && fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath); // Delete the old image file
+                if (oldImagePath) {
+                    await deleteImageFromS3(oldImagePath);
                 }
+
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                const extension = path.extname(req.file.originalname);
+                const newFilename = `profile/${uniqueSuffix}${extension}`;
+
+                await s3Client.upload({
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: newFilename,
+                    Body: req.file.buffer,
+                    ContentType: req.file.mimetype,
+                    ACL: 'public-read',
+                }).promise();
+
+                const s3ImageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${newFilename}`;
+
                 updatedBlogData.featuredImage = {
-                    name: req.file.filename,
-                    path: req.file.path
+                    name: req.file.originalname,
+                    path: s3ImageUrl
                 };
             }
 
-            // Update the specific blog post in the blog array
             isThisAdmin.blog[blogPostIndex] = updatedBlogData;
 
-            // Save the updated admin document
             await isThisAdmin.save();
 
-            // Return only the updated blog post
             res.send({
                 status: 200,
                 type: 'blog',
@@ -202,45 +195,40 @@ route.post('/edit', uploadFeaturedImage.single('featuredImage'), async (req, res
     }
 });
 
+// Delete Blog Route
 route.delete('/delete/:blogId', async (req, res) => {
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
-        const { blogId } = req.params;
 
-        try {
-            const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
-            
-            if (!isThisAdmin) {
-                return res.status(403).send({ status: 403, message: 'Unauthorized' });
+        const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
+        if (isThisAdmin) {
+            try {
+                const blog = await adminModel.findOne({ 'blog._id': req.params.blogId });
+
+                if (blog) {
+                    const blogIndex = blog.blog.findIndex(b => b._id.toString() === req.params.blogId);
+                    const featuredImage = blog.blog[blogIndex].featuredImage;
+
+                    if (featuredImage && featuredImage.path) {
+                        await deleteImageFromS3(featuredImage.path);
+                    }
+
+                    blog.blog.splice(blogIndex, 1);
+                    await blog.save();
+
+                    res.send({
+                        status: 200,
+                        message: 'Blog Deleted Successfully',
+                    });
+                } else {
+                    res.status(404).send({ status: 404, message: 'Blog not found' });
+                }
+            } catch (error) {
+                console.error('Error deleting blog:', error);
+                res.status(500).send({ status: 500, message: 'Error deleting blog' });
             }
-
-            // Find the index of the blog post to delete
-            const blogPostIndex = isThisAdmin.blog.findIndex(blog => blog._id.toString() === blogId);
-            if (blogPostIndex === -1) {
-                return res.status(404).send({ status: 404, message: 'Blog post not found' });
-            }
-
-            const blogPost = isThisAdmin.blog[blogPostIndex];
-            
-            // If the blog post has a featured image, delete the image file
-            if (blogPost.featuredImage?.path && fs.existsSync(blogPost.featuredImage.path)) {
-                fs.unlinkSync(blogPost.featuredImage.path);
-            }
-
-            // Remove the blog post from the blog array
-            isThisAdmin.blog.splice(blogPostIndex, 1);
-
-            // Save the updated admin document
-            await isThisAdmin.save();
-
-            res.send({
-                status: 200,
-                message: 'Blog post deleted successfully',
-                type : 'blogDelete'
-            });
-        } catch (error) {
-            console.error('Error deleting blog post:', error);
-            res.status(500).send({ status: 500, message: 'Internal server error' });
+        } else {
+            res.status(403).send({ status: 403, message: 'Unauthorized' });
         }
     } else {
         res.status(401).send({ status: 401, message: 'Authorization token required' });
@@ -284,7 +272,38 @@ route.post('/category', async (req, res) => {
     }
 });
 
+route.get('/', async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // Default to page 1
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+    const skip = (page - 1) * limit;
 
+    try {
+        // Find the admin document
+        const admin = await adminModel.findOne();
+
+        if (!admin || !admin.blog) {
+            return res.status(404).json({ status: 404, message: 'No blogs found' });
+        }
+
+        // Filter and paginate blogs within the blog array
+        const publishedBlogs = admin.blog;
+        const totalBlogs = publishedBlogs.length;
+
+        // Paginate the filtered blogs
+        const paginatedBlogs = publishedBlogs.slice(skip, skip + limit);
+
+        res.status(200).json({
+            status: 200,
+            data: paginatedBlogs,
+            totalBlogs,
+            currentPage: page,
+            totalPages: Math.ceil(totalBlogs / limit),
+        });
+    } catch (error) {
+        console.error('Error fetching blogs:', error);
+        res.status(500).json({ status: 500, message: 'Internal server error' });
+    }
+});
 
 
 

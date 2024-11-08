@@ -26,7 +26,7 @@ const TypingTestStats = () => {
     let stats = localStorage.getItem('stats')
     stats = JSON.parse(stats)
     const navigate = useNavigate();
-    const {wpm, consistency, accuracy, correctChars, incorrectChars, extraChars, time, level} = stats?.data;
+    const {wpm, consistency, accuracy, correctChars, incorrectChars, timeOfCompletion, isCompleted, extraChars, time, level} = stats?.data;
     // console.log("WPM:", wpm, "Consistency:", consistency, "Accuracy:", accuracy);
 
     const data = {
@@ -154,6 +154,19 @@ const TypingTestStats = () => {
         setShowAlert(false); // Set showAlert to false
     };
 
+    useEffect(()=>{
+        if(isCompleted){
+            setShowAlert(true)
+            setAlertDetail({
+                title : 'Congratulations!',
+                type : 'Success',
+                message : `Hurrey! You have comleted the test before the time`,
+                navigateTo : '',
+                confirmBtn : true
+            })
+        }
+    }, [])
+
 
     return(
         <>
@@ -191,8 +204,8 @@ const TypingTestStats = () => {
                                     <h1>{consistency[consistency?.length - 1]}</h1>
                                 </div>
                                 <div>
-                                    <h4>Time</h4>
-                                    <h1>{time}s</h1>
+                                    <h4>Time Taken</h4>
+                                    <h1>{timeOfCompletion}s</h1>
                                 </div>
                             </div>
                         </div>

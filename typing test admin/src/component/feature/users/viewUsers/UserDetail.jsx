@@ -216,7 +216,7 @@ const UserDetail = () => {
             matches1Min = rawUserData?.match_1 
             matches3Min = rawUserData?.match_3 
             matches5Min = rawUserData?.match_5 
-            setImagePath(rawUserData?.profileimage?.newname)
+            setImagePath(rawUserData?.profileimage?.s3url)
         }
     }, [rawUserData])
     
@@ -237,7 +237,7 @@ const UserDetail = () => {
               <div className="profile-card my-4">
                 <div className="sec-1">
                   <div className="profile-img">
-                    <img src={imagePath ? `${BASE_API_URL}/uploads/profile/${imagePath}` : "/assets/images/profile.png"}  alt="" />
+                    <img src={imagePath ? `${imagePath}` : "/assets/images/profile.png"}  alt="" />
                     <button className="btn" onClick={()=>profileRef?.current?.click()}><i className="fa-regular fa-upload fa-md" style={{ color: "#71cac7" }} /></button>
                     <input type="file" ref={profileRef} onChange={(event)=>{handleFileChange(event)}} style={{visibility : 'hidden'}} />
                   </div>

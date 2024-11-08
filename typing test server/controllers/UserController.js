@@ -9,7 +9,10 @@ const randNum = require('random-number')
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
-
+const multerS3 = require('multer-s3');
+require('dotenv').config(); 
+const { S3Client, PutObjectCommand, DeleteObjectCommand  } = require('@aws-sdk/client-s3');
+const { Upload } = require('@aws-sdk/lib-storage');
 
 
 const calculateAverage = (numbers) => {
@@ -18,44 +21,49 @@ const calculateAverage = (numbers) => {
     return sum / numbers.length; // Return the average
 };
 
-// Directory to store uploaded files temporarily
-// const uploadDir = path.resolve(__dirname, '../assets/uploads/profile');
-const uploadDir = 'assets/uploads/profile';
-// console.log(uploadDir)
 
-// Ensure the upload directory exists
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Multer storage configuration
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir); // Save the file to the upload directory
+// Initialize AWS S3 client using v3 SDK
+const s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
-    filename: function (req, file, cb) {
-        // Generate a unique name for the file (use timestamp + original extension)
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname); // Get the file extension
-        const newFilename = `${uniqueSuffix}${extension}`;
-        cb(null, newFilename); // Set the new filename
+  });
+  
+  // Multer S3 storage configuration
+  const storage = multerS3({
+    s3: s3Client,
+    bucket: process.env.AWS_BUCKET_NAME,
+    acl: 'public-read',
+    metadata: (req, file, cb) => {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const extension = path.extname(file.originalname);
+      const newFilename = `profile/${uniqueSuffix}${extension}`;
+      cb(null, newFilename); // S3 key (path within the bucket)
     }
-});
-
-// Multer instance with limits and file type filter
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // Limit to 10MB
-    fileFilter: (req, file, cb) => {
-        // Allow only .jpeg, .jpg, .png file types
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type. Only JPEG, JPG, and PNG are allowed.'), false);
-        }
+  });
+  
+  const upload = multer({ storage: storage });
+  
+  // Function to delete an existing image from S3
+  const deleteImageFromS3 = async (imageKey) => {
+    try {
+      const deleteParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: imageKey,
+      };
+      const deleteCommand = new DeleteObjectCommand(deleteParams);
+      await s3Client.send(deleteCommand); // Using the v3 SDK method
+      console.log("Existing profile image deleted from S3 successfully.");
+    } catch (error) {
+      console.error("Error deleting image from S3:", error);
     }
-});
+  };
+  
 
 route.get('/local', async (req, res) => {
     try {
@@ -329,7 +337,7 @@ route.post('/', async (req, res) => {
     // console.log(req.body)
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
-        const { wpm, consistency, accuracy, correctChars, incorrectChars, extraChars, time, level } = req.body.data;
+        const { wpm, consistency, accuracy, correctChars, incorrectChars, timeOfCompletion, extraChars, time, level } = req.body.data;
         const {date} = req.body
         
         const avgWpm = calculateAverage(wpm)
@@ -346,6 +354,7 @@ route.post('/', async (req, res) => {
             matchdate : date,
             time : time,
             level : level !== "" ? level : 'easy',
+            timeofcompletion : timeOfCompletion,
             characters : { 
                 correct : correctChars,
                 incorrect : incorrectChars,
@@ -459,47 +468,49 @@ route.post('/', async (req, res) => {
     }
 });
 
-
 // Route to handle profile picture upload
 route.post('/upload-profile', upload.single('profile'), async (req, res) => {
-    if(req.headers.authorization) {
-        const ID = jwt.decode(req.headers.authorization, key);
-        if (!req.file) {
-            return res.status(400).send({ message: 'No file uploaded or invalid file type.' });
+    if (req.headers.authorization) {
+      const ID = jwt.decode(req.headers.authorization, key);
+  
+      // Check if file is uploaded
+      if (!req.file) {
+        return res.status(400).send({ message: 'No file uploaded or invalid file type.' });
+      }
+  
+      try {
+        const isProfilePresent = await userModel.findOne({ _id: ID.id });
+  
+        if (isProfilePresent) {
+          const existingImageKey = isProfilePresent?.profileimage?.s3key;
+  
+          // Delete the previous profile image from S3 if it exists
+          if (existingImageKey) {
+            await deleteImageFromS3(existingImageKey);
+          }
+  
+          // Upload new profile image data
+          const profileData = {
+            originalname: req.file.originalname,
+            s3key: req.file.key, // The S3 key (path) for the file
+            s3url: req.file.location, // The URL to access the file
+            updatedat: new Date()
+          };
+  
+          // Update the user's profile with the new image data
+          await userModel.updateOne({ _id: ID?.id }, { profileimage: profileData });
+  
+          // Send the details back to the client
+          return res.send({ status: 200, message: "Profile Uploaded Successfully", type: "profile", profile: profileData });
+        } else {
+          return res.status(404).send({ message: "User not found" });
         }
-
-        const isProfilePresent = await userModel.findOne({ _id : ID.id })
-
-        if(isProfilePresent) {
-            const getPath = isProfilePresent?.profileimage?.filepath;
-
-            if (getPath) {
-                fs.unlink(getPath, (err) => {
-                    if (err) {
-                        console.error("Failed to delete existing profile image:", err);
-                    } else {
-                        console.log("Existing profile image deleted successfully.");
-                    }
-                });
-            }
-            
-            // File uploaded successfully
-            const originalName = req.file.originalname;
-            const newName = req.file.filename;
-            const filePath = path.join(uploadDir, req.file.filename);
-            
-            const profileData = {
-                originalname : originalName,
-                newname : newName,
-                filepath : filePath,
-                updatedat : new Date()
-            }
-        
-            await userModel.updateOne({_id : ID?.id}, {profileimage : profileData});
-
-            // Send the details back to the client
-            return res.send({ status: 200, message: "Profile Uploaded Successfully", type: "profile", profile: profileData });
-        }
+      } catch (err) {
+        console.error('Error processing profile upload:', err);
+        return res.status(500).send({ message: "Internal server error" });
+      }
+    } else {
+      return res.status(401).send({ message: "Unauthorized request." });
     }
 });
 
@@ -523,6 +534,7 @@ route.delete('/', async (req, res) => {
             
             // Delete the account based on the accountid parameter
             const deletionResult = await userModel.deleteOne({_id: decoded.id});
+            await notificationModel.deleteOne({userId: decoded.id});
             if (deletionResult.deletedCount === 0) {
                 return res.status(404).send({status: 404, message: 'Account not found or already deleted'});
             }

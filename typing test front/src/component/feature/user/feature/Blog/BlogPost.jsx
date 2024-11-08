@@ -35,7 +35,7 @@ const BlogPost = (props) => {
   return (
     <>
         <div className="blog-post my-3">
-            <div className="blog-img"><NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><img src={`${BASE_API_URL}/uploads/featuredImage/${featuredImage?.name}`} alt="" /></NavLink></div>
+            <div className="blog-img"><NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><img src={`${featuredImage?.path}`} alt="" /></NavLink></div>
             <div className="blog-content">
                 <NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><h1>{title}</h1></NavLink>
                 <p>{description}</p>

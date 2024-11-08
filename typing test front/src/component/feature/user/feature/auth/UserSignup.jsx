@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom'
 import GoogleAuth from './GoogleAuth'
 
 const UserSignup = () => {
-
   const dispatch = useDispatch();
   const navigate = useNavigate()
   const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
@@ -15,22 +14,26 @@ const UserSignup = () => {
   const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
   const isError = useSelector(state => state.UserDataSlice.isError)
   const errorMsg = useSelector(state => state.UserDataSlice.errorMsg)
-  const [eye, setEye] = useState({pass : false, repass : false})
+  const [eye, setEye] = useState({ pass: false, repass: false })
   const [loader, setLoader] = useState(false)
   const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
 
+  // State to handle Google signup
+  const [isGoogleSignup, setIsGoogleSignup] = useState(false);
+
   const signupForm = useFormik({
-    validationSchema : UserSignupSchema,
-    initialValues : {
-      username : '',
-      email : '',
-      password : '',
-      repassword : '',
-      createdate : null
+    validationSchema: UserSignupSchema,
+    initialValues: {
+      username: '',
+      email: '',
+      password: '',
+      repassword: '',
+      createdate: null
     },
-    onSubmit : async(formData) => {
+    validateOnBlur: !isGoogleSignup, // Skip validation on blur during Google signup
+    validateOnChange: !isGoogleSignup, // Skip validation on change during Google signup
+    onSubmit: async (formData) => {
       formData.createdate = new Date();
-      // console.log(formData)
       dispatch(handleCreateUser(formData))
     }
   })
@@ -40,26 +43,25 @@ const UserSignup = () => {
   };
 
   useEffect(() => {
-    if(isProcessing) {
-      if(processingMsg?.type === 'signup') {
+    if (isProcessing) {
+      if (processingMsg?.type === 'signup') {
         setLoader(true)
         dispatch(resetState())
       }
-    } 
+    }
   }, [isProcessing, processingMsg])
 
-
   useEffect(() => {
-    if(isError) {
-      setTimeout(()=>{
+    if (isError) {
+      setTimeout(() => {
         dispatch(resetState())
       }, 4000)
     }
   }, [isError])
 
   useEffect(() => {
-    if(isFullfilled) {
-      if(fullFillMsg?.type === 'signup'){
+    if (isFullfilled) {
+      if (fullFillMsg?.type === 'signup') {
         navigate(`/user`)
         dispatch(resetState())
       }
@@ -74,17 +76,17 @@ const UserSignup = () => {
         {
           errorMsg?.type === 'signup' ? (<small className='text-danger'>{errorMsg?.message}</small>) : null
         }
-        <div className='auth-input my-4'>
+        <div className='auth-input my-3'>
           <div className="auth">
-            <input  type="text" name='username' onChange={signupForm.handleChange} placeholder='User Name' />
+            <input type="text" name='username' onChange={signupForm.handleChange} placeholder='User Name' />
             <i className="fa-solid fa-user fa-sm" style={{ color: "#8c8c8c" }} />
           </div>
           {
             signupForm.errors.username && signupForm.touched.username && (<small className='text-danger'>{signupForm.errors.username}</small>)
           }
           <div className="auth">
-            <input  type="email" name='email' onChange={signupForm.handleChange} placeholder='Email Address' />
-            <i class="fa-solid fa-envelope fa-sm" style={{color : '#8c8c8c'}}></i>
+            <input type="email" name='email' onChange={signupForm.handleChange} placeholder='Email Address' />
+            <i className="fa-solid fa-envelope fa-sm" style={{ color: '#8c8c8c' }}></i>
           </div>
           {
             signupForm.errors.email && signupForm.touched.email && (<small className='text-danger'>{signupForm.errors.email}</small>)
@@ -132,13 +134,13 @@ const UserSignup = () => {
           {
             signupForm.errors.repassword && signupForm.touched.repassword && (<small className='text-danger'>{signupForm.errors.repassword}</small>)
           }
-          <button type='submit' className='theme-btn lg width-90'>Sign Up { loader ? <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> : null }</button>
+          <button type='submit' className='theme-btn lg width-90'>Sign Up {loader ? <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> : null}</button>
           <div className='width-90'><p className='font-idle text-center'>or</p></div>
-          <div className='d-flex justify-content-center width-90'>
-            <GoogleAuth props={'Sign Up'} />
-          </div>
         </div>
       </form>
+          <div className='d-flex justify-content-center width-90'>
+            <GoogleAuth onClick={()=>setIsGoogleSignup(true)} props={'Sign Up'} />
+          </div>
     </>
   )
 }

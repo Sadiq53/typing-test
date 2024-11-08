@@ -106,7 +106,7 @@ const AllUsers = () => {
                                                             <img
                                                                 src={
                                                                     value?.profile
-                                                                        ? `${BASE_API_URL}/uploads/profile/${value?.profile}`
+                                                                        ? `${value?.profile}`
                                                                         : "/assets/images/profile.png"
                                                                 }
                                                                 alt=""

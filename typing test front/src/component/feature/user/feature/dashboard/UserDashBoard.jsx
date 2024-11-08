@@ -196,7 +196,7 @@ useEffect(() => {
 
   useEffect(()=>{
     if(rawUserData) {
-      setImagePath(rawUserData?.profileimage?.newname)
+      setImagePath(rawUserData?.profileimage?.s3url)
     }
   }, [rawUserData])
   
@@ -213,7 +213,7 @@ useEffect(() => {
               <div className="profile-layout">
                 <div className="profile-sec1">
                   <div className='profile-upload-main'>
-                    <img src={imagePath ? `${BASE_API_URL}/uploads/profile/${imagePath}` : "/assets/images/profile.png"}  alt="" />
+                    <img src={imagePath ? `${imagePath}` : "/assets/images/profile.png"}  alt="" />
                     <div className='profile-upload'><button onClick={()=>profileRef?.current?.click()}><i className="fa-regular fa-upload fa-xl" style={{ color: "#71cac7" }} /></button></div>
                     <input type="file" ref={profileRef} onChange={handleFileChange} style={{visibility : 'hidden'}} />
                   </div>

@@ -91,8 +91,8 @@ const UserSchema = mongoose.Schema({
     },
     profileimage : {
         originalname : { type : String, default : '' },
-        newname : { type : String, default : '' },
-        filepath : { type : String, default : '' },
+        s3key : { type : String, default : '' },
+        s3url : { type : String, default : '' },
         updatedat : { type : Date, default : new Date() },
     },
     top1minavg : {
@@ -171,6 +171,7 @@ const UserSchema = mongoose.Schema({
         matchdate : { type : Date, default : new Date() },
         time : { type : Number, default : 0 },
         level : { type : String, default : '' },
+        timeofcompletion : { type : Number, default : 0 },
         characters : { 
             correct : { type : String, default : '' },
             incorrect : { type : String, default : '' },
@@ -188,6 +189,7 @@ const UserSchema = mongoose.Schema({
         matchdate : { type : Date, default : new Date() },
         time : { type : Number, default : 0 },
         level : { type : String, default : '' },
+        timeofcompletion : { type : Number, default : 0 },
         characters : { 
             correct : { type : String, default : '' },
             incorrect : { type : String, default : '' },
@@ -205,6 +207,7 @@ const UserSchema = mongoose.Schema({
         matchdate : { type : Date, default : new Date() },
         time : { type : Number, default : 0 },
         level : { type : String, default : '' },
+        timeofcompletion : { type : Number, default : 0 },
         characters : { 
             correct : { type : String, default : '' },
             incorrect : { type : String, default : '' },

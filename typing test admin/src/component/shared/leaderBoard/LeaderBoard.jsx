@@ -21,7 +21,7 @@ const LeaderBoard = () => {
 
     useEffect(() => {
         if (rawAllUserData) {
-            setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.overall?.avgAcc, avgWpm : value?.overall?.avgWpm, avgConsis : value?.overall?.avgConsis}}))
+            setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.s3url, avgAcc : value?.overall?.avgAcc, avgWpm : value?.overall?.avgWpm, avgConsis : value?.overall?.avgConsis}}))
             // console.log(rawAllUserData)  
         }
     }, [rawAllUserData]);
@@ -156,7 +156,7 @@ const LeaderBoard = () => {
                                         displayData?.map((value, index) => (  
                                             <tr key={index}>
                                                 <td>{index+1}</td>
-                                                <td><NavLink to={`/admin/users/${value.username}`}><div className='profile'><img src={value?.profile ? `${BASE_API_URL}/uploads/profile/${value?.profile}` : "/assets/images/profile.png"}  alt="" />{value?.username}</div></NavLink></td>
+                                                <td><NavLink to={`/admin/users/${value.username}`}><div className='profile'><img src={value?.profile ? `${value?.profile}` : "/assets/images/profile.png"}  alt="" />{value?.username}</div></NavLink></td>
                                                 <td>{Math.round(value?.avgWpm)}</td>
                                                 <td>{Math.round(value?.avgAcc)}</td>
                                                 <td>{Math.round(value?.avgConsis)}</td>

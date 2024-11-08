@@ -262,7 +262,7 @@ const BlogEditor = () => {
                                         {imagePreview ? (
                                             <img className='blog-image' src={imagePreview} alt="Preview" />
                                         ) : param?.id ? (
-                                            <img className='blog-image' src={`${BASE_API_URL}/uploads/featuredImage/${displayData?.featuredImage?.name}`} alt="Preview" />
+                                            <img className='blog-image' src={`${displayData?.featuredImage?.path}`} alt="Preview" />
                                         ) : null}
                                     </div>
                                     <input
