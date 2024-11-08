@@ -219,6 +219,7 @@ route.delete('/delete/:blogId', async (req, res) => {
                     res.send({
                         status: 200,
                         message: 'Blog Deleted Successfully',
+                        type : 'blogDelete'
                     });
                 } else {
                     res.status(404).send({ status: 404, message: 'Blog not found' });

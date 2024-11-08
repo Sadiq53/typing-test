@@ -64,13 +64,13 @@ const DeleteBlogModal = (props) => {
                                 <div className="pass-footer mt-4">
                                     <button
                                     type="button"
-                                    className="theme-btn sm bg-idle"
+                                    className="btn"
                                     data-bs-dismiss="modal"
                                     ref={clsModal}
                                     >
                                         Close
                                     </button>
-                                    <button  onClick={deleteConfirmation} className="theme-btn-danger sm">
+                                    <button  onClick={deleteConfirmation} className="btn btn-danger">
                                         {
                                             isLoading ? (<ButtonLoader props={'Deleting'} />) : 'Delete'
                                         }
