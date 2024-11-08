@@ -222,7 +222,11 @@ route.post("/send-notification", async (req, res) => {
         const response = await admin.messaging().sendEachForMulticast({
             tokens: tokens,
             notification: payload.notification,
+        }).catch((error) => {
+            console.error("Error in sendEachForMulticast:", error);
+            throw error; // Re-throw to catch in the main try-catch
         });
+        
 
         // Check for individual failed tokens
         const failedTokens = [];
