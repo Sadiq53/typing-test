@@ -17,6 +17,8 @@ const UserDashBoard = () => {
   const matches5Min = useSelector(state => state.UserDataSlice.match5) 
   const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled) 
   const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg) 
+  const isProcessing = useSelector(state => state.UserDataSlice.isProcessing) 
+  const processingMsg = useSelector(state => state.UserDataSlice.processingMsg) 
   const [formattedDate, setFormattedDate] = useState();
   const dispatch = useDispatch();
   const [totalMatchesCompleted, setTotalMatchesCompleted] = useState(0);
@@ -26,6 +28,8 @@ const UserDashBoard = () => {
   const [match5MinData, setMatch5MinData] = useState([])
   const [imagePath, setImagePath] = useState('');
   const profileRef = useRef();
+  const [loader, setLoader] = useState({state : false, for : ''})
+
 
 // for finding the total matches----------------------------------------------------
 useEffect(()=>{
@@ -154,9 +158,13 @@ useEffect(() => {
   
   useEffect(()=>{
     if(isFullfilled) {
+      if(fullFillMsg?.type === 'profile') {
+        setLoader({state : false, for : ''})
+        dispatch(resetState())
+      }
       dispatch(resetState())
     }
-  }, [ isFullfilled ])
+  }, [ isFullfilled, fullFillMsg ])
 
 
   // handle successfully login toasts-------------------------------------------------------------------
@@ -202,6 +210,16 @@ useEffect(() => {
   
   // handle upload profile------------------------------------------------------------------------------
 
+  useEffect(()=>{
+    if(isProcessing) {
+      if(processingMsg?.type === 'profile') {
+        setLoader({state : true, for : 'profile'})
+        dispatch(resetState())
+      }
+      
+    }
+  }, [ isProcessing, processingMsg ])
+
 
   return (
     <>
@@ -214,6 +232,9 @@ useEffect(() => {
                 <div className="profile-sec1">
                   <div className='profile-upload-main'>
                     <img src={imagePath ? `${imagePath}` : "/assets/images/profile.png"}  alt="" />
+                    {
+                      loader.state && loader.for === 'profile' && (<div className="profile-loader"><i className="fa-duotone fa-solid fa-loader fa-spin-pulse fa-2xl" style={{color : '#fff'}} /></div>)
+                    }
                     <div className='profile-upload'><button onClick={()=>profileRef?.current?.click()}><i className="fa-regular fa-upload fa-xl" style={{ color: "#71cac7" }} /></button></div>
                     <input type="file" ref={profileRef} onChange={handleFileChange} style={{visibility : 'hidden'}} />
                   </div>

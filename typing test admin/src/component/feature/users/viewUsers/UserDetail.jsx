@@ -170,6 +170,11 @@ const UserDetail = () => {
           setLoader({state : true, for : 'block-unblock'})
           dispatch(resetState())
         }
+        if(processingMsg?.type === 'profile') {
+          setLoader({state : true, for : 'profile'})
+          dispatch(resetState())
+        }
+        
       }
     }, [ isProcessing, processingMsg ])
 
@@ -177,6 +182,10 @@ const UserDetail = () => {
       if(isFullfilled) {
         if(fullFillMsg?.type === 'block-unblock') {
           dynamicToast({ message: "Account Toggled Successfully!", icon: "success" });
+          setLoader({state : false, for : ''})
+          dispatch(resetState())
+        }
+        if(fullFillMsg?.type === 'profile') {
           setLoader({state : false, for : ''})
           dispatch(resetState())
         }
@@ -239,7 +248,10 @@ const UserDetail = () => {
                   <div className="profile-img">
                     <img src={imagePath ? `${imagePath}` : "/assets/images/profile.png"}  alt="" />
                     <button className="btn" onClick={()=>profileRef?.current?.click()}><i className="fa-regular fa-upload fa-md" style={{ color: "#71cac7" }} /></button>
-                    <input type="file" ref={profileRef} onChange={(event)=>{handleFileChange(event)}} style={{visibility : 'hidden'}} />
+                    {
+                      loader.state && loader.for === 'profile' && (<div className="profile-loader"><i className="fa-duotone fa-solid fa-loader fa-spin-pulse fa-2xl" style={{color : '#fff'}} /></div>)
+                    }
+                    <input type="file" ref={profileRef} onChange={(event)=>{handleFileChange(event)}} style={{display : 'none'}} />
                   </div>
                   <div className="profile-data">
                     <h1>{rawUserData?.username}</h1>

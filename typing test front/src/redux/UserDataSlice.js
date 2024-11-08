@@ -512,6 +512,7 @@ const UserDataSlice = createSlice({
         });
         builder.addCase(handleUploadProfile.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg.type = 'profile'
         });
         builder.addCase(handleDeleteUserAccount.fulfilled, (state, action) => {
             if(action.payload.status) {

@@ -39,6 +39,7 @@ const handleSigninUser = createAsyncThunk('handleSigninUser', async(formData) =>
         return checkMsg
     }
 })
+
 const handleSigninUserWithGoogle = createAsyncThunk('handleSigninUserWithGoogle', async(UserInfo) => {
     const response = await axios.post(`${USER_API_URL}/signin/google`, UserInfo)
     // console.log(response.data)
@@ -509,6 +510,10 @@ const UserDataSlice = createSlice({
         });
         builder.addCase(handleUploadProfile.pending, (state, action) => {
             state.isProcessing = true
+            state.processingMsg = {
+                type : 'profile',
+                messsage : 'Profile Uploade in Process'
+            }
         });
         builder.addCase(handleDeleteUserAccount.fulfilled, (state, action) => {
             if(action.payload.status) {

@@ -125,7 +125,7 @@ const UserSignin = () => {
           <div><input type='checkbox' /> <label className='font-idle'> &nbsp; Remember Me</label></div>
           <NavLink to='' className='font-idle'>Forgot Password?</NavLink>
         </div>
-        <button type='submit' className='theme-btn lg width-90'>Sign In  { loader && <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#15131a" }} /> }</button>
+        <button type='submit' className='theme-btn lg width-90'>Sign In  { loader && <i className="fa-solid fa-circle-notch fa-spin " style={{ color: "#15131a" }} /> }</button>
         <div className='width-90'><p className='font-idle text-center'>or</p></div>
         <div className='d-flex justify-content-center width-90'>
           <GoogleAuth props={'Sign In'} />

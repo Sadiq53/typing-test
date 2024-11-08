@@ -1621,4 +1621,10 @@ button.google-sign-btn img {
     display: flex;
     justify-content: flex-end;
 }
+.profile-loader{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 

@@ -9,12 +9,6 @@
         flex-direction: column;
         gap: 12px;
     }
-    .profile-card .profile-img {
-        width: 26%;
-    }
-    .profile-card .profile-img img{
-        width: 100%;
-    }
     .profile-data{
         align-items: center;
     }
@@ -62,8 +56,5 @@
         flex-direction: column;
         gap: 16px;
         align-items: flex-start;
-    }
-    .alluser-table table .profile img{
-        width: 20%;
     }
 }

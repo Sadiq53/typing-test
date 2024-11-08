@@ -9,28 +9,28 @@ const admin = require("firebase-admin");
 require('dotenv').config();  // Load environment variables from .env
 
 
-// const serviceAccount = {
-//     type: 'service_account',
-//     project_id: process.env.FIREBASE_PROJECT_ID,
-//     private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-//     private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Correctly replace escaped \n
-//     client_email: process.env.FIREBASE_CLIENT_EMAIL,
-//     client_id: process.env.FIREBASE_CLIENT_ID,
-//     auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-//     token_uri: 'https://oauth2.googleapis.com/token',
-//     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-//     client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
-// };
+const serviceAccount = {
+    type: 'service_account',
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Correctly replace escaped \n
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    client_id: process.env.FIREBASE_CLIENT_ID,
+    auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+    token_uri: 'https://oauth2.googleapis.com/token',
+    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+    client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
+};
 
 
-//     // Check if already initialized to prevent re-initialization issues
-//     if (!admin.apps.length) {
-//         admin.initializeApp({
-//             credential: admin.credential.cert(serviceAccount),
-//         });
-//     } else {
-//         console.log('Firebase already initialized');
-//     }
+    // Check if already initialized to prevent re-initialization issues
+    if (!admin.apps.length) {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+        });
+    } else {
+        console.log('Firebase already initialized');
+    }
 
 
 
@@ -200,48 +200,48 @@ route.post('/para', async (req, res) => {
 });
 
 // Route to send notification to all users
-// route.post("/send-notification", async (req, res) => {
-//     const { title, message } = req.body;
+route.post("/send-notification", async (req, res) => {
+    const { title, message } = req.body;
     
-//     try {
-//         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
-//         const tokens = users.map((user) => user.fcmToken);
+    try {
+        const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
+        const tokens = users.map((user) => user.fcmToken);
     
-//         const payload = {
-//             notification: {
-//                 title,
-//                 body: message
-//             }
-//         };
+        const payload = {
+            notification: {
+                title,
+                body: message
+            }
+        };
 
-//         // Send notifications to each device
-//         const response = await admin.messaging().sendEachForMulticast({
-//             tokens: tokens,
-//             notification: payload.notification,
-//         });
+        // Send notifications to each device
+        const response = await admin.messaging().sendEachForMulticast({
+            tokens: tokens,
+            notification: payload.notification,
+        });
 
-//         // Check for individual failed tokens
-//         const failedTokens = [];
-//         response.responses.forEach((resp, idx) => {
-//             if (!resp.success) {
-//                 failedTokens.push(tokens[idx]);
-//                 console.error("Error sending to token:", tokens[idx], resp.error);
-//             }
-//         });
+        // Check for individual failed tokens
+        const failedTokens = [];
+        response.responses.forEach((resp, idx) => {
+            if (!resp.success) {
+                failedTokens.push(tokens[idx]);
+                console.error("Error sending to token:", tokens[idx], resp.error);
+            }
+        });
 
-//         res.status(200).json({ 
-//             success: true,
-//             message: "Notification processed with possible individual failures.",
-//             failedTokens: failedTokens,
-//             successCount: response.successCount,
-//             failureCount: response.failureCount
-//         });
+        res.status(200).json({ 
+            success: true,
+            message: "Notification processed with possible individual failures.",
+            failedTokens: failedTokens,
+            successCount: response.successCount,
+            failureCount: response.failureCount
+        });
 
-//     } catch (error) {
-//         console.error("Error sending notification:", error);
-//         res.status(500).json({ success: false, error: error.message });
-//     }
-// });
+    } catch (error) {
+        console.error("Error sending notification:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
 
 
 
