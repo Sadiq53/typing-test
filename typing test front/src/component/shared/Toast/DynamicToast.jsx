@@ -27,10 +27,11 @@ const toastMixin = Swal.mixin({
 });
 
 // Dynamic toast function
-export const dynamicToast = ({ message, icon, timer = 3000 }) => {
+export const dynamicToast = ({ message, body, icon, timer }) => {
   toastMixin.fire({
     icon: icon,
     title: message,
-    timer: timer,
+    html: `<p>${body ? body : ''}</p>`,
+    timer: timer !== 0 ? timer : 3000,
   });
 };

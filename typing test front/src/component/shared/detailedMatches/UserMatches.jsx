@@ -158,7 +158,7 @@ const UserMatches = () => {
                 </div>
             </section>
             <Footer />
-            <div style={{ position: 'absolute', left: '-100%', top: '28%' }}>
+            <div style={{ position: 'absolute', left: '-300%', top: '28%' }}>
                 <Certificate ref={certificateRef} props={stats} />
             </div>
         </>

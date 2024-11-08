@@ -6,6 +6,7 @@ import PageDataLoader from '../component/shared/loader/PageDataLoader';
 import { messaging } from '../firebaseConfig'
 import { getToken, onMessage } from "firebase/messaging";
 import { USER_API_URL } from '../util/API_URL';
+import { dynamicToast } from '../component/shared/Toast/DynamicToast';
 
 
 const UserModule = () => {
@@ -50,7 +51,7 @@ const UserModule = () => {
         onMessage(messaging, (payload) => {
             console.log("Message received. ", payload);
             // Display notification in the app
-            alert(`New notification: ${payload.notification.title}`);
+            dynamicToast({ message: `${payload.notification.title}`, body : `${payload.notification.body}`, timer : 5000, icon: 'info' })
         });
 
         if ("serviceWorker" in navigator) {
