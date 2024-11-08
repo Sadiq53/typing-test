@@ -203,9 +203,17 @@ route.post("/send-notification", async (req, res) => {
     const { title, message } = req.body;
     
     try {
+        // Find users with fcmToken
         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
         const tokens = users.map((user) => user.fcmToken);
-    
+
+        if (tokens.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No valid tokens available to send notification to.'
+            });
+        }
+
         const payload = {
             notification: {
                 title,
@@ -241,6 +249,7 @@ route.post("/send-notification", async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
 
 
 
