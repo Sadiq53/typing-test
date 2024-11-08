@@ -22,14 +22,10 @@ const serviceAccount = {
 };
 
 
-    // Check if already initialized to prevent re-initialization issues
-    if (!admin.apps.length) {
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
-        });
-    } else {
-        console.log('Firebase already initialized');
-    }
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+    });
+
 
 
 
