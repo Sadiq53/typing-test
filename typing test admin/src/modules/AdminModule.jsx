@@ -5,6 +5,7 @@ import { handleGetAdminData, resetState } from '../redux/AdminDataSlice';
 import PageDataLoader from '../component/shared/loader/PageDataLoader'
 import SideBar from '../component/shared/header/SideBar';
 import Header from '../component/shared/header/Header';
+import { handleGetAboutData, handleGetPrivacyData, handleGetTermData } from '../redux/DynamicPagesDataSlice';
 
 
 const AdminModule = () => {
@@ -38,6 +39,14 @@ const AdminModule = () => {
     useEffect(()=>{
         const ID = localStorage.getItem('adminToken')
         dispatch(handleGetAdminData(ID))
+    }, [])
+
+    useEffect(()=>{
+        dispatch(handleGetTermData())
+    }, [])
+
+    useEffect(()=>{
+        dispatch(handleGetAboutData())
     }, [])
 
     return (

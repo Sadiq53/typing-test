@@ -72,24 +72,44 @@ const BlogEditor = () => {
         }));
     };
     
-
-
-    useEffect(()=>{
-        if(param?.id) {
-            if(blogData) {
-                const filterData = blogData?.filter(value => value._id === param?.id)
-                setDisplayData(filterData[0])
-                setContent({
-                    title : filterData[0]?.title,
-                    content : filterData[0]?.content,
-                    description : filterData[0]?.description,
-                    category : filterData[0]?.category,
-                    status : filterData[0]?.status,
-                    tags : filterData[0]?.tags
-                })
+    const fetchBlogData = () => {
+        if (param?.id && blogData?.length > 0) {
+            const filterData = blogData.find(value => value._id === param?.id);
+            
+            if (filterData) {
+                setContent(prevContent => ({
+                    title: filterData.title || prevContent.title,
+                    content: filterData.content || prevContent.content,
+                    description: filterData.description || prevContent.description,
+                    category: filterData.category || prevContent.category,
+                    status: filterData.status || prevContent.status,
+                    tags: filterData.tags || prevContent.tags
+                }));
+                setDisplayData(filterData);
+            } else {
+                // console.warn("No matching blog post found.");
             }
         }
-    }, [blogData])
+    }
+
+    useEffect(() => {
+        fetchBlogData()
+    }, [blogData]);
+
+    useEffect(() => {
+        setContent(prevContent => ({
+            title: displayData.title || prevContent.title,
+            content: displayData.content || prevContent.content,
+            description: displayData.description || prevContent.description,
+            category: displayData.category || prevContent.category,
+            status: displayData.status || prevContent.status,
+            tags: displayData.tags || prevContent.tags
+        }));
+    }, [blogData, displayData]);
+    
+    
+
+    // useEffect(()=>{console.log(content)}, [])
 
     const handleContentChange = (value) => {
         setContent({ ...content, content: value });
@@ -165,6 +185,7 @@ const BlogEditor = () => {
             <section>
                 <div className="container pb-5 pt-7">
                     <div className="row align-items-center">
+                {/* <button onClick={()=>console.log(content)}>ok</button> */}
                         <div className=" col-md-9">
                             <div className="blog-main-layout">
                                     <h2 className='text-center'>{param?.id ? 'Update Blog Post' : 'Create New Blog Post'}</h2>
@@ -283,7 +304,7 @@ const BlogEditor = () => {
                                     </div>
                                     <div className="tag-input-container">
                                         <div className="tag-list" onClick={() => document.getElementById('hidden-input').focus()}>
-                                            {content.tags.map((tag, index) => (
+                                            {content?.tags?.map((tag, index) => (
                                                 <div key={index} className="tag-item">
                                                     {tag}
                                                     <button type="button" onClick={() => removeTag(index)}>✕</button>

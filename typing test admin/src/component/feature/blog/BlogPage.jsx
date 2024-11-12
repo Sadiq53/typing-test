@@ -58,7 +58,7 @@ const BlogPage = () => {
                         </div>
                         <div className="col-md-12 mt-5">
                             <div className="leaderboard-table my-3">
-                                <table className="table table-hover table-striped">
+                                <table className="table table-hover table-dark table-striped">
                                     <thead>
                                         <tr>
                                             <th>S.No.</th>

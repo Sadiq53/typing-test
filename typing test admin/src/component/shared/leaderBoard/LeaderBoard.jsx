@@ -141,7 +141,7 @@ const LeaderBoard = () => {
                             }
                         </div>
                         <div className="alluser-table  my-3">
-                            <table className="table table-striped table-hover">
+                            <table className="table table-dark table-striped table-hover">
                                 <thead>
                                     <tr>
                                     <th>#</th>

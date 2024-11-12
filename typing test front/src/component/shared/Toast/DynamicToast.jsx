@@ -32,6 +32,6 @@ export const dynamicToast = ({ message, body, icon, timer }) => {
     icon: icon,
     title: message,
     html: `<p>${body ? body : ''}</p>`,
-    timer: timer !== 0 ? timer : 3000,
+    timer: timer ? timer : 3000,
   });
 };

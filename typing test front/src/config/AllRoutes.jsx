@@ -19,23 +19,23 @@ const AllRoutes = () => {
         }
     }
 
-    const isAdminTokenPresent = () => {
-        const token = localStorage.getItem('adminToken')
-        if(token) {
-            return true
-        } else {
-            return false
-        }
-    }
+    // const isAdminTokenPresent = () => {
+    //     const token = localStorage.getItem('adminToken')
+    //     if(token) {
+    //         return true
+    //     } else {
+    //         return false
+    //     }
+    // }
 
     const allRoutes = useRoutes([
-        {
-            path : '/',
-            element : isAdminTokenPresent() ? (
-                <Navigate to='/admin' replace />
-            ) : (<RootModule />),
-            children : rootRoutes
-        },
+        // {
+        //     path : '/',
+        //     element : isAdminTokenPresent() ? (
+        //         <Navigate to='/admin' replace />
+        //     ) : (<RootModule />),
+        //     children : rootRoutes
+        // },
         {
             path : '/',
             element : isUserTokenPresent() ? (
@@ -55,17 +55,17 @@ const AllRoutes = () => {
                 <Navigate to='/user' replace />
             ) : (<UserAuth />)
         },
-        {
-            path : '/adminsignin',
-            element : isUserTokenPresent() ? (
-                <Navigate to='/user' replace />
-            ) : isAdminTokenPresent() ? (<Navigate to='/admin' />) : (<AdminSignin />)
-        },
-        {
-            path : '/admin',
-            element :(<AdminModule />),
-            children : adminRoutes
-        },
+        // {
+        //     path : '/adminsignin',
+        //     element : isUserTokenPresent() ? (
+        //         <Navigate to='/user' replace />
+        //     ) : isAdminTokenPresent() ? (<Navigate to='/admin' />) : (<AdminSignin />)
+        // },
+        // {
+        //     path : '/admin',
+        //     element :(<AdminModule />),
+        //     children : adminRoutes
+        // },
         {
             path : '/user',
             element : (<UserModule />),

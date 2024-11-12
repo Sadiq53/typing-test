@@ -76,8 +76,8 @@ const AdminSchema = mongoose.Schema({
         {
             title : { type : String, default : '' },
             content : { type : String, default : '' },
-            description : { type : String, default : '' },
             status : { type : String, default : '' },
+            description : { type : String, default : '' },
             category : { type : Array, default : [] },
             tags : { type : Array, default : [] },
             createdat : { type : Date, default : Date.now() },

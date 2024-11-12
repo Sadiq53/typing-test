@@ -106,7 +106,7 @@
         font-size: 30px;
     }
     .footer ul a {
-        font-size: 10px;
+        font-size: 8px;
     }
     .width-80{
         width: 100%;
@@ -127,7 +127,10 @@
         font-size: 35px;
     }
     .profile img {
-        width: 16%;
+        /* width: 16%; */
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
     }
     ::-webkit-scrollbar {
         height: 8px;
@@ -143,7 +146,7 @@
     }
     .footer ul{
         justify-content: center;
-        gap: 10px;
+        gap: 6px;
     }
     .footer p{
         text-align: center;
@@ -212,6 +215,11 @@
     .blog-header .post-time{
         font-size: 14px;
     }
+    .blog-header{
+        flex-direction: column;
+    }
+    .blog-header h1{width: 100%;}
+    .blog-header h6{width: 100%;}
     .profile-stacs .stacs div {
         display: grid;
         align-items: center;
@@ -249,6 +257,30 @@
     .stacs table th{
         font-size: 14px;
         
+    }
+    .header-dynamic-page h4 {
+        font-size: 40px !important;
+    }
+    .about-main .about-section .row{
+        flex-direction: column-reverse !important;
+        gap: 20px;
+    }
+    .header-dynamic-page {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .header-dynamic-page h4 {
+        margin-bottom:8px !important ;
+    }
+    .about-section a {
+        font-size: 12px !important;
+    }
+    .leaderboard-table table th {
+        font-size: 14px;
+    }
+    .leaderboard-table table tr:nth-child(odd) td{
+        
+        font-size: 12px;
     }
     
 }

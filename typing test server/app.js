@@ -3,10 +3,10 @@ const app = express();
 const cors = require('cors');
 const routes = require('./config/AllRoutes')
 const path = require('path')
+const bodyParser = require('body-parser');
 
 
-
-
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'assets')))
 app.use(express.urlencoded({ extended : true }))

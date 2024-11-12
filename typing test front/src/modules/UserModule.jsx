@@ -7,6 +7,7 @@ import { messaging } from '../firebaseConfig'
 import { getToken, onMessage } from "firebase/messaging";
 import { USER_API_URL } from '../util/API_URL';
 import { dynamicToast } from '../component/shared/Toast/DynamicToast';
+import { handleGetAboutData, handleGetPrivacyData, handleGetTermData } from '../redux/DynamicPagesDataSlice';
 
 
 const UserModule = () => {
@@ -101,6 +102,10 @@ const UserModule = () => {
             navigate(`/user/signout/${'isBlocked'}`)
         }
     }, [userData])
+
+    useEffect(()=>{dispatch(handleGetAboutData())}, [])
+    // useEffect(()=>{dispatch(handleGetPrivacyData())}, [])
+    useEffect(()=>{dispatch(handleGetTermData())}, [])
 
     return (
         <>

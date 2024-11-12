@@ -7,7 +7,6 @@ import { dynamicToast } from '../../../shared/Toast/DynamicToast';
 const DeleteBlogModal = (props) => {
 
     const clsModal = useRef();
-    console.log(props)
     const dispatch = useDispatch();
     const isFullfilled = useSelector(state => state.AdminDataSlice.isFullfilled) 
     const fullFillMsg = useSelector(state => state.AdminDataSlice.fullFillMsg) 

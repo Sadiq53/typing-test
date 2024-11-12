@@ -6,6 +6,10 @@ import LeaderBoard from '../../component/shared/leaderBoard/LeaderBoard';
 import Lobby from '../../component/feature/user/feature/lobby/Lobby';
 import TypingTestStats from '../../component/feature/user/feature/lobby/TypingTestStatistics';
 import Signout from '../../component/shared/auth/Signout';
+import About from '../../component/feature/user/feature/dynamicPages/About';
+import Privacy_Policy from '../../component/feature/user/feature/dynamicPages/Privacy_Policy';
+import Contact from '../../component/feature/user/feature/contact/Contact';
+import Terms_Condition from '../../component/feature/user/feature/dynamicPages/Terms_Condition';
 
 const userRoutes = [
     {
@@ -39,6 +43,22 @@ const userRoutes = [
     {
         path : 'blog/:id',
         element : <BlogInner />
+    },
+    {
+        path : 'about',
+        element : <About />
+    },
+    {
+        path : 'privacy',
+        element : <Privacy_Policy />
+    },
+    {
+        path : 'contact',
+        element : <Contact />
+    },
+    {
+        path : 'term-condition',
+        element : <Terms_Condition />
     },
 ]
 

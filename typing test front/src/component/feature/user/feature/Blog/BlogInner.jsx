@@ -52,7 +52,7 @@ const BlogInner = () => {
                     <div className="col-md-12">
                         <div className="blog-header">
                             <h1 className="heading">{displayData?.title}</h1>
-                            <h className="post-time">Posted : {formattedDate}</h>
+                            <h6 className="post-time">Posted : {formattedDate}</h6>
                         </div>
                         <div className="blog-banner my-4"><img src={`${displayData?.featuredImage?.path}`} alt="" /></div>
                         <div className="blog-content my-4" dangerouslySetInnerHTML={{ __html: displayData?.content }}>

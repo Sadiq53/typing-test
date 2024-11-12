@@ -37,7 +37,7 @@ const BlogPost = (props) => {
         <div className="blog-post my-3">
             <div className="blog-img"><NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><img src={`${featuredImage?.path}`} alt="" /></NavLink></div>
             <div className="blog-content">
-                <NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><h1>{title}</h1></NavLink>
+                <NavLink className="text-dec-none" to={`${isToken ? '/user/' : '/'}blog/${_id}`}><h1 >{title}</h1></NavLink>
                 <p>{description}</p>
             </div>
             <NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}>Read More...</NavLink>

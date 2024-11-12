@@ -54,7 +54,6 @@ const BlogView = () => {
                             <h1 className="heading">{displayData?.title}</h1>
                             <h className="post-time">Posted : {formattedDate}</h>
                         </div>
-                        {console.log(displayData?.featuredImage)}
                         <div className="blog-banner my-4"><img src={`${displayData?.featuredImage?.path}`} alt="" /></div>
                         <div className="blog-content my-4" dangerouslySetInnerHTML={{ __html: displayData?.content }}>
                         </div>

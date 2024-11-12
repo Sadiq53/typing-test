@@ -167,6 +167,12 @@ const TypingTestStats = () => {
         }
     }, [])
 
+    const calculateAverage = (numbers) => {
+        if (numbers.length === 0) return 0; // Avoid division by zero
+        const sum = numbers.reduce((acc, num) => acc + num, 0); // Sum the numbers
+        return sum / numbers.length; // Return the average
+    };
+
 
     return(
         <>
@@ -178,11 +184,11 @@ const TypingTestStats = () => {
                             <div className="statistics-layout">
                                 <div>
                                     <h4>WPM</h4>
-                                    <h1>{wpm[wpm?.length - 1]}</h1>
+                                    <h1>{Math.round(calculateAverage(wpm))}</h1>
                                 </div>
                                 <div>
                                     <h4>Accuracy</h4>
-                                    <h1>{accuracy[accuracy?.length - 1]}<span>%</span></h1>
+                                    <h1>{Math.round(calculateAverage(accuracy))}<span>%</span></h1>
                                 </div>
                             </div>
                         </div>
@@ -201,7 +207,7 @@ const TypingTestStats = () => {
                                 </div>
                                 <div>
                                     <h4>Consistency</h4>
-                                    <h1>{consistency[consistency?.length - 1]}</h1>
+                                    <h1>{Math.round(calculateAverage(consistency))}%</h1>
                                 </div>
                                 <div>
                                     <h4>Time Taken</h4>

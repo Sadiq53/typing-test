@@ -53,11 +53,22 @@ const UserSignup = () => {
 
   useEffect(() => {
     if (isError) {
+      
+    }
+  }, [isError])
+  useEffect(() => {
+    if(isError) {
+      if(errorMsg?.type === 'signup') {
+        setLoader(false)
+        setTimeout(()=>{
+          dispatch(resetState())
+        }, 3000)
+      }
       setTimeout(() => {
         dispatch(resetState())
       }, 4000)
     }
-  }, [isError])
+  }, [isError, errorMsg])
 
   useEffect(() => {
     if (isFullfilled) {

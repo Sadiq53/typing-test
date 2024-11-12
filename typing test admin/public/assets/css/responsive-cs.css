@@ -57,4 +57,19 @@
         gap: 16px;
         align-items: flex-start;
     }
+    .navbar-collapse{
+        border: none !important;
+        background-color: transparent !important;
+    }
+    .left-side {
+        padding-bottom: 15px;
+        padding-right: 0;
+    }
+    .right-side{
+        order: -1;
+    }
+    .repeater-item{
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
 }

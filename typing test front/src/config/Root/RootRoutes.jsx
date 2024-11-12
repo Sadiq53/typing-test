@@ -4,6 +4,10 @@ import TypingTestStats from '../../component/feature/user/feature/lobby/TypingTe
 import LeaderBoard from '../../component/shared/leaderBoard/LeaderBoard';
 import Blog from '../../component/feature/user/feature/Blog/Blog';
 import BlogInner from '../../component/feature/user/feature/Blog/BlogInner';
+import Privacy_Policy from '../../component/feature/user/feature/dynamicPages/Privacy_Policy';
+import About from '../../component/feature/user/feature/dynamicPages/About';
+import Terms_Condition from '../../component/feature/user/feature/dynamicPages/Terms_Condition';
+import Contact from '../../component/feature/user/feature/contact/Contact';
 
 
 const rootRoutes = [
@@ -30,6 +34,22 @@ const rootRoutes = [
     {
         path : 'adminsignin',
         element : <AdminSignin />
+    },
+    {
+        path : 'privacy',
+        element : <Privacy_Policy />
+    },
+    {
+        path : 'about',
+        element : <About />
+    },
+    {
+        path : 'term-condition',
+        element : <Terms_Condition />
+    },
+    {
+        path : 'contact',
+        element : <Contact />
     },
 ]
 

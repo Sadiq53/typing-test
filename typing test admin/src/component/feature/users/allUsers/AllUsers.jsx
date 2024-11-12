@@ -85,7 +85,7 @@ const AllUsers = () => {
                         </div>
                         <div className="col-md-12">
                             <div className="alluser-table my-4">
-                                <table className="table table-hover table-striped">
+                                <table className="table table-hover table-dark table-striped">
                                     <thead>
                                         <tr>
                                             <th>#</th>

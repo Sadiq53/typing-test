@@ -150,7 +150,7 @@ const AdminSignin = () => {
         <div className="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
           <div className="d-flex align-items-center justify-content-center w-100">
             <div className="row justify-content-center w-100">
-              <div className="col-md-8 col-lg-6 col-xxl-3">
+              <div className="col-md-8 col-lg-8 col-xxl-3">
                 <div className="card mb-0">
                   <form onSubmit={adminSigninForm.handleSubmit}>
                   <div className="card-body">
@@ -159,7 +159,7 @@ const AdminSignin = () => {
                       className="text-nowrap logo-img text-center d-block py-3 w-100"
                     >
                       <img
-                        src="./assets/images/logo 2.svg"
+                        src="./assets/images/logo.svg"
                         width={180}
                         alt=""
                       />

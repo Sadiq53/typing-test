@@ -6,8 +6,9 @@ import { Provider } from 'react-redux'
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import UserDataSlice from './redux/UserDataSlice.js'
 import AdminDataSlice from './redux/AdminDataSlice.js'
+import DynamicPagesDataSlice from './redux/DynamicPagesDataSlice.js'
 
-const rootReducer = combineReducers({ AdminDataSlice, UserDataSlice });
+const rootReducer = combineReducers({ AdminDataSlice, UserDataSlice, DynamicPagesDataSlice });
 const store = configureStore({
   reducer : rootReducer
 });

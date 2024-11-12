@@ -10,6 +10,9 @@ import UserMatches from '../../component/shared/detailedMatches/UserMatches';
 import Signout from '../../component/shared/auth/Signout';
 import CreateUser from '../../component/feature/users/addUsers/CreateUser';
 import Notification from '../../component/feature/notification/Notification';
+import DynamicPages from '../../component/feature/dynamicPages/DynamicPages';
+import Editor from '../../component/feature/dynamicPages/Editor';
+import About from '../../component/feature/dynamicPages/About';
 
 const adminRoutes = [
     {
@@ -63,6 +66,18 @@ const adminRoutes = [
     {
         path : 'signout/:type',
         element : <Signout />
+    },
+    {
+        path : 'pages',
+        element : <DynamicPages  />
+    },
+    {
+        path : 'about',
+        element : <About  />
+    },
+    {
+        path : 'editor/:page',
+        element : <Editor  />
     }
 ]
 

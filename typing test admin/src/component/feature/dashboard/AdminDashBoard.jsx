@@ -20,7 +20,7 @@ const AdminDashBoard = () => {
 
     useEffect(() => {
         if (localStorage.getItem('isSignin')) {
-            dynamicToast({ message: 'Logged in Successfully!', icon: 'success' });
+            dynamicToast({ message: 'Logged in Successfully!', timer : 3000, icon: 'success' });
             setTimeout(() => {
                 localStorage.removeItem('isSignin');
             }, 3500);

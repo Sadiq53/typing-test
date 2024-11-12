@@ -3,12 +3,12 @@ import {NavLink} from 'react-router-dom'
 const SideBar = () => {
   return (
     <>
-    <aside className="left-sidebar">
+    <aside className="left-sidebar ">
         {/* Sidebar scroll*/}
         <div>
         <div className="brand-logo d-flex align-items-center justify-content-between">
             <NavLink to='/admin' className="text-nowrap logo-img">
-            <img src="/assets/images/logo 2.svg" width={180} alt="" />
+            <img src="/assets/images/logo.svg" width={180} alt="" />
             </NavLink>
             <div
             className="close-btn d-xl-none d-block sidebartoggler cursor-pointer"
@@ -85,6 +85,25 @@ const SideBar = () => {
                 </NavLink>
             </li>
             {/* PARAGRAPH PART */}
+
+            {/* Pages PART */}
+            <li className="nav-small-cap">
+                <i className="ti ti-dots nav-small-cap-icon fs-4" />
+                <span className="hide-menu">Pages</span>
+            </li>
+            <li className="sidebar-item">
+                <NavLink
+                className="sidebar-link"
+                to='/admin/pages'
+                aria-expanded="false"
+                >
+                <span>
+                    <i class="fa-regular fa-list-check"></i>
+                </span>
+                <span className="hide-menu">Manage Pages</span>
+                </NavLink>
+            </li>
+            {/* Pages PART */}
 
             {/* Blogs PART */}
             <li className="nav-small-cap">

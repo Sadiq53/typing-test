@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Header from '../../../../shared/header/Header'
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -67,6 +67,7 @@ const Lobby = () => {
     time: 0,
     level : ''
   })
+  const checkUserToken = useMemo(() => !!localStorage.getItem('userToken'), []);
 
   // Function to get a random index based on array length
   function getRandomIndex(array) {
@@ -393,7 +394,7 @@ const Lobby = () => {
 
   useEffect(()=>{
     if(localStorage.getItem('isSignout')) {
-      dynamicToast({ message: 'Logged out Successfully!', icon: 'info' })
+      dynamicToast({ message: 'Logged out Successfully!', timer: 3000, icon: 'info' })
       setTimeout(()=>{
         localStorage.removeItem('isSignout')
       }, 3500)
@@ -402,7 +403,7 @@ const Lobby = () => {
 
   useEffect(()=>{
     if(localStorage.getItem('accountDelete')) {
-      dynamicToast({ message: 'Account Deleted Successfully', icon: 'info' })
+      dynamicToast({ message: 'Account Deleted Successfully', timer: 3000, icon: 'info' })
       setTimeout(()=>{
         localStorage.removeItem('accountDelete')
       }, 3500)
@@ -453,7 +454,7 @@ const handleAlertClose = () => {
             className="row custom-align"
             style={{
               transition: 'transform 0.3s ease', 
-              transform: hasFocus ? 'translateY(-50%)' : 'none',
+              transform: window.innerWidth < 767 ? hasFocus ? 'translateY(-40%)' : 'none' : hasFocus ? 'translateY(-50%)' : 'none',
             }}
           >
             <div ref={containerRef} className="cutom-lobby-head">
@@ -579,10 +580,10 @@ const handleAlertClose = () => {
                 <div className='width-80'>
                   <div className="footer">
                     <ul>
-                      <li><NavLink to=''>Contact Us &nbsp; |</NavLink></li>
-                      <li><NavLink to=''>About &nbsp; |</NavLink></li>
-                      <li><NavLink to=''>Privacy Policy &nbsp; |</NavLink></li>
-                      <li><NavLink to=''>Terms & Condition</NavLink></li>
+                      <li><NavLink to={checkUserToken ? '/user/contact' : '/contact'}>Contact Us &nbsp; |</NavLink></li>
+                      <li><NavLink to={checkUserToken ? '/user/about' : '/about'}>About &nbsp; |</NavLink></li>
+                      <li><NavLink to={checkUserToken ? '/user/privacy' : '/privacy'}>Privacy Policy &nbsp; |</NavLink></li>
+                      <li><NavLink to={checkUserToken ? '/user/term-condition' : '/term-condition'}>Terms & Condition</NavLink></li>
                     </ul>
                   </div>
                 </div>
