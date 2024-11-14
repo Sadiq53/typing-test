@@ -160,14 +160,15 @@ const Min1Paragraphs = (props) => {
                     <div className="row">
                         <div className="col-md-12">
                             <div className="para-layout">
-                                <h2 className='font-active text-left'>Set Paragraphs For {timeFilter} Min {levelFilter} Mode</h2>
+                                <h2 className='font-active word-space-5 text-left'>Set Paragraphs For {timeFilter} Min {levelFilter} Mode</h2>
                                 {displayData?.map((value, index) => (
                                     
                                         <form className='display-para-sec' onSubmit={UpdateParaForm.handleSubmit}>
                                             <div className="add-para" key={index}>
                                                 <textarea
                                                     className="para-writer"
-                                                    readOnly={editableIndex !== index}
+                                                    // readOnly={editableIndex !== index}
+                                                    disabled={editableIndex !== index}
                                                     name={value.id}
                                                     onChange={UpdateParaForm.handleChange}
                                                     value={UpdateParaForm.values[value.id] || ''}
@@ -199,6 +200,7 @@ const Min1Paragraphs = (props) => {
                                 ))}
                                 <form className='form' onSubmit={addParaForm.handleSubmit}>
                                     {textareas.map((textarea, index) => (
+                                        <>
                                         <div className="add-para" key={textarea.id}>
                                             <textarea
                                                 ref={(el) => (textareaRef.current[index] = el)}
@@ -214,10 +216,11 @@ const Min1Paragraphs = (props) => {
                                                 placeholder="Set a Paragraph..."
                                                 value={textarea.para}
                                             />
+                                        </div>
                                             {addParaForm.errors.paragraphs && addParaForm.errors.paragraphs[index]?.para && (
                                                 <div className="error text-danger">{addParaForm.errors.paragraphs[index].para}</div>
                                             )}
-                                        </div>
+                                        </>
                                     ))}
                                     <div className='add-more-para'>
                                         <button type='submit' className='btn btn-primary'>{loader ? (<ButtonLoader props={'Uploading Paragraph'} />) : 'Upload Paragraph'}</button>

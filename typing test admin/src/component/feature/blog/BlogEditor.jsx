@@ -10,7 +10,7 @@ import { BASE_API_URL } from '../../../util/API_URL'
 import AddBlogCategory from './blogElements/AddBlogCategory';
 
 const BlogEditor = () => {
-    const [content, setContent] = useState({ content: '', title: '', description : '', category : [], status : '', tags : [] });
+    const [content, setContent] = useState({ content: '', title: '', description : '', category : [], status : '', tags : [], seoTitle : '', seoDescription : '', index : '' });
     const [imageData, setImageData] = useState();
     const featuredImage = useRef(null);
     const dispatch = useDispatch();
@@ -83,7 +83,10 @@ const BlogEditor = () => {
                     description: filterData.description || prevContent.description,
                     category: filterData.category || prevContent.category,
                     status: filterData.status || prevContent.status,
-                    tags: filterData.tags || prevContent.tags
+                    tags: filterData.tags || prevContent.tags,
+                    index: filterData.index || prevContent.index,
+                    seoDescription: filterData.seoDescription || prevContent.seoDescription,
+                    seoTitle: filterData.seoTitle || prevContent.seoTitle,
                 }));
                 setDisplayData(filterData);
             } else {
@@ -103,7 +106,10 @@ const BlogEditor = () => {
             description: displayData.description || prevContent.description,
             category: displayData.category || prevContent.category,
             status: displayData.status || prevContent.status,
-            tags: displayData.tags || prevContent.tags
+            tags: displayData.tags || prevContent.tags,
+            index: displayData.index || prevContent.index,
+            seoDescription: displayData.seoDescription || prevContent.seoDescription,
+            seoTitle: displayData.seoTitle || prevContent.seoTitle
         }));
     }, [blogData, displayData]);
     
@@ -124,6 +130,9 @@ const BlogEditor = () => {
         profileData.append('title', content.title);
         profileData.append('content', content.content);
         profileData.append('description', content.description);
+        profileData.append('index', content.index);
+        profileData.append('seoDescription', content.seoDescription);
+        profileData.append('seoTitle', content.seoTitle);
         profileData.append('date', new Date());
         profileData.append('category', JSON.stringify(content.category))
         profileData.append('status', content.status)
@@ -183,23 +192,23 @@ const BlogEditor = () => {
     return (
         <>
             <section>
-                <div className="container pb-5 pt-7">
+                <div className="container  pb-5 pt-7">
                     <div className="row align-items-center">
                 {/* <button onClick={()=>console.log(content)}>ok</button> */}
                         <div className=" col-md-9">
-                            <div className="blog-main-layout">
+                            <div className="blog-main-layout p-35 custom-flex-column">
                                     <h2 className='text-center'>{param?.id ? 'Update Blog Post' : 'Create New Blog Post'}</h2>
                                 <div className="blog-form-cs">
-                                    <div className='my-3'>
+                                    <div className='my-2'>
                                         <label className='font-active' htmlFor="Title">Enter Post Title: &nbsp;</label>
                                         <input className='form-control' placeholder='Enter Your Blog Title Here' type="text" value={content.title} onChange={(event) => setContent({ ...content, title: event.target.value })} name="title" />
                                     </div>
-                                    <div className='my-3'>
+                                    <div className='my-2'>
                                         <label className='font-active' htmlFor="Title">Description: &nbsp;</label>
                                         <input className='form-control' placeholder='Brief Description of Your Blog' type="text" value={content.description} onChange={(event) => setContent({ ...content, description: event.target.value })} name="title" />
                                     </div>
                                 </div>
-                                <div className="blog-editor">
+                                <div className="blog-editor p-0 m-0">
                                     <ReactQuill
                                         value={content.content}
                                         onChange={handleContentChange}
@@ -207,6 +216,52 @@ const BlogEditor = () => {
                                         modules={BlogEditor.modules}
                                         formats={BlogEditor.formats}
                                     />
+                                </div>
+                            </div>
+                            <div className="blog-main-layout p-35 my-4">
+                                <h4 className='m-0'>Search Engine Optimisation</h4>
+                                <div className="blog-form-cs">
+                                    <div className='my-2'>
+                                        <label className='font-active' htmlFor="Title">SEO Title &nbsp;</label>
+                                        <input className='form-control' placeholder='Enter Your Blog Title Here' type="text" value={content.seoTitle} onChange={(event) => setContent({ ...content, seoTitle: event.target.value })} name="seoTitle" />
+                                    </div>
+                                    <div className='my-2'>
+                                        <label className='font-active' htmlFor="Title">SEO Description: &nbsp;</label>
+                                        <input className='form-control' placeholder='Brief Description of Your Blog' type="text" value={content.seoDescription} onChange={(event) => setContent({ ...content, seoDescription: event.target.value })} name="seoDescription" />
+                                    </div>
+                                    <div className='my-2'>
+                                        <label className='font-active' htmlFor="Title">Index : &nbsp;</label>
+                                        <div className='seo-index-radio'>
+                                            <div className="form-check w-auto">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="exampleRadios"
+                                                    id="exampleRadios1"
+                                                    value="index"
+                                                    checked={content.index === "index"}
+                                                    onChange={() => setContent({ ...content, index: "index" })}
+                                                />
+                                                <label className="form-check-label" htmlFor="exampleRadios1">
+                                                    Index
+                                                </label>
+                                            </div>
+                                            <div className="form-check w-auto">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="exampleRadios"
+                                                    id="exampleRadios2"
+                                                    value="noindex"
+                                                    checked={content.index === "noindex"}
+                                                    onChange={() => setContent({ ...content, index: "noindex" })}
+                                                />
+                                                <label className="form-check-label" htmlFor="exampleRadios2">
+                                                    No Index
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

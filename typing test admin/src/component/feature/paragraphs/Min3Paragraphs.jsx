@@ -167,7 +167,8 @@ const Min3Paragraphs = (props) => {
                                             <div className="add-para" key={index}>
                                                 <textarea
                                                     className="para-writer"
-                                                    readOnly={editableIndex !== index}
+                                                    // readOnly={editableIndex !== index}
+                                                    disabled={editableIndex !== index}
                                                     name={value.id}
                                                     onChange={UpdateParaForm.handleChange}
                                                     value={UpdateParaForm.values[value.id] || ''}
@@ -199,6 +200,7 @@ const Min3Paragraphs = (props) => {
                                 ))}
                                 <form className='form' onSubmit={addParaForm.handleSubmit}>
                                     {textareas.map((textarea, index) => (
+                                        <>
                                         <div className="add-para" key={textarea.id}>
                                             <textarea
                                                 ref={(el) => (textareaRef.current[index] = el)}
@@ -213,11 +215,12 @@ const Min3Paragraphs = (props) => {
                                                 }}
                                                 placeholder="Set a Paragraph..."
                                                 value={textarea.para}
-                                            />
+                                                />
+                                        </div>
                                             {addParaForm.errors.paragraphs && addParaForm.errors.paragraphs[index]?.para && (
                                                 <div className="error text-danger">{addParaForm.errors.paragraphs[index].para}</div>
                                             )}
-                                        </div>
+                                        </>
                                     ))}
                                     <div className='add-more-para'>
                                         <button type='submit' className='btn btn-primary'>{loader ? (<ButtonLoader props={'Uploading Paragraph'} />) : 'Upload Paragraph'}</button>

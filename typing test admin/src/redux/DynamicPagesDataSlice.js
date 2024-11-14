@@ -67,6 +67,90 @@ const handleDeleteTermData = createAsyncThunk('handleDeleteTermData', async() =>
     }
 })
 
+const handleGetContactData = createAsyncThunk('handleGetContactData', async() => {
+    const response = await axios.get(`${BASE_API_URL}/contact`)
+    if(response.data.status === 200) {
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type,
+            data : response.data.result,
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type,
+            data : []
+        }
+        return checkMsg
+    }
+})
+
+const handleUpdateContactData = createAsyncThunk('handleUpdateContactData', async(ID) => {
+    const response = await axios.put(`${BASE_API_URL}/contact/${ID}`)
+    if(response.data.status === 200) {
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type,
+            data : ID,
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type,
+            data : []
+        }
+        return checkMsg
+    }
+})
+
+const handleDeleteBulkContactData = createAsyncThunk('handleDeleteBulkContactData', async(Ids) => {
+    const response = await axios.post(`${BASE_API_URL}/contact/bulk`, {ids : Ids})
+    if(response.data.status === 200) {
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type,
+            data : Ids,
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type,
+            data : []
+        }
+        return checkMsg
+    }
+})
+
+const handleDeleteSingleContactData = createAsyncThunk('handleDeleteSingleContactData', async(ID) => {
+    const response = await axios.delete(`${BASE_API_URL}/contact/${ID}`)
+    if(response.data.status === 200) {
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type,
+            data : ID,
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type,
+            data : []
+        }
+        return checkMsg
+    }
+})
+
 const handleGetPrivacyData = createAsyncThunk('handleGetPrivacyData', async() => {
     const response = await axios.get(`${BASE_API_URL}/privacy-policy`)
     if(response.data.status === 200) {
@@ -156,10 +240,10 @@ const handleGetAboutData = createAsyncThunk('handleGetAboutData', async() => {
 const handlePostAboutData = createAsyncThunk('handlePostAboutData', async(formData) => {
     const ID = localStorage.getItem('adminToken')
     const response = await axios.post(`${BASE_API_URL}/about`, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization : ID
-        },
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization : ID
+            },
     })
     if(response.data.status === 200) {
         let checkMsg = {
@@ -261,6 +345,8 @@ const handleDeleteAbout = createAsyncThunk('handleDeleteAbout', async() => {
 })
 
 
+
+
 const initialState = {
     isProcessing : false,
     isFullfilled : false,
@@ -279,7 +365,8 @@ const initialState = {
     },
     term : {},
     privacy : {},
-    about : {createdat : '', metaData : []}
+    about : {createdat : '', metaData : []},
+    contact : []
 }
 
 const UserDataSlice = createSlice({
@@ -308,7 +395,6 @@ const UserDataSlice = createSlice({
                     type: action.payload.type,
                     message: action.payload.message,
                 };
-                console.log(action.payload?.data) 
                 const {privacyPolicy, termsCondition} = action.payload?.data
                 state.term = termsCondition
                 state.privacy = privacyPolicy
@@ -329,6 +415,36 @@ const UserDataSlice = createSlice({
             state.processingMsg = {
                 type : 'termsCondition',
                 messsage : 'Fetching Terms & Condition Data'
+            }
+        });
+        builder.addCase(handleGetContactData.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+                const {data} = action.payload
+                state.contact = data?.contact
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });              
+        builder.addCase(handleGetContactData.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'contact',
+                messsage : 'Fetching Contact Data'
             }
         });
         builder.addCase(handleGetPrivacyData.fulfilled, (state, action) => {
@@ -690,9 +806,109 @@ const UserDataSlice = createSlice({
                 messsage : 'Updating About Data'
             }
         });
+        builder.addCase(handleUpdateContactData.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+        
+                const { data } = action.payload; // Assuming `data` contains the updated contact object
+                state.contact = state.contact?.map((value) =>
+                    value._id === data ? { ...value, status: 'seen' } : value
+                );
+                
+                // Reset error state
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });                           
+        builder.addCase(handleUpdateContactData.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'updatecontact',
+                messsage : 'Updating Contact Data'
+            }
+        });
+        builder.addCase(handleDeleteBulkContactData.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+        
+                const { data } = action.payload; // Assuming `data` contains an array of deleted IDs
+        
+                // Filter out deleted contacts from the current state
+                state.contact = state.contact.filter(contact => !data.includes(contact._id));
+        
+                // Reset error state
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });        
+        builder.addCase(handleDeleteBulkContactData.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'deletebulkcontact',
+                messsage : 'Deleting About Data'
+            }
+        });
+        builder.addCase(handleDeleteSingleContactData.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+                state.contact = state.contact?.filter(value => value._id !== action.payload?.data)
+                // Reset error state
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });
+        builder.addCase(handleDeleteSingleContactData.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'deletecontact',
+                messsage : 'Deleting About Data'
+            }
+        });
     }
 })
 
 export default UserDataSlice.reducer;
-export {handleGetTermData, handlePostTermData, handleDeleteAbout, handleUpdateAboutData, handleDeleteOneAbout, handleGetAboutData, handlePostAboutData, handleDeleteTermData, handleGetPrivacyData, handlePostPrivacyData, handleDeletePrivacyData};
+export {handleGetTermData, handlePostTermData, handleDeleteSingleContactData, handleDeleteBulkContactData, handleUpdateContactData, handleGetContactData, handleDeleteAbout, handleUpdateAboutData, handleDeleteOneAbout, handleGetAboutData, handlePostAboutData, handleDeleteTermData, handleGetPrivacyData, handlePostPrivacyData, handleDeletePrivacyData};
 export const{ resetState, handleClearState } = UserDataSlice.actions

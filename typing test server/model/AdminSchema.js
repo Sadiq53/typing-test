@@ -77,6 +77,9 @@ const AdminSchema = mongoose.Schema({
             title : { type : String, default : '' },
             content : { type : String, default : '' },
             status : { type : String, default : '' },
+            index : { type : String, default : '' },
+            seoDescription : { type : String, default : '' },
+            seoTitle : { type : String, default : '' },
             description : { type : String, default : '' },
             category : { type : Array, default : [] },
             tags : { type : Array, default : [] },
@@ -87,6 +90,12 @@ const AdminSchema = mongoose.Schema({
             }
         }
     ],
+    profileimage : {
+        originalname : { type : String, default : '' },
+        s3key : { type : String, default : '' },
+        s3url : { type : String, default : '' },
+        updatedat : { type : Date, default : new Date() },
+    },
     blogCategory : { type : Array, default : [] }
 
 

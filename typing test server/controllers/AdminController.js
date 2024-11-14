@@ -7,6 +7,10 @@ const notificationModel = require('../model/NotificationSchema')
 const key = require('../config/token_Keys');
 const admin = require("firebase-admin");
 require('dotenv').config();  // Load environment variables from .env
+const path = require('path');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const { S3Client, DeleteObjectCommand  } = require('@aws-sdk/client-s3');
 
 const serviceAccount = {
     type: 'service_account',
@@ -26,6 +30,69 @@ const serviceAccount = {
     });
 
 
+    // Initialize AWS S3 client using v3 SDK
+const s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+});
+  
+  // Multer S3 storage configuration
+    const storage = multerS3({
+        s3: s3Client,
+        bucket: process.env.AWS_BUCKET_NAME,
+        acl: 'public-read',
+        metadata: (req, file, cb) => {
+        cb(null, { fieldName: file.fieldname });
+        },
+        key: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        const newFilename = `profile/${uniqueSuffix}${extension}`;
+        cb(null, newFilename); // S3 key (path within the bucket)
+        }
+    });
+  
+    const upload = multer({ storage: storage });
+
+    // Function to delete an existing image from S3
+  const deleteImageFromS3 = async (imageKey) => {
+    try {
+      const deleteParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: imageKey,
+      };
+      const deleteCommand = new DeleteObjectCommand(deleteParams);
+      await s3Client.send(deleteCommand); // Using the v3 SDK method
+      console.log("Existing profile image deleted from S3 successfully.");
+    } catch (error) {
+      console.error("Error deleting image from S3:", error);
+    }
+  };
+
+  // Multer storage configuration to save images locally
+const storageForNotification = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = path.join(__dirname, '../assets/notification');
+        // Ensure that the directory exists
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir); // Store images in assets/notification folder
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        const newFilename = `notification-${uniqueSuffix}${extension}`;
+        cb(null, newFilename); // Save with a unique filename
+    }
+});
+
+// Use multer for file upload (local storage configuration)
+const uploadForNotification = multer({ storage: storageForNotification });
+
 
 
 route.use('/blog', require('./sub-controllers/BlogController'))
@@ -40,12 +107,13 @@ route.get('/', async(req, res) => {
         let userCount = await userModel.countDocuments({})
         adminData = {
             email : adminData?.email,
-            username : adminData?.username,
+            _id : adminData?.username,
             paragraphs : adminData?.paragraphs,
             blogCount : adminData?.blog?.length,
             block : adminData?.blockUser,
             userCount : userCount,
-            blogCategory : adminData?.blogCategory
+            blogCategory : adminData?.blogCategory,
+            profileimage : adminData?.profileimage
         }
         if(adminData) {
             res.send({ status : 200, adminData : adminData })
@@ -194,9 +262,9 @@ route.post('/para', async (req, res) => {
 });
 
 // Route to send notification to all users
-route.post("/send-notification", async (req, res) => {
-    const { title, message } = req.body;
-    
+route.post("/send-notification", uploadForNotification.single('image'), async (req, res) => {
+    const { title, message, url } = req.body;
+    console.log(req.body)
     try {
         // Find users with fcmToken
         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
@@ -209,22 +277,30 @@ route.post("/send-notification", async (req, res) => {
             });
         }
 
+        // Get the local file path for the image
+        const imageUrl = req.file ? `/assets/notification/${req.file.filename}` : null; // Store relative path
+
+        // Create the notification payload including the URL and imageUrl
         const payload = {
             notification: {
                 title,
-                body: message
-            }
+                body: message,
+            },
+            data: {
+                url: url, // URL for the notification link
+                imageUrl: imageUrl, // Image URL for the notification
+            },
         };
 
         // Send notifications to each device
         const response = await admin.messaging().sendEachForMulticast({
             tokens: tokens,
             notification: payload.notification,
+            data: payload.data, // Attach data payload with URL and imageUrl
         }).catch((error) => {
             console.error("Error in sendEachForMulticast:", error);
             throw error; // Re-throw to catch in the main try-catch
         });
-        
 
         // Check for individual failed tokens
         const failedTokens = [];
@@ -235,7 +311,7 @@ route.post("/send-notification", async (req, res) => {
             }
         });
 
-        res.status(200).json({ 
+        res.status(200).json({
             success: true,
             message: "Notification processed with possible individual failures.",
             failedTokens: failedTokens,
@@ -249,9 +325,67 @@ route.post("/send-notification", async (req, res) => {
     }
 });
 
+route.put('/', async(req, res) => {
+    if(req.headers.authorization){
+        const ID = jwt.decode(req.headers.authorization, key)
+        const { currentpassword, newpassword } = req.body;
+        const findUser = await adminModel.findOne({ _id : ID?.id })
+        // console.log(findUser)
+        if(findUser) {
+            if(findUser?.password === sha(currentpassword)) {
+                await adminModel.updateOne({ _id : ID?.id }, { password : sha(newpassword) })
+                res.send({ status : 200, type : "adminupdatepassword", message : "Password Updated Succefully" })
+            } else res.send({ status : 401, type : "adminupdatepassword", message : "Current Password is Incorrect" })
+        }
+    }
+});
 
-
-
+// Route to handle profile picture upload
+route.post('/upload-profile', upload.single('profile'), async (req, res) => {
+    if (req.headers.authorization) {
+      const ID = jwt.decode(req.headers.authorization, key);
+  
+      // Check if file is uploaded
+      if (!req.file) {
+        return res.status(400).send({ message: 'No file uploaded or invalid file type.' });
+      }
+  
+      try {
+        const isProfilePresent = await adminModel.findOne({ _id : ID?.id });
+  
+        if (isProfilePresent) {
+          const existingImageKey = isProfilePresent?.profileimage?.s3key;
+  
+          // Delete the previous profile image from S3 if it exists
+          if (existingImageKey) {
+            await deleteImageFromS3(existingImageKey);
+          }
+  
+          // Upload new profile image data
+          const profileData = {
+            originalname: req.file.originalname,
+            s3key: req.file.key, // The S3 key (path) for the file
+            s3url: req.file.location, // The URL to access the file
+            updatedat: new Date()
+          };
+        //   console.log(profileData)
+  
+          // Update the user's profile with the new image data
+          await adminModel.updateOne({ _id : ID?.id }, { profileimage: profileData });
+  
+          // Send the details back to the client
+          return res.send({ status: 200, message: "Profile Uploaded Successfully", type: "profile", profile: profileData });
+        } else {
+          return res.status(404).send({ message: "User not found" });
+        }
+      } catch (err) {
+        console.error('Error processing profile upload:', err);
+        return res.status(500).send({ message: "Internal server error" });
+      }
+    } else {
+    return res.status(401).send({ message: "Unauthorized request." });
+    }
+});
 
 
 

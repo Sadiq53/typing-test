@@ -38,7 +38,7 @@ const BlogPost = (props) => {
             <div className="blog-img"><NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><img src={`${featuredImage?.path}`} alt="" /></NavLink></div>
             <div className="blog-content">
                 <NavLink className="text-dec-none" to={`${isToken ? '/user/' : '/'}blog/${_id}`}><h1 >{title}</h1></NavLink>
-                <p>{description}</p>
+                <p>{description.length > 100 ? description.slice(0, 100) + "..." : description}</p>
             </div>
             <NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}>Read More...</NavLink>
         </div>

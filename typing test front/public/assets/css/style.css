@@ -1207,12 +1207,17 @@ button.google-sign-btn img {
   }
 /* Loader for Delete button */
 
-.blog-post{
+.blog-post {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
     gap: 20px;
+    /* border: 1px solid #fff; */
+    background-color: #1f1d21;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: rgb(255 255 255 / 9%) 1px 1px 20px 5px;
 }
 
 .blog-post .blog-img{
@@ -1228,22 +1233,20 @@ button.google-sign-btn img {
 .blog-post .blog-content h1{
     color: #71CAC7;
     font-family: Inter;
-    font-size: 32px;
+    font-size: 24px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
     text-transform: capitalize;
+    margin-bottom: 16px;
 }
 
-.text-dec-none{
-    text-decoration: none !important;
 
-}
 
 .blog-post .blog-content p{
     color: #8C8C8C;
     font-family: Inter;
-    font-size: 17px;
+    font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
@@ -1252,7 +1255,7 @@ button.google-sign-btn img {
 
 .blog-content a{
     color: #71CAC7 !important;
-    text-decoration: underline !important;
+    text-decoration: underline;
 }
 
 .blog-post a{
@@ -1323,6 +1326,7 @@ button.google-sign-btn img {
 .p-10-15 {
     padding: 10px 15px !important;
 }
+.p-0{padding: 0 !important;}
 
 .para-layout{
     border-radius: 28px;
@@ -1771,3 +1775,99 @@ button.google-sign-btn img {
 .about-main .about-section:nth-child(even) .row{
     flex-direction: row-reverse;
 }
+
+.caps-alert{
+    position: absolute;
+    background-color: #71CAC7;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #4bfff9;
+    top: 20%;
+    opacity: 1;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: capsblink 0.5s infinite alternate;
+}
+
+@keyframes capsblink {
+    0% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+.text-dec-none{
+    text-decoration: none !important;
+}
+
+/* Notification container */
+.cs-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none; /* Initially hidden */
+    background-color: #333;
+    color: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    max-width: 400px;
+    width: 100%;
+    animation: slide-in 0.5s forwards; /* Animation to slide in */
+  }
+  
+  .cs-notification-show {
+    display: block; /* Show when triggered */
+  }
+  
+  .cs-notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .cs-notification-text {
+    max-width: 250px; /* Limit the width for text */
+  }
+  
+  .cs-notification-title {
+    font-size: 18px;
+    margin: 0;
+  }
+  
+  .cs-notification-body {
+    font-size: 14px;
+    margin: 5px 0;
+  }
+  
+  .cs-notification-url {
+    font-size: 14px;
+    color: #4c90e3;
+    text-decoration: none;
+  }
+  
+  .cs-notification-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-left: 10px;
+  }
+  
+  @keyframes slide-in {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  

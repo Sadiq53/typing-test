@@ -217,6 +217,14 @@
     scroll-behavior: smooth;
   }
 }
+
+.app-header{
+  background: #15131a;
+  border-bottom: 1px solid #71cac730;
+}
+select option{
+  color: #000 !important;
+}
 body {
   margin: 0;
   font-family: var(--bs-body-font-family);
@@ -2550,10 +2558,10 @@ progress {
   color: var(--bs-secondary-color);
   opacity: 1;
 }
-.form-control:disabled {
-  background-color: transparent;
-  opacity: 0.3;
-  cursor: no-drop;
+textarea:disabled, input:disabled  {
+  background-color: transparent !important;
+  opacity: 0.3 !important;
+  cursor: no-drop !important;
 }
 .form-control::-webkit-file-upload-button {
   padding: 8px 16px;
@@ -4502,14 +4510,14 @@ fieldset:disabled .btn {
 }
 .dropdown-item:focus,
 .dropdown-item:hover {
-  color: var(--bs-dropdown-link-hover-color);
-  background-color: var(--bs-dropdown-link-hover-bg);
+  color: #000;
+  background-color: #71CAC7;
 }
 .dropdown-item.active,
 .dropdown-item:active {
-  color: var(--bs-dropdown-link-active-color);
   text-decoration: none;
-  background-color: var(--bs-dropdown-link-active-bg);
+  color: #000;
+  background-color: #71CAC7;
 }
 .dropdown-item.disabled,
 .dropdown-item:disabled {

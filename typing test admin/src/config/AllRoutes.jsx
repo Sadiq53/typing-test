@@ -1,7 +1,7 @@
 import { Navigate, useRoutes } from 'react-router-dom'
 import AdminModule from '../modules/AdminModule'
 import adminRoutes from '../config/Admin/AdminRoutes'
-import Testing from '../component/feature/Testing'
+// import Testing from '../component/feature/Testing' 
 import AdminSignin from '../component/feature/auth/AdminSignin'
 
 const AllRoutes = () => {

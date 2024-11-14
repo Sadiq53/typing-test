@@ -178,6 +178,39 @@ const handleUploadProfile = createAsyncThunk('handleUploadProfile', async(data) 
     }
 });
 
+const handleAdminProfileUpload = createAsyncThunk('handleAdminProfileUpload', async(formData) => {
+    const ID = localStorage.getItem('adminToken')
+    try {
+        // Send the file to your server endpoint
+        const response = await axios.post(`${ADMIN_API_URL}/upload-profile`, formData, {
+            headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization : ID
+        },
+        });
+        if(response.data.status === 200) {
+            const profileData = {responseData : response.data.profile}
+            let checkMsg = {
+                status : true,
+                message : response.data.message,
+                type : response.data.type,
+                data : profileData,
+            }
+            return checkMsg
+        } else {
+            let checkMsg = {
+                status : false,
+                message : response.data.message,
+                type : response.data.type,
+                data : []
+            }
+            return checkMsg
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+    }
+});
+
 const handleAddParagraphs = createAsyncThunk('handleAddParagraphs', async(formData)=> {
     const ID = localStorage.getItem('adminToken')
     const response = await axios.post(`${ADMIN_API_URL}/add-para`, formData, { headers : { Authorization : ID } })
@@ -367,6 +400,11 @@ const handleCreateUser = createAsyncThunk('handleCreateUser', async(Data) => {
         }
         return checkMsg
     }
+})
+
+const handleUpdateAdminPassword = createAsyncThunk('handleUpdateAdminPassword', async(formData) => {
+    const ID = localStorage.getItem('adminToken')
+    const response = await axios.put(`${ADMIN_API_URL}`, formData, { headers : { Authorization : ID } })
 })
 
 const initialState = {
@@ -594,7 +632,7 @@ const AdminDataSlice = createSlice({
             // Check if the payload indicates a successful operation
             if (action.payload.status) {
                 const { username, responseData } = action.payload.data;
-                console.log("profileData : ", action.payload.data)
+                // console.log("profileData : ", action.payload.data)
         
                 // Set fulfillment state and message
                 state.isFullfilled = true;
@@ -627,6 +665,42 @@ const AdminDataSlice = createSlice({
             }
         });              
         builder.addCase(handleUploadProfile.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'profile',
+                messsage : 'Profile Uploade in Process'
+            }
+        });
+        builder.addCase(handleAdminProfileUpload.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                const { responseData } = action.payload.data;
+                // console.log("profileData : ", action.payload.data)
+        
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+        
+                // Update profile image in userData
+                state.adminData.profileimage = responseData; // Use newname if it's the correct key
+        
+                // Reset error state
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });              
+        builder.addCase(handleAdminProfileUpload.pending, (state, action) => {
             state.isProcessing = true
             state.processingMsg = {
                 type : 'profile',
@@ -865,5 +939,5 @@ const AdminDataSlice = createSlice({
 })
 
 export default AdminDataSlice.reducer;
-export {handleGetAdminData, handleSigninAdmin, handleGetBlogPost, handleCreateUser, handleAddBlogCategory, handleDeleteBlogPost, handleDeleteParagraph, handleEditBlogPost, handleAddBlogPost, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleUploadProfile, handleGetUser};
+export {handleGetAdminData, handleSigninAdmin, handleAdminProfileUpload, handleGetBlogPost, handleCreateUser, handleAddBlogCategory, handleDeleteBlogPost, handleDeleteParagraph, handleEditBlogPost, handleAddBlogPost, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleUploadProfile, handleGetUser};
 export const {resetState, handleClearState, handleGetAllUsers, handleAddBlogPostToState} = AdminDataSlice.actions

@@ -26,7 +26,14 @@ const DynamicPagesDataSchema = mongoose.Schema({
                 }
             }
         ]
-    }
+    },
+    contact : [{
+        name : { type : String, default : '' },
+        email : { type : String, default : '' },
+        message : { type : String, default : '' },
+        time : { type : Date, default : Date.now() },
+        status : { type : String, default : 'unseen' },
+    }]
 
 }, { collection : "dynamiPages" });
 

@@ -5,9 +5,9 @@ import { handleGetUserData, handleLocalDataCalling, resetState } from '../redux/
 import PageDataLoader from '../component/shared/loader/PageDataLoader';
 import { messaging } from '../firebaseConfig'
 import { getToken, onMessage } from "firebase/messaging";
-import { USER_API_URL } from '../util/API_URL';
-import { dynamicToast } from '../component/shared/Toast/DynamicToast';
+import { BASE_API_URL, USER_API_URL } from '../util/API_URL';
 import { handleGetAboutData, handleGetPrivacyData, handleGetTermData } from '../redux/DynamicPagesDataSlice';
+import NotificationToats from '../component/shared/Toast/NotificationToats';
 
 
 const UserModule = () => {
@@ -50,9 +50,16 @@ const UserModule = () => {
     useEffect(()=>{
         // Handle foreground messages
         onMessage(messaging, (payload) => {
-            console.log("Message received. ", payload);
+            
+            const { title, body } = payload.notification;
+            const { url, imageUrl } = payload.data;
             // Display notification in the app
-            dynamicToast({ message: `${payload.notification.title}`, body : `${payload.notification.body}`, timer : 5000, icon: 'info' })
+            <NotificationToats
+                title={title}
+                body={body}
+                url={url}
+                imageUrl={`${BASE_API_URL}/${imageUrl}`}
+            />
         });
 
         if ("serviceWorker" in navigator) {

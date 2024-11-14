@@ -78,7 +78,7 @@ const AllUsers = () => {
     return (
         <>
             <section>
-                <div className="container py-5">
+                <div className="container pb-5 pt-7">
                     <div className="row">
                         <div className="col-md-12 py-4">
                             <h1>All Active Users</h1>
@@ -123,7 +123,7 @@ const AllUsers = () => {
                                                     </NavLink>
                                                 </td>
                                                 <td>
-                                                    <NavLink to="">
+                                                    <NavLink to={`/admin/users/${value?.username}`}>
                                                         <button className="btn">
                                                             <i className="fa-solid fa-user-pen fa-lg" />
                                                         </button>

@@ -40,8 +40,8 @@ const deleteImageFromS3 = async (imageKey) => {
 route.post('/', upload, async (req, res) => {
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
-        const { title, content, date, description, status, category, tags } = req.body;
-
+        const { title, content, date, description, status, category, tags, seoTitle, index, seoDescription } = req.body;
+        console.log(index, seoDescription, seoTitle)
         const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
         if (isThisAdmin) {
             try {
@@ -75,6 +75,9 @@ route.post('/', upload, async (req, res) => {
                     category: JSON.parse(category),
                     createdat: date,
                     description,
+                    seoDescription,
+                    seoTitle,
+                    index,
                     featuredImage: {
                         name: req.file?.originalname || null,
                         path: s3ImageUrl, // Save the S3 URL in the database
@@ -111,7 +114,8 @@ route.post('/', upload, async (req, res) => {
 route.post('/edit', upload, async (req, res) => {
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
-        const { title, content, date, id, description, status, category, tags } = req.body;
+        const { title, content, date, id, description, status, category, tags, seoTitle, index, seoDescription } = req.body;
+        console.log(index, seoDescription, seoTitle)
 
         // Parse `category` and `tags` fields from JSON.stringify format
         let parsedCategory = [];
@@ -147,7 +151,10 @@ route.post('/edit', upload, async (req, res) => {
                 category: parsedCategory,
                 status,
                 tags: parsedTags,
-                createdat: date
+                createdat: date,
+                seoDescription,
+                seoTitle,
+                index
             };
 
             if (req.file) {

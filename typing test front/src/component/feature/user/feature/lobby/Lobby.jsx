@@ -14,6 +14,7 @@ const Lobby = () => {
   const [time, setTime] = useState(60);
   const [userInput, setUserInput] = useState("");
   const typingAreaRef = useRef(null);
+  // const isCapsLockOn = useRef(false);
   const containerRef = useRef(null);
   const [hasFocus, setHasFocus] = useState(false);
   const [difficulty, setDifficulty] = useState("easy");
@@ -27,9 +28,8 @@ const Lobby = () => {
   const isError = useSelector(state => state.UserDataSlice.isError)
   const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
   const [timeUp, setTimeUp] = useState(false)
-  const [Min1, setMin1] = useState({})
-  const [Min3, setMin3] = useState({})
-  const [Min5, setMin5] = useState({})
+  const [rootFocus, setRootFocus] = useState(false)
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
   const [alertDetail, setAlertDetail] = useState({
     title : '',
     message : '',
@@ -93,10 +93,6 @@ const Lobby = () => {
   };
 
   useEffect(() => {
-    // Update Min1, Min3, and Min5 values if they exist in `paragraphs`
-    setMin1(paragraphs?.Min1 || []);
-    setMin3(paragraphs?.Min3 || []);
-    setMin5(paragraphs?.Min5 || []);
 
     const changeTime = {
         60: 'Min1',
@@ -166,7 +162,7 @@ const Lobby = () => {
     const newDifficulty = e;
     // console.log(newDifficulty)
     setDifficulty(newDifficulty);
-    typingAreaRef.current.focus();
+    rootFocus && typingAreaRef.current.focus();
   };
   // Handle paragraph difficulty change----------------------------------------------------------
 
@@ -268,7 +264,7 @@ const Lobby = () => {
 
   // Determine if the paragraph is completed by checking if correct and incorrect characters typed match the non-space characters
   isCompleted = (correctChars + incorrectChars) >= nonSpaceCharCount;
-  timeOfCompletion = elapsedTime;
+  timeOfCompletion = (elapsedTime + 1);
 
 
   setStats((prevStats) => ({
@@ -373,7 +369,7 @@ const Lobby = () => {
     //   time: value     // Update the 'time' property
     // }));    
     setTimeLimit(Number(value))
-    typingAreaRef.current.focus();
+    rootFocus && typingAreaRef.current.focus();
   }
   // set the selected time in stats-----------------------------------------------------------------------------
 
@@ -445,6 +441,12 @@ const handleAlertClose = () => {
   setShowAlert(false); // Set showAlert to false
 };
 
+const handleKeyUp = (event) => {
+  // Check if Caps Lock is on and update the ref
+  const capsLockStatus = event.getModifierState("CapsLock");
+  setIsCapsLockOn(capsLockStatus);
+};
+
   return (
     <>
       <Header />
@@ -452,10 +454,13 @@ const handleAlertClose = () => {
         <div className="container">
           <div 
             className="row custom-align"
-            style={{
-              transition: 'transform 0.3s ease', 
-              transform: window.innerWidth < 767 ? hasFocus ? 'translateY(-40%)' : 'none' : hasFocus ? 'translateY(-50%)' : 'none',
-            }}
+            onKeyUp={handleKeyUp}
+            onKeyDown={handleKeyUp}
+            // ref={isCapsLockOn}
+            // style={{
+            //   transition: 'transform 0.3s ease', 
+            //   transform: window.innerWidth < 767 ? hasFocus ? 'translateY(-40%)' : 'none' : hasFocus ? 'translateY(-50%)' : 'none',
+            // }}
           >
             <div ref={containerRef} className="cutom-lobby-head">
               <div className='lobby-menu'>
@@ -525,9 +530,9 @@ const handleAlertClose = () => {
             <div className="col-md-12">
               <div className="typing-area" 
                     tabIndex={0} // Make the div focusable
-                    onClick={() => typingAreaRef.current.focus()} 
-                    onFocus={() => setHasFocus(true)} 
-                    onBlur={() => setHasFocus(false)}
+                    onClick={() => {typingAreaRef.current.focus(), setRootFocus(true)}} 
+                    onFocus={() => {setHasFocus(true), setRootFocus(true)}} 
+                    onBlur={() => {setHasFocus(false), setRootFocus(false)}}
                     >
                 <div style={{ fontSize: "30px" }}>
                   {currentParagraph && typeof currentParagraph === "string" 
@@ -612,6 +617,15 @@ const handleAlertClose = () => {
           </div>
           </div>
         </div>
+        )
+      }
+
+      {
+        hasFocus && rootFocus && isCapsLockOn && (
+          <div className="caps-alert">
+            <h5 className='m-0'>CAPS LOCK</h5>
+            <i class="fa-light fa-lock"></i>
+          </div>
         )
       }
 

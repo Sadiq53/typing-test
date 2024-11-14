@@ -5,7 +5,7 @@ import { handleGetAdminData, resetState } from '../redux/AdminDataSlice';
 import PageDataLoader from '../component/shared/loader/PageDataLoader'
 import SideBar from '../component/shared/header/SideBar';
 import Header from '../component/shared/header/Header';
-import { handleGetAboutData, handleGetPrivacyData, handleGetTermData } from '../redux/DynamicPagesDataSlice';
+import { handleGetAboutData, handleGetContactData, handleGetPrivacyData, handleGetTermData } from '../redux/DynamicPagesDataSlice';
 
 
 const AdminModule = () => {
@@ -47,6 +47,10 @@ const AdminModule = () => {
 
     useEffect(()=>{
         dispatch(handleGetAboutData())
+    }, [])
+
+    useEffect(()=>{
+        dispatch(handleGetContactData())
     }, [])
 
     return (

@@ -2,11 +2,8 @@ import { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { handleBlockUnblockUser, handleGetUser, resetState, handleUploadProfile } from "../../../../redux/AdminDataSlice";
 import { NavLink, useParams } from "react-router-dom";
-import Footer from "../../../shared/footer/Footer";
-import Header from "../../../shared/header/Header";
 import DeleteUserModal from "../modals/DeleteUserModal";
 import { dynamicToast } from "../../../shared/Toast/DynamicToast";
-import { BASE_API_URL } from "../../../../util/API_URL";
 import UpdatePassModal from "../modals/UpdatePassModal";
 
 const UserDetail = () => {
@@ -247,7 +244,7 @@ const UserDetail = () => {
                 <div className="sec-1">
                   <div className="profile-img">
                     <img src={imagePath ? `${imagePath}` : "/assets/images/profile.png"}  alt="" />
-                    <button className="btn" onClick={()=>profileRef?.current?.click()}><i className="fa-regular fa-upload fa-md" style={{ color: "#71cac7" }} /></button>
+                    <button className="btn" onClick={()=>profileRef?.current?.click()}><i class="fa-solid fa-upload cs-color-dark"></i></button>
                     {
                       loader.state && loader.for === 'profile' && (<div className="profile-loader"><i className="fa-duotone fa-solid fa-loader fa-spin-pulse fa-2xl" style={{color : '#fff'}} /></div>)
                     }

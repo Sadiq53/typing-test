@@ -13,6 +13,9 @@ import Notification from '../../component/feature/notification/Notification';
 import DynamicPages from '../../component/feature/dynamicPages/DynamicPages';
 import Editor from '../../component/feature/dynamicPages/Editor';
 import About from '../../component/feature/dynamicPages/About';
+import AdminProfile from '../../component/feature/profile/AdminProfile';
+import Contacts from '../../component/feature/contact/Contacts';
+import DetailContact from '../../component/feature/contact/DetailContact';
 
 const adminRoutes = [
     {
@@ -74,6 +77,18 @@ const adminRoutes = [
     {
         path : 'about',
         element : <About  />
+    },
+    {
+        path : 'contact',
+        element : <Contacts  />
+    },
+    {
+        path : 'contact/:id',
+        element : <DetailContact  />
+    },
+    {
+        path : 'profile',
+        element : <AdminProfile  />
     },
     {
         path : 'editor/:page',

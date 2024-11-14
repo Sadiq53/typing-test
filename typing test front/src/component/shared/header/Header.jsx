@@ -118,7 +118,7 @@ const Header = () => {
                             </ul>
                         </div>
                     </div>
-                    <div className="col-md-12 col-12"><GoogleADs /></div>
+                    {/* <div className="col-md-12 col-12"><GoogleADs /></div> */}
                 </div>
             </div>
         </>
