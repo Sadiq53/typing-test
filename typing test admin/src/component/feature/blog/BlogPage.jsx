@@ -58,7 +58,7 @@ const BlogPage = () => {
                         </div>
                         <div className="col-md-12 mt-5">
                             <div className="leaderboard-table my-3">
-                                <table className="table table-hover table-dark table-striped">
+                                <table className="table table-hover m-0 table-dark table-striped">
                                     <thead>
                                         <tr>
                                             <th>S.No.</th>
@@ -101,12 +101,12 @@ const BlogPage = () => {
                                         )})}
                                     </tbody>
                                 </table>
+                            </div>
                                 <Pagination
                                     totalPages={totalPages}
                                     currentPage={currentPage}
                                     onPageChange={handlePageChange}
                                 />
-                            </div>
                         </div>
                     </div>
                 </div>

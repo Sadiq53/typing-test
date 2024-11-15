@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const sha = require('sha1')
 const adminModel = require('../model/AdminSchema')
 const userModel = require('../model/UserSchema')
+const DataModel = require('../model/DynamicPagesDataSchema')
 const notificationModel = require('../model/NotificationSchema')
 const key = require('../config/token_Keys');
 const admin = require("firebase-admin");
@@ -73,26 +74,23 @@ const s3Client = new S3Client({
   };
 
   // Multer storage configuration to save images locally
-const storageForNotification = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, '../assets/notification');
-        // Ensure that the directory exists
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir); // Store images in assets/notification folder
+  const storageForHomeSEO = multerS3({
+    s3: s3Client,
+    bucket: process.env.AWS_BUCKET_NAME,
+    acl: 'public-read',
+    metadata: (req, file, cb) => {
+    cb(null, { fieldName: file.fieldname });
     },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const newFilename = `notification-${uniqueSuffix}${extension}`;
-        cb(null, newFilename); // Save with a unique filename
+    key: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const extension = path.extname(file.originalname);
+    const newFilename = `homeSeo/${uniqueSuffix}${extension}`;
+    cb(null, newFilename); // S3 key (path within the bucket)
     }
 });
 
 // Use multer for file upload (local storage configuration)
-const uploadForNotification = multer({ storage: storageForNotification });
-
+const uploadForHomeSEO = multer({ storage: storageForHomeSEO });
 
 
 route.use('/blog', require('./sub-controllers/BlogController'))
@@ -262,9 +260,9 @@ route.post('/para', async (req, res) => {
 });
 
 // Route to send notification to all users
-route.post("/send-notification", uploadForNotification.single('image'), async (req, res) => {
+route.post("/send-notification", async (req, res) => {
     const { title, message, url } = req.body;
-    console.log(req.body)
+    
     try {
         // Find users with fcmToken
         const users = await notificationModel.find({ fcmToken: { $exists: true, $ne: null } });
@@ -277,41 +275,42 @@ route.post("/send-notification", uploadForNotification.single('image'), async (r
             });
         }
 
-        // Get the local file path for the image
-        const imageUrl = req.file ? `/assets/notification/${req.file.filename}` : null; // Store relative path
+         // Get the local file path for the image
+         const imageUrl = req.file ? `/assets/notification/${req.file.filename}` : null; // Store relative path
 
-        // Create the notification payload including the URL and imageUrl
+        //  console.log(imageUrl)
+
+        const obj = {
+            message : message
+        }
+
         const payload = {
             notification: {
                 title,
                 body: message,
-            },
-            data: {
-                url: url, // URL for the notification link
-                imageUrl: imageUrl, // Image URL for the notification
-            },
+            }
         };
 
         // Send notifications to each device
         const response = await admin.messaging().sendEachForMulticast({
             tokens: tokens,
             notification: payload.notification,
-            data: payload.data, // Attach data payload with URL and imageUrl
         }).catch((error) => {
-            console.error("Error in sendEachForMulticast:", error);
+            // console.error("Error in sendEachForMulticast:", error);
             throw error; // Re-throw to catch in the main try-catch
         });
+        
 
         // Check for individual failed tokens
         const failedTokens = [];
         response.responses.forEach((resp, idx) => {
             if (!resp.success) {
                 failedTokens.push(tokens[idx]);
-                console.error("Error sending to token:", tokens[idx], resp.error);
+                // console.error("Error sending to token:", tokens[idx], resp.error);
             }
         });
 
-        res.status(200).json({
+        res.status(200).json({ 
             success: true,
             message: "Notification processed with possible individual failures.",
             failedTokens: failedTokens,
@@ -385,6 +384,62 @@ route.post('/upload-profile', upload.single('profile'), async (req, res) => {
     } else {
     return res.status(401).send({ message: "Unauthorized request." });
     }
+});
+
+// Route for updating Home Page SEO
+route.post('/home-seo', uploadForHomeSEO.single('seoImage'), async (req, res) => {
+  try {
+    if (!req.headers.authorization) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const { seoTitle, seoDiscription } = req.body;
+
+    // Check if file is uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded or invalid file type.' });
+    }
+
+    const isProfilePresent = await DataModel.findOne({}, { homePageSEO: 1, _id: 0 });
+
+    if (isProfilePresent) {
+      const existingImageKey = isProfilePresent.homePageSEO?.imageKey;
+
+      // Delete the previous image from S3 if it exists
+      if (existingImageKey) {
+        await deleteImageFromS3(existingImageKey);
+      }
+    }
+
+    const newHomePageSEO = {
+      seoTitle: seoTitle,
+      seoDiscription: seoDiscription,
+      imageUrl: req.file.location,
+      imageKey: req.file.key,
+    };
+
+    await DataModel.updateOne(
+      {}, // filter for matching document; leave empty if updating the first document
+      {
+        $set: { "homePageSEO": newHomePageSEO },
+      },
+      { upsert: true } // creates the document if it doesn't exist
+    );
+
+    res.status(200).json({
+      status: 200,
+      message: "Home Page SEO updated successfully.",
+      type: "homepageseo",
+      result: {
+        seoTitle,
+        seoDiscription,
+        imageUrl: req.file.location,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating Home Page SEO:", error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 });
 
 

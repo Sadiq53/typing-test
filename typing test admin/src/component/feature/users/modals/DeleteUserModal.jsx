@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { handleDeleteUserAccount } from '../../../../redux/AdminDataSlice';
+import { handleDeleteBulkAccount, handleDeleteUserAccount } from '../../../../redux/AdminDataSlice';
 import { dynamicToast } from '../../../shared/Toast/DynamicToast';
 
 const DeleteUserModal = (props) => {
@@ -14,15 +14,19 @@ const DeleteUserModal = (props) => {
     const processingMsg = useSelector(state => state.AdminDataSlice.processingMsg) 
     const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate();
-
-    const deleteConfirmation = () =>{
-        dispatch(handleDeleteUserAccount(props.props))
+    
+    const deleteConfirmation = () => {
+        if (Array.isArray(props.props)) {
+            dispatch(handleDeleteBulkAccount(props.props));
+        } else {
+            dispatch(handleDeleteUserAccount(props.props));
+        }
     }
 
     useEffect(()=>{
         if(isFullfilled) {
             if(fullFillMsg?.type === 'delete') {
-                dynamicToast({ message: "Account Deleted Successfully", icon: "info" });
+                dynamicToast({ message: "Account Deleted Successfully", icon: "success" });
                 clsModal.current.click();
                 setIsLoading(false)
                 setTimeout(()=>{

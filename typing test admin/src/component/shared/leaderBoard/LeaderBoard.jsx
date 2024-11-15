@@ -41,26 +41,60 @@ const LeaderBoard = () => {
     }
 
     const updateDataOnLevels = () => {
-        switch(levelFilter) {
-            case 'all' :
-                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.overall?.avgAcc, avgWpm : value?.overall?.avgWpm, avgConsis : value?.overall?.avgConsis}}))
-                break;
-            
-            case 'easy' :
-                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.easy?.avgAcc, avgWpm : value?.levels?.easy?.avgWpm, avgConsis : value?.levels?.easy?.avgConsis}}))
-                break;
-            
-            case 'medium' :
-                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.medium?.avgAcc, avgWpm : value?.levels?.medium?.avgWpm, avgConsis : value?.levels?.medium?.avgConsis}}))
-                break;
-            
-            case 'hard' :
-                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.hard?.avgAcc, avgWpm : value?.levels?.hard?.avgWpm, avgConsis : value?.levels?.hard?.avgConsis}}))
-                break;
-            default:
-                console.warn(`Unhandled match type: ${match}`);
-        }
-    }
+        const getFilteredData = (level) => {
+            switch (level) {
+                case 'easy':
+                    return rawAllUserData?.map(value => ({
+                        username: value.username,
+                        profile: value.profile.newname,
+                        avgAcc: value?.levels?.easy?.avgAcc,
+                        avgWpm: value?.levels?.easy?.avgWpm,
+                        avgConsis: value?.levels?.easy?.avgConsis
+                    }));
+                case 'medium':
+                    return rawAllUserData?.map(value => ({
+                        username: value.username,
+                        profile: value.profile.newname,
+                        avgAcc: value?.levels?.medium?.avgAcc,
+                        avgWpm: value?.levels?.medium?.avgWpm,
+                        avgConsis: value?.levels?.medium?.avgConsis
+                    }));
+                case 'hard':
+                    return rawAllUserData?.map(value => ({
+                        username: value.username,
+                        profile: value.profile.newname,
+                        avgAcc: value?.levels?.hard?.avgAcc,
+                        avgWpm: value?.levels?.hard?.avgWpm,
+                        avgConsis: value?.levels?.hard?.avgConsis
+                    }));
+                case 'all':
+                default:
+                    return rawAllUserData?.map(value => ({
+                        username: value.username,
+                        profile: value.profile.newname,
+                        avgAcc: value?.overall?.avgAcc,
+                        avgWpm: value?.overall?.avgWpm,
+                        avgConsis: value?.overall?.avgConsis
+                    }));
+            }
+        };
+    
+        // Get filtered data for the selected level
+        const filteredData = getFilteredData(levelFilter);
+    
+        // Sort the data based on avgWpm, avgConsis, and avgAcc
+        const rankedData = filteredData
+            ?.filter(item => item.avgWpm && item.avgConsis && item.avgAcc) // Ensure valid data
+            .sort((a, b) => {
+                if (b.avgWpm !== a.avgWpm) return b.avgWpm - a.avgWpm; // Primary: avgWpm
+                if (b.avgConsis !== a.avgConsis) return b.avgConsis - a.avgConsis; // Secondary: avgConsis
+                return b.avgAcc - a.avgAcc; // Tertiary: avgAcc
+            });
+    
+        // Update the display data
+        setDisplayData(rankedData);
+    };
+    
 
     useEffect(()=>{
         updateDataOnLevels()
@@ -131,38 +165,47 @@ const LeaderBoard = () => {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="show-filter py-2">
-                            <h3 className='font-active text-left'>0{timeFilter} Min {levelFilter} Mode</h3>
-                            {
-                                isLoading && (<div class="rl-loading-container">
-                                    <div class="rl-loading-thumb rl-loading-thumb-1"></div>
-                                    <div class="rl-loading-thumb rl-loading-thumb-2"></div>
-                                    <div class="rl-loading-thumb rl-loading-thumb-3"></div>
-                                </div>)
-                            }
+                            <h3 className="font-active text-left">0{timeFilter} Min {levelFilter} Mode</h3>
+                            {isLoading && (
+                                <div className="rl-loading-container">
+                                    <div className="rl-loading-thumb rl-loading-thumb-1"></div>
+                                    <div className="rl-loading-thumb rl-loading-thumb-2"></div>
+                                    <div className="rl-loading-thumb rl-loading-thumb-3"></div>
+                                </div>
+                            )}
                         </div>
-                        <div className="alluser-table  my-3">
-                            <table className="table table-dark table-striped table-hover">
+                        <div className="alluser-table my-3">
+                            <table className="table table-dark m-0 table-striped table-hover">
                                 <thead>
                                     <tr>
-                                    <th>#</th>
-                                    <th>name</th>
-                                    <th>wpm</th>
-                                    <th>accuracy</th>
-                                    <th>consistency</th>
+                                        <th>#</th>
+                                        <th>name</th>
+                                        <th>wpm</th>
+                                        <th>accuracy</th>
+                                        <th>consistency</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {
-                                        displayData?.map((value, index) => (  
-                                            <tr key={index}>
-                                                <td>{index+1}</td>
-                                                <td><NavLink to={`/admin/users/${value.username}`}><div className='profile'><img src={value?.profile ? `${value?.profile}` : "/assets/images/profile.png"}  alt="" />{value?.username}</div></NavLink></td>
-                                                <td>{Math.round(value?.avgWpm)}</td>
-                                                <td>{Math.round(value?.avgAcc)}</td>
-                                                <td>{Math.round(value?.avgConsis)}</td>
-                                            </tr>
-                                        ))
-                                    }
+                                    {displayData?.map((value, index) => (
+                                        <tr key={index}>
+                                            <td>{index + 1}</td>
+                                            <td>
+                                                <NavLink to={`/admin/users/${value.username}`}>
+                                                    <div className="profile">
+                                                        <img src={value?.profile || "/assets/images/profile.png"} alt="" />
+                                                        {value?.username}
+                                                        {/* Show badges based on the index, after the username */}
+                                                        {index + 1 === 1 && <span className="badge-icon cs">🥇</span>}
+                                                        {index + 1 === 2 && <span className="badge-icon cs">🥈</span>}
+                                                        {index + 1 === 3 && <span className="badge-icon cs">🥉</span>}
+                                                    </div>
+                                                </NavLink>
+                                            </td>
+                                            <td>{Math.round(value?.avgWpm)}</td>
+                                            <td>{Math.round(value?.avgAcc)}</td>
+                                            <td>{Math.round(value?.avgConsis)}</td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -170,6 +213,8 @@ const LeaderBoard = () => {
                 </div>
             </div>
         </section>
+
+
 
     </>
   )

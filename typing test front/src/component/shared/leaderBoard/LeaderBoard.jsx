@@ -42,26 +42,59 @@ const LeaderBoard = () => {
     }
 
     const updateDataOnLevels = () => {
-        switch(levelFilter) {
-            case 'all' :
-                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.overall?.avgAcc, avgWpm : value?.overall?.avgWpm, avgConsis : value?.overall?.avgConsis}}))
-                break;
-            
-            case 'easy' :
-                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.easy?.avgAcc, avgWpm : value?.levels?.easy?.avgWpm, avgConsis : value?.levels?.easy?.avgConsis}}))
-                break;
-            
-            case 'medium' :
-                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.medium?.avgAcc, avgWpm : value?.levels?.medium?.avgWpm, avgConsis : value?.levels?.medium?.avgConsis}}))
-                break;
-            
-            case 'hard' :
-                setDisplayData(rawAllUserData?.map(value => {return {username : value.username, profile : value.profile.newname, avgAcc : value?.levels?.hard?.avgAcc, avgWpm : value?.levels?.hard?.avgWpm, avgConsis : value?.levels?.hard?.avgConsis}}))
-                break;
-            default:
-                console.warn(`Unhandled match type: ${match}`);
-        }
-    }
+        const getFilteredData = (level) => {
+            switch (level) {
+                case 'easy':
+                    return rawAllUserData?.map(value => ({
+                        username: value.username,
+                        profile: value.profile.newname,
+                        avgAcc: value?.levels?.easy?.avgAcc,
+                        avgWpm: value?.levels?.easy?.avgWpm,
+                        avgConsis: value?.levels?.easy?.avgConsis
+                    }));
+                case 'medium':
+                    return rawAllUserData?.map(value => ({
+                        username: value.username,
+                        profile: value.profile.newname,
+                        avgAcc: value?.levels?.medium?.avgAcc,
+                        avgWpm: value?.levels?.medium?.avgWpm,
+                        avgConsis: value?.levels?.medium?.avgConsis
+                    }));
+                case 'hard':
+                    return rawAllUserData?.map(value => ({
+                        username: value.username,
+                        profile: value.profile.newname,
+                        avgAcc: value?.levels?.hard?.avgAcc,
+                        avgWpm: value?.levels?.hard?.avgWpm,
+                        avgConsis: value?.levels?.hard?.avgConsis
+                    }));
+                case 'all':
+                default:
+                    return rawAllUserData?.map(value => ({
+                        username: value.username,
+                        profile: value.profile.newname,
+                        avgAcc: value?.overall?.avgAcc,
+                        avgWpm: value?.overall?.avgWpm,
+                        avgConsis: value?.overall?.avgConsis
+                    }));
+            }
+        };
+    
+        // Get filtered data for the selected level
+        const filteredData = getFilteredData(levelFilter);
+    
+        // Sort the data based on avgWpm, avgConsis, and avgAcc
+        const rankedData = filteredData
+            ?.filter(item => item.avgWpm && item.avgConsis && item.avgAcc) // Ensure valid data
+            .sort((a, b) => {
+                if (b.avgWpm !== a.avgWpm) return b.avgWpm - a.avgWpm; // Primary: avgWpm
+                if (b.avgConsis !== a.avgConsis) return b.avgConsis - a.avgConsis; // Secondary: avgConsis
+                return b.avgAcc - a.avgAcc; // Tertiary: avgAcc
+            });
+    
+        // Update the display data
+        setDisplayData(rankedData);
+    };
 
     useEffect(()=>{
         updateDataOnLevels()
@@ -156,7 +189,13 @@ const LeaderBoard = () => {
                                         displayData?.length !== 0 ? displayData?.map((value, index) => (
                                             <tr>
                                                 <td>{index+1}</td>
-                                                <td><div className='profile'><img src={value?.profile ? `${value?.profile}` : "/assets/images/profile.png"}  alt="" />{value?.username}</div></td>
+                                                <td><div className='profile'><img src={value?.profile ? `${value?.profile}` : "/assets/images/profile.png"}  alt="" />
+                                                    {value?.username}
+                                                    {/* Show badges based on the index, after the username */}
+                                                    {index + 1 === 1 && <span className="badge-icon cs">🥇</span>}
+                                                    {index + 1 === 2 && <span className="badge-icon cs">🥈</span>}
+                                                    {index + 1 === 3 && <span className="badge-icon cs">🥉</span>}
+                                                </div></td>
                                                 <td>{Math.round(value?.avgWpm)}</td>
                                                 <td>{Math.round(value?.avgAcc)}</td>
                                                 <td>{Math.round(value?.avgConsis)}</td>

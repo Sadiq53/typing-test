@@ -48,7 +48,7 @@ const Blog = () => {
                         </div>
                         <div className="blog-layout mt-5">
                             {
-                                displayData && displayData?.map(value => <BlogPost props={value} />)
+                                displayData?.length !== 0 ? displayData?.map(value => <BlogPost props={value} />) : (<h5 className="text-light">No Blogs Found</h5>)
                             }
                         </div>
                     </div>

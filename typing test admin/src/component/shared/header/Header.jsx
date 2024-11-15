@@ -8,7 +8,9 @@ const Header = () => {
   const checkAdminToken = useMemo(() => !!localStorage.getItem('adminToken'), []);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [notificationBadge, setNotificationBadge] = useState(false);
+  const [imagePath, setImagePath] = useState('');
   const contactData = useSelector(state => state.DynamicPagesDataSlice.contact)
+  const adminData = useSelector(state => state.AdminDataSlice.adminData)
 
   useEffect(() => {
     if (contactData) {
@@ -40,6 +42,12 @@ const Header = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
+
+  useEffect(()=>{
+    if(adminData) {
+      setImagePath(adminData?.profileimage?.s3url)
+    }
+  }, [adminData])
 
   return (
     <header className="app-header">
@@ -77,7 +85,7 @@ const Header = () => {
                 onClick={()=>setIsDropdownOpen(!isDropdownOpen)} // Toggle dropdown visibility on click
               >
                 <img
-                  src="/assets/images/profile/user-1.jpg"
+                  src={imagePath ? `${imagePath}` : "/assets/images/profile.png"}
                   alt="Profile"
                   width={35}
                   height={35}

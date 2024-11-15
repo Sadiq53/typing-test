@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const sha = require('sha1')
 const userModel = require('../model/UserSchema')
 const adminModel = require('../model/AdminSchema')
+const DataModel = require('../model/DynamicPagesDataSchema')
 const notificationModel = require('../model/NotificationSchema')
 const key = require('../config/token_Keys');
 const randNum = require('random-number')
@@ -73,14 +74,15 @@ route.get('/local', async (req, res) => {
         if (!adminData.length) {
             return res.status(404).send({ status: 404, message: 'No admin data found' });
         }
-
+        const homePageSEO = await DataModel.findOne({}, { homePageSEO: 1, _id: 0 });
         const blogData = adminData[0]?.blog || []; // Fallback to an empty array if blog is undefined
         const filteredBlogData = blogData.filter(value => value.status === 'Published'); // Filter published blogs
         
         const localData = {
             paragraphs: adminData[0]?.paragraphs || [], // Fallback to empty array if paragraphs is undefined
             blog: filteredBlogData,
-            blogCategory: adminData[0]?.blogCategory || [] // Fallback to empty array if blogCategory is undefined
+            blogCategory: adminData[0]?.blogCategory || [], // Fallback to empty array if blogCategory is undefined
+            homePageSEO : homePageSEO?.homePageSEO
         };
 
         res.status(200).send({ status: 200, localData }); // Send successful response
@@ -129,14 +131,14 @@ route.get('/dashdata/:limit/:type', async (req, res) => {
     const fetchFilteredData = async (filterType, limit) => {
         const levels = ['all', 'easy', 'medium', 'hard'];
         const queries = levels.map(level => ({
-            [`${filterType}.${level}.avgwpm`]: { $gt: 1 },
-            [`${filterType}.${level}.avgconsis`]: { $gt: 1 },
-            [`${filterType}.${level}.avgacc`]: { $gt: 1 }
+            [`${filterType}.${level}.avgwpm`]: { $gt: 40 },
+            [`${filterType}.${level}.avgconsis`]: { $gt: 8 },
+            [`${filterType}.${level}.avgacc`]: { $gt: 90 }
         }));
 
         const results = await userModel.find({
             $or: queries
-        }).limit(limit);
+        });
 
         return results;
     };
@@ -174,7 +176,7 @@ route.get('/dashdata/:limit/:type', async (req, res) => {
         };
     };
 
-    const filteredData = allUser?.map(user => {
+    const filteredData = allUser.map(user => {
         const matchData = user[matchType] || [];
 
         // Extract data for easy, medium, and hard levels
@@ -182,10 +184,10 @@ route.get('/dashdata/:limit/:type', async (req, res) => {
         const mediumData = extractLevelData(matchData, 'medium');
         const hardData = extractLevelData(matchData, 'hard');
 
-        // Return the structured response
+        // Return the structured response with overall and levels data
         return {
             username: user?.username,
-            profile : user?.profileimage,
+            profile: user?.profileimage,
             overall: {
                 avgWpm: calculateAverage(matchData.map(value => parseFloat(value.avgwpm))),
                 avgAcc: calculateAverage(matchData.map(value => parseFloat(value.avgacc))),
@@ -199,8 +201,26 @@ route.get('/dashdata/:limit/:type', async (req, res) => {
         };
     });
 
-    res.send({ status: 200, userData: filteredData, type: "leaderboard", message: "Leaderboard Data" });
+    // Sort users based on overall performance in descending order for ranking
+    const sortedData = filteredData.sort((a, b) => {
+        // Ranking priority: avgWpm > avgConsis > avgAcc
+        const scoreA = a.overall.avgWpm * 0.5 + a.overall.avgConsis * 0.3 + a.overall.avgAcc * 0.2;
+        const scoreB = b.overall.avgWpm * 0.5 + b.overall.avgConsis * 0.3 + b.overall.avgAcc * 0.2;
+        return scoreB - scoreA;
+    });
+
+    // Slice the top 100 users
+    const top100 = sortedData.slice(0, 100);
+
+    // Add ranking to the data
+    const rankedData = top100.map((user, index) => ({
+        rank: index + 1,
+        ...user
+    }));
+
+    res.send({ status: 200, userData: rankedData, type: "leaderboard", message: "Leaderboard Data" });
 });
+
 
 route.post('/signin/google', async(req, res) => {
     const token = Object.keys(req.body)[0];
@@ -531,7 +551,13 @@ route.delete('/', async (req, res) => {
             if (!checkAccount) {
                 return res.status(404).send({status: 404, message: 'User not found'});
             }
-            
+
+            const imageKey = checkAccount?.profileimage?.s3Key
+
+            if(imageKey) {
+                await deleteImageFromS3(imageKey)
+            }
+
             // Delete the account based on the accountid parameter
             const deletionResult = await userModel.deleteOne({_id: decoded.id});
             await notificationModel.deleteOne({userId: decoded.id});

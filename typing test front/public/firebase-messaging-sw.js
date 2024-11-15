@@ -1,5 +1,3 @@
-import { BASE_API_URL } from "../src/util/API_URL";
-
 importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js");
 
@@ -20,7 +18,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: `${BASE_API_URL}/${payload.data.imageUrl}`
+    icon: "./aasets/images/logo 2.svg"
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

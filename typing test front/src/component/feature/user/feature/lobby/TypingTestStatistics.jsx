@@ -29,21 +29,33 @@ const TypingTestStats = () => {
     const {wpm, consistency, accuracy, correctChars, incorrectChars, timeOfCompletion, isCompleted, extraChars, time, level} = stats?.data;
     // console.log("WPM:", wpm, "Consistency:", consistency, "Accuracy:", accuracy);
 
+    const getEvenlySpacedData = (array, numPoints) => {
+        const step = Math.floor(array.length / numPoints); // Determine the spacing between points
+        let result = [];
+      
+        // Collect evenly spaced values
+        for (let i = 0; i < numPoints; i++) {
+          result.push(array[i * step]);
+        }
+      
+        return result;
+      };
+
     const data = {
-        labels: Array.from({ length: wpm.length }, (_, i) => i + 1), // X-axis label based on data length
+        labels: Array.from({ length: 15 }, (_, i) => i + 1), // X-axis label based on data length
         datasets: [
-            // {
-            //     label: 'WPM',
-            //     data: wpm,
-            //     borderColor: 'rgba(75, 192, 192, 1)',
-            //     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            //     fill: false,
-            //     tension: 0.4,
-            //     pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-            // },
+            {
+                label: 'WPM',
+                data: getEvenlySpacedData(wpm, 15),
+                borderColor: 'rgba(255, 127, 80, 1)',
+                backgroundColor: 'rgba(255, 127, 80, 0.2)',
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: 'rgba(255, 127, 80, 1)',
+            },
             {
                 label: 'Consistency (%)',
-                data: consistency,
+                data: getEvenlySpacedData(consistency, 15),
                 borderColor: 'rgba(113, 202, 199, 1)',
                 backgroundColor: 'rgba(113, 202, 199, 0.2)',
                 fill: false,
@@ -52,7 +64,7 @@ const TypingTestStats = () => {
             },
             {
                 label: 'Accuracy (%)',
-                data: accuracy,
+                data: getEvenlySpacedData(accuracy, 15),
                 borderColor: 'rgba(255, 255, 255, 1)',
                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
                 fill: false,

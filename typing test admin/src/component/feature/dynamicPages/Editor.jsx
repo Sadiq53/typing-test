@@ -93,7 +93,7 @@ const Editor = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="blog-editor">
+                            <div className="blog-editor p-0">
                                 <ReactQuill
                                     value={content.content}
                                     onChange={handleContentChange}
@@ -102,7 +102,7 @@ const Editor = () => {
                                     formats={Editor.formats}
                                 />
                             </div>
-                            <div className="save-editor-btn">
+                            <div className=" mt-3">
                                 <button className="btn btn-primary" onClick={handleSave}>
                                     Save Post {loader && <i className="fa-solid fa-circle-notch fa-spin" style={{ color: "#fff" }} />}
                                 </button>

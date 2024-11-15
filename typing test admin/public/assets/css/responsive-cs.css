@@ -43,7 +43,7 @@
         align-items: flex-start;
     }
     .display-para-sec .para-btns{
-        width: 100%;
+        width: 100% !important;
         flex-direction: row;
     }
     .display-para-sec .add-para{
@@ -71,5 +71,12 @@
     .repeater-item{
         grid-template-columns: 1fr;
         padding: 0;
+    }
+    .admin-profile-layout .profile-sec2, .admin-profile-layout .profile-sec2 div{
+        flex-direction: column;
+    }
+    .display-para-sec .para-btns button{
+        height: 40px;
+        width: 40px;
     }
 }

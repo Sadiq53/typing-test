@@ -6,7 +6,7 @@ import { handleTest, resetState } from '../../../../../redux/UserDataSlice';
 import { dynamicToast } from '../../../../shared/Toast/DynamicToast'
 import { easyWords, generateParagraph, hardWords, mediumWords } from './ParagraphGenerater';
 import DynamicAlert from '../../../../shared/Toast/DynamicAlert'
-
+import { Helmet } from 'react-helmet';
 
 
 const Lobby = () => {
@@ -27,6 +27,7 @@ const Lobby = () => {
   const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
   const isError = useSelector(state => state.UserDataSlice.isError)
   const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
+  const homePageSEO = useSelector(state => state.UserDataSlice.homePageSEO)
   const [timeUp, setTimeUp] = useState(false)
   const [rootFocus, setRootFocus] = useState(false)
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
@@ -449,6 +450,23 @@ const handleKeyUp = (event) => {
 
   return (
     <>
+
+      {
+        homePageSEO && (
+          <Helmet>
+            {/* Set the page title */}
+            <title>{homePageSEO.seoTitle || 'Default Title'}</title>
+            {/* Meta description for SEO */}
+            <meta name="description" content={homePageSEO.seoDescription || 'Default Description'} />
+            {/* Open Graph tags for social media */}
+            <meta property="og:title" content={homePageSEO.seoTitle || 'Default Title'} />
+            <meta property="og:description" content={homePageSEO.seoDescription || 'Default Description'} />
+            <meta property="og:image" content={homePageSEO?.imageUrl || '/default-image.jpg'} />
+            <link rel="icon" href={homePageSEO?.imageUrl || '/default-favicon.ico'} />
+          </Helmet>
+        )
+      }
+
       <Header />
       <section className='lobby-area'>
         <div className="container">
@@ -464,7 +482,7 @@ const handleKeyUp = (event) => {
           >
             <div ref={containerRef} className="cutom-lobby-head">
               <div className='lobby-menu'>
-                <ul>
+                <ul style={{ visibility: timerRunning ? 'hidden' : 'visible' }}>
                   <li>Time :</li>
                   <li>
                     <button
@@ -498,7 +516,7 @@ const handleKeyUp = (event) => {
                 </h4>
               </div>
               <div className='lobby-menu'>
-                <ul>
+                <ul style={{ visibility: timerRunning ? 'hidden' : 'visible' }}>
                   <li>Level :</li>
                   <li>
                     <button

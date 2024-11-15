@@ -160,9 +160,10 @@ const Min3Paragraphs = (props) => {
                     <div className="row">
                         <div className="col-md-12">
                             <div className="para-layout">
-                                <h2 className='font-active text-left'>Set Paragraphs For {timeFilter} Min {levelFilter} Mode</h2>
+                                <h2 className='font-active word-space-5 text-left'>Set Paragraphs For {timeFilter} Min {levelFilter} Mode</h2>
                                 {displayData?.map((value, index) => (
-                                    
+                                    <>
+                                        <h4 className='m-0'>{`Paragraph ${index+1}`}</h4>
                                         <form className='display-para-sec' onSubmit={UpdateParaForm.handleSubmit}>
                                             <div className="add-para" key={index}>
                                                 <textarea
@@ -182,7 +183,7 @@ const Min3Paragraphs = (props) => {
                                             ) : (
                                                 <button
                                                     type='button' // Ensure the button type is 'button'
-                                                    className='btn btn-primary'
+                                                    className='btn btn-primary '
                                                     onClick={(e) => {
                                                         e.preventDefault(); // Prevent default form submission
                                                         handleEditToggle(index); // Toggle edit mode
@@ -196,8 +197,9 @@ const Min3Paragraphs = (props) => {
                                                 </button>
                                             </div>
                                         </form>
-                                    
+                                    </>
                                 ))}
+                                <h4 className='m-0'>Add New Paragraph</h4>
                                 <form className='form' onSubmit={addParaForm.handleSubmit}>
                                     {textareas.map((textarea, index) => (
                                         <>
@@ -215,7 +217,7 @@ const Min3Paragraphs = (props) => {
                                                 }}
                                                 placeholder="Set a Paragraph..."
                                                 value={textarea.para}
-                                                />
+                                            />
                                         </div>
                                             {addParaForm.errors.paragraphs && addParaForm.errors.paragraphs[index]?.para && (
                                                 <div className="error text-danger">{addParaForm.errors.paragraphs[index].para}</div>
@@ -227,11 +229,11 @@ const Min3Paragraphs = (props) => {
                                         <div>
                                             <button type='button' className='theme-btn' onClick={handleDeleteLast}>
                                                 <i className="fa-solid fa-trash-can fa-lg" style={{ color: "#d41111" }} />
-                                                &nbsp; Delete
+                                                &nbsp; {window.innerWidth <= 767 ? "" : "Delete"}
                                             </button>
                                             <button type='button' className='theme-btn' onClick={handleAddMore}>
                                                 <i className="fa-solid fa-plus-large fa-lg" style={{ color: "#71cac7" }} />
-                                                &nbsp; Add More
+                                                &nbsp; {window.innerWidth <= 767 ? "" : "Add More"}
                                             </button>
                                         </div>
                                     </div>

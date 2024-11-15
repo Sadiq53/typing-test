@@ -63,7 +63,8 @@ const DynamicPages = () => {
                         <div className="pages-layout">
                                 <div className="pages-inner">
                                     <h3>Manage Terms & Condition</h3>
-                                        <table className="table pages table-dark table-striped">
+                                    <div className="alluser-table w-100">
+                                        <table className="table pages m-0 table-dark table-striped">
                                             <thead>
                                                 <tr>
                                                     <th>Title</th>
@@ -82,47 +83,52 @@ const DynamicPages = () => {
                                             </tbody>
                                         </table>
                                     </div>
+                                </div>
                                 <div className="pages-inner">
                                     <h3>Manage Privacy & Policy</h3>
-                                    <table className="table pages  table-dark table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Posted On</th>
-                                                    <th>Edit</th>
-                                                    <th>Delete</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>{privacyData?.title}</td>
-                                                    <td>{formattedDate?.privacy}</td>
-                                                    <td><NavLink to={`/admin/editor/${'privacy'}`} style={{border : "none"}} className='btn'><i className="fa-regular  fa-pen-to-square fa-lg"></i></NavLink></td>
-                                                    <td><button className="btn" onClick={()=>setDeletePageData('privacy')} data-bs-toggle="modal" data-bs-target="#deletepagedata"><i class="fa-solid fa-trash fa-lg"></i></button></td>
-                                                </tr>
-                                            </tbody>
-                                    </table>
+                                    <div className="alluser-table w-100">
+                                        <table className="table pages m-0  table-dark table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Title</th>
+                                                        <th>Posted On</th>
+                                                        <th>Edit</th>
+                                                        <th>Delete</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>{privacyData?.title}</td>
+                                                        <td>{formattedDate?.privacy}</td>
+                                                        <td><NavLink to={`/admin/editor/${'privacy'}`} style={{border : "none"}} className='btn'><i className="fa-regular  fa-pen-to-square fa-lg"></i></NavLink></td>
+                                                        <td><button className="btn" onClick={()=>setDeletePageData('privacy')} data-bs-toggle="modal" data-bs-target="#deletepagedata"><i class="fa-solid fa-trash fa-lg"></i></button></td>
+                                                    </tr>
+                                                </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div className="pages-inner">
                                     <h3>Manage About US</h3>
-                                    <table className="table pages  table-dark table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Posted On</th>
-                                                    <th>Edit</th>
-                                                    <th>Delete</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>{aboutTitles}</td>
-                                                    <td>{formattedDate?.about}</td>
-                                                    <td><NavLink to={`/admin/about`} style={{border : "none"}} className='btn'><i className="fa-regular  fa-pen-to-square fa-lg"></i></NavLink></td>
-                                                    <td><button className="btn" onClick={()=>setDeletePageData('about')} data-bs-toggle="modal" data-bs-target="#deletepagedata"><i class="fa-solid fa-trash fa-lg"></i></button></td>
-                                                </tr>
-                                            </tbody>
-                                    </table>
+                                    <div className="alluser-table w-100">
+                                        <table className="table pages m-0  table-dark table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Title</th>
+                                                        <th>Posted On</th>
+                                                        <th>Edit</th>
+                                                        <th>Delete</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>{aboutTitles}</td>
+                                                        <td>{formattedDate?.about}</td>
+                                                        <td><NavLink to={`/admin/about`} style={{border : "none"}} className='btn'><i className="fa-regular  fa-pen-to-square fa-lg"></i></NavLink></td>
+                                                        <td><button className="btn" onClick={()=>setDeletePageData('about')} data-bs-toggle="modal" data-bs-target="#deletepagedata"><i class="fa-solid fa-trash fa-lg"></i></button></td>
+                                                    </tr>
+                                                </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                         </div>
                     </div>

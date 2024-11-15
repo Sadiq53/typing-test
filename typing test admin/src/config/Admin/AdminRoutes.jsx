@@ -16,6 +16,7 @@ import About from '../../component/feature/dynamicPages/About';
 import AdminProfile from '../../component/feature/profile/AdminProfile';
 import Contacts from '../../component/feature/contact/Contacts';
 import DetailContact from '../../component/feature/contact/DetailContact';
+import ManageAds from '../../component/feature/ADS/ManageAds';
 
 const adminRoutes = [
     {
@@ -89,6 +90,10 @@ const adminRoutes = [
     {
         path : 'profile',
         element : <AdminProfile  />
+    },
+    {
+        path : 'ads',
+        element : <ManageAds  />
     },
     {
         path : 'editor/:page',

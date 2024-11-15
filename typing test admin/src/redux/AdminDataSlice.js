@@ -99,6 +99,33 @@ const handleDeleteUserAccount = createAsyncThunk('handleDeleteUserAccount', asyn
     }
 }) 
 
+const handleDeleteBulkAccount = createAsyncThunk('handleDeleteBulkAccount', async(formData) => {
+    const ID = localStorage.getItem('adminToken')
+    try{
+        const response = await axios.post(`${ADMIN_API_URL}/users/bulk-delete`, formData, { headers : { Authorization : ID } })
+        // console.log(response.data)
+        if(response.data.status === 200) {
+            let checkMsg = {
+                status : true,
+                message : response.data.message,
+                type : response.data.type,
+                data : formData,
+            }
+            return checkMsg
+        } else {
+            let checkMsg = {
+                status : false,
+                message : response.data.message,
+                type : response.data.type,
+                data : []
+            }
+            return checkMsg
+        }
+    } catch (error) {
+        console.error('Error deleting account:', error);
+    }
+}) 
+
 const handleBlockUnblockUser = createAsyncThunk('handleBlockUnblockUser', async(username) => {
     const ID = localStorage.getItem('adminToken')
     const data = {username : username, date : new Date()}
@@ -552,6 +579,38 @@ const AdminDataSlice = createSlice({
             state.processingMsg.message = 'Deleting User'
             state.processingMsg.type = 'delete'
         });
+        builder.addCase(handleDeleteBulkAccount.fulfilled, (state, action) => {
+            if (action.payload.status) {
+                const { data } = action.payload;
+        
+                // Filter out deleted users and update the list
+                const filteredData = state.allUserData?.filter(value => !data?.includes(value.username));
+                state.allUserData = filteredData;
+        
+                // Update success message
+                state.isFullfilled = true;
+                state.fullFillMsg.type = action.payload.type;
+                state.fullFillMsg.message = action.payload.message;
+        
+                // Adjust user count by the number of deleted users
+                state.adminData.userCount -= data.length;
+        
+                // Reset error and processing flags
+                state.isError = false;
+                state.isProcessing = false;
+            } else { 
+                // Handle error case
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg.message = action.payload.message;
+                state.errorMsg.type = action.payload.type;
+            }
+        });
+        builder.addCase(handleDeleteBulkAccount.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg.message = 'Deleting User'
+            state.processingMsg.type = 'delete'
+        });
         builder.addCase(handleBlockUnblockUser.fulfilled, (state, action) => {
             if (action.payload.status) {
                 const { username } = action.payload.data;
@@ -939,5 +998,5 @@ const AdminDataSlice = createSlice({
 })
 
 export default AdminDataSlice.reducer;
-export {handleGetAdminData, handleSigninAdmin, handleAdminProfileUpload, handleGetBlogPost, handleCreateUser, handleAddBlogCategory, handleDeleteBlogPost, handleDeleteParagraph, handleEditBlogPost, handleAddBlogPost, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleUploadProfile, handleGetUser};
+export {handleGetAdminData, handleSigninAdmin, handleDeleteBulkAccount, handleAdminProfileUpload, handleGetBlogPost, handleCreateUser, handleAddBlogCategory, handleDeleteBlogPost, handleDeleteParagraph, handleEditBlogPost, handleAddBlogPost, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleUploadProfile, handleGetUser};
 export const {resetState, handleClearState, handleGetAllUsers, handleAddBlogPostToState} = AdminDataSlice.actions

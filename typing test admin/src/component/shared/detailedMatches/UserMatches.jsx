@@ -101,7 +101,7 @@ const UserMatches = () => {
                         </div>
                         <div className="col-md-12">
                             <div className="alluser-table my-5">
-                                <table className="table table-equal table-hover table-striped">
+                                <table className="table table-dark m-0 table-equal table-hover table-striped">
                                     <thead>
                                         <tr>
                                             <th>S.No.</th>

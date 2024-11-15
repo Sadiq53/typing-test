@@ -83,6 +83,7 @@ const AdminProfile = () => {
   useEffect(()=>{
     if(rawAdminData) {
       setImagePath(rawAdminData?.profileimage?.s3url)
+      console.log(rawAdminData?.profileimage?.s3url)
     }
   }, [rawAdminData])
   
@@ -108,7 +109,7 @@ const AdminProfile = () => {
                         <div className="admin-profile-layout">
                             <div className="profile-sec1">
                                 <div className="profile-upload-main">
-                                <img src={imagePath ? `${imagePath}` : "/assets/images/profile/user-1.jpg"}  alt="" />
+                                <img src={imagePath ? `${imagePath}` : "/assets/images/profile.png"}  alt="" />
                                     {
                                     loader.state && loader.for === 'profile' && (<div className="profile-loader"><i className="fa-duotone fa-solid fa-loader fa-spin-pulse fa-2xl" style={{color : '#000'}} /></div>)
                                     }
@@ -122,8 +123,8 @@ const AdminProfile = () => {
                             </div>
                             <div className="profile-sec2">
                                 <div>
-                                    <h5>Email Address : </h5>
-                                    <p>{rawAdminData?.email}</p>
+                                    <h5>User Name : </h5>
+                                    <p>{rawAdminData?._id}</p>
                                 </div>
                                 <div>
                                     <h5>Password : </h5>

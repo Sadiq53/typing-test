@@ -78,7 +78,8 @@ route.get('/', async (req, res) => {
                     profile : value?.profileimage?.s3url,
                     isblock : value?.isblocked?.status,
                     createdate : value?.createdate,
-                    accountid : value?.accountid
+                    accountid : value?.accountid,
+                    email : value?.email
                 }
             })
 
@@ -230,6 +231,11 @@ route.delete('/:username', async (req, res) => {
             }
 
             const extractUserId = isUserPresent?._id 
+            const imageKey = isUserPresent?.profileimage?.s3Key
+
+            if(imageKey) {
+                await deleteImageFromS3(imageKey)
+            }
 
             // Delete the account based on the accountid parameter
             const deletionResult = await userModel.deleteOne({username : username});
@@ -254,6 +260,66 @@ route.delete('/:username', async (req, res) => {
         res.status(500).send({status: 500, message: 'An error occurred while deleting the account'});
     }
 });
+
+route.post('/bulk-delete', async (req, res) => {
+
+    try {
+        // Check for the presence of the Authorization header
+        if (req.headers.authorization) {
+            // Decode the JWT token
+            const token = req.headers.authorization;
+            const decoded = jwt.verify(token, key); // Using jwt.verify for validation
+
+            // Verify if the requesting user is an admin
+            const isAdmin = await adminModel.findOne({ _id: decoded.id });
+            if (!isAdmin) {
+                return res.status(403).send({ status: 403, message: 'Unauthorized access' });
+            }
+
+            const usernames = req.body; // Expect an array of usernames in the request body
+            if (!Array.isArray(usernames) || usernames.length === 0) {
+                return res.status(400).send({ status: 400, message: 'Invalid or empty usernames array' });
+            }
+
+            // Fetch all user documents matching the provided usernames
+            const usersToDelete = await userModel.find({ username: { $in: usernames } });
+
+            if (usersToDelete.length === 0) {
+                return res.status(404).send({ status: 404, message: 'No matching users found' });
+            }
+
+            // Extract user IDs and image keys for cleanup
+            const userIds = usersToDelete.map(user => user._id);
+            const imageKeys = usersToDelete
+                .filter(user => user.profileimage?.s3Key)
+                .map(user => user.profileimage.s3Key);
+
+            // Delete images from S3
+            if (imageKeys.length > 0) {
+                await Promise.all(imageKeys.map(deleteImageFromS3)); // Assuming `deleteImageFromS3` can handle promises
+            }
+
+            // Delete users and related notifications in bulk
+            const deleteUsersResult = await userModel.deleteMany({ _id: { $in: userIds } });
+            await notificationModel.deleteMany({ userId: { $in: userIds } });
+
+            // Send a response
+            res.send({
+                status: 200,
+                type: 'delete',
+                message: `${deleteUsersResult.deletedCount} user(s) deleted successfully`,
+            });
+        } else {
+            // If no authorization header is present
+            res.status(401).send({ status: 401, message: 'Authorization header missing' });
+        }
+    } catch (error) {
+        // Catch any errors that occur
+        console.error(error);
+        res.status(500).send({ status: 500, message: 'An error occurred while deleting accounts' });
+    }
+});
+
 
 route.get('/:username', async(req, res) => {
     // console.log('Request received for user:', req.params.username);

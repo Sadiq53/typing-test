@@ -27,6 +27,13 @@ const DynamicPagesDataSchema = mongoose.Schema({
             }
         ]
     },
+    homePageSEO : {
+            index : { type : String, default : '' },
+            seoDescription : { type : String, default : '' },
+            seoTitle : { type : String, default : '' },
+            imageUrl : { type : String, default : '' },
+            imageKey : { type : String, default : '' },
+    },
     contact : [{
         name : { type : String, default : '' },
         email : { type : String, default : '' },

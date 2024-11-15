@@ -143,7 +143,26 @@ const SideBar = () => {
             </li>
             {/* LEADERBOARD PART */}
 
-            {/* LEADERBOARD PART */}
+            {/* ADS PART */}
+            <li className="nav-small-cap">
+                <i className="ti ti-dots nav-small-cap-icon fs-4" />
+                <span className="hide-menu">Ads</span>
+            </li>
+            <li className="sidebar-item">
+                <NavLink
+                className="sidebar-link"
+                to='/admin/ads'
+                aria-expanded="false"
+                >
+                <span>
+                    <i class="fa-solid fa-rectangle-ad"></i>
+                </span>
+                <span className="hide-menu">Manage Ads</span>
+                </NavLink>
+            </li>
+            {/* ADS PART */}
+
+            {/* NOTIFICATION PART */}
             <li className="nav-small-cap">
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Notification</span>
@@ -160,7 +179,7 @@ const SideBar = () => {
                 <span className="hide-menu">Push Notification</span>
                 </NavLink>
             </li>
-            {/* LEADERBOARD PART */}
+            {/* NOTIFICATION PART */}
 
             {/* AUTH PART */}
             <li className="nav-small-cap">

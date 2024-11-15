@@ -162,7 +162,8 @@ const Min1Paragraphs = (props) => {
                             <div className="para-layout">
                                 <h2 className='font-active word-space-5 text-left'>Set Paragraphs For {timeFilter} Min {levelFilter} Mode</h2>
                                 {displayData?.map((value, index) => (
-                                    
+                                    <>
+                                        <h4 className='m-0'>{`Paragraph ${index+1}`}</h4>
                                         <form className='display-para-sec' onSubmit={UpdateParaForm.handleSubmit}>
                                             <div className="add-para" key={index}>
                                                 <textarea
@@ -196,8 +197,9 @@ const Min1Paragraphs = (props) => {
                                                 </button>
                                             </div>
                                         </form>
-                                    
+                                    </>
                                 ))}
+                                <h4 className='m-0'>Add New Paragraph</h4>
                                 <form className='form' onSubmit={addParaForm.handleSubmit}>
                                     {textareas.map((textarea, index) => (
                                         <>

@@ -56,67 +56,69 @@ const Contacts = () => {
                         <div className="col-md-12">
                             <div className="card">
                                 <div className="card-header">
-                                <div className="contact-show-header space-even">
+                                <div className="contact-show-header ">
                                     <h4>Contact</h4>
                                     <button className='btn' onClick={()=>dispatch(handleGetContactData())}><i class="fa-solid fa-rotate fa-2xl"></i></button>
                                 </div>
                                 </div>
                                 <div className="card-body">
-                                    <table className="table table-hover table-striped table-dark">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedIds.length === contactData.length}
-                                                        onChange={toggleSelectAll}
-                                                    />
-                                                </th>
-                                                <th>ID</th>
-                                                <th>Name</th>
-                                                <th>Email</th>
-                                                <th>Time</th>
-                                                <th>Status</th>
-                                                <th>Operations</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {
-                                                contactData?.length !== 0 && contactData?.map((value, index) => (
-                                                    <tr key={value._id}>
-                                                        <td>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={selectedIds.includes(value._id)}
-                                                                onChange={() => toggleSelectContact(value._id)}
-                                                            />
-                                                        </td>
-                                                        <td>{index + 1}</td>
-                                                        <td>
-                                                            <NavLink to={`/admin/contact/${value._id}`}>
-                                                                {value?.name}
-                                                            </NavLink>
-                                                        </td>
-                                                        <td>{value?.email}</td>
-                                                        <td>{formatDate(value?.time)}</td>
-                                                        <td>
-                                                            <span className={`mb-1 badge rounded-pill ${value.status === 'unseen' ? 'bg-warning' : 'bg-info'}`}>
-                                                                {value.status}
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <button
-                                                                className='btn p-0'
-                                                                onClick={() => dispatch(handleDeleteSingleContactData(value?._id))}
-                                                            >
-                                                                <i className="fa-solid fa-trash-can fa-lg" style={{ color: "#d41111" }} />
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            }
-                                        </tbody>
-                                    </table>
+                                    <div className='alluser-table'>
+                                        <table className="table table-hover table-striped table-dark">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedIds.length === contactData.length}
+                                                            onChange={toggleSelectAll}
+                                                        />
+                                                    </th>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Time</th>
+                                                    <th>Status</th>
+                                                    <th>Operations</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    contactData?.length !== 0 && contactData?.map((value, index) => (
+                                                        <tr key={value._id}>
+                                                            <td>
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={selectedIds.includes(value._id)}
+                                                                    onChange={() => toggleSelectContact(value._id)}
+                                                                />
+                                                            </td>
+                                                            <td>{index + 1}</td>
+                                                            <td>
+                                                                <NavLink to={`/admin/contact/${value._id}`}>
+                                                                    {value?.name}
+                                                                </NavLink>
+                                                            </td>
+                                                            <td>{value?.email}</td>
+                                                            <td>{formatDate(value?.time)}</td>
+                                                            <td>
+                                                                <span className={`mb-1 badge rounded-pill ${value.status === 'unseen' ? 'bg-warning' : 'bg-info'}`}>
+                                                                    {value.status}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <button
+                                                                    className='btn p-0'
+                                                                    onClick={() => dispatch(handleDeleteSingleContactData(value?._id))}
+                                                                >
+                                                                    <i className="fa-solid fa-trash-can fa-lg" style={{ color: "#d41111" }} />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div className="card-footer">
                                     <button 

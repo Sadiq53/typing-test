@@ -2,8 +2,7 @@ import { useParams } from "react-router-dom"
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { BASE_API_URL } from "../../../util/API_URL";
-import Header from "../../shared/header/Header";
-import Footer from "../../shared/footer/Footer";
+import {Helmet} from 'react-helmet'
 
 
 const BlogView = () => {
@@ -46,6 +45,17 @@ const BlogView = () => {
 
   return (
     <>
+      <Helmet>
+        {/* Set the page title */}
+        <title>{displayData.seoTitle || 'Default Title'}</title>
+        {/* Meta description for SEO */}
+        <meta name="description" content={displayData.seoDescription || 'Default Description'} />
+        {/* Open Graph tags for social media */}
+        <meta property="og:title" content={displayData.seoTitle || 'Default Title'} />
+        <meta property="og:description" content={displayData.seoDescription || 'Default Description'} />
+        <meta property="og:image" content={displayData?.featuredImage?.path || '/default-image.jpg'} />
+        <link rel="icon" href={displayData?.featuredImage?.path || '/default-favicon.ico'} />
+        </Helmet>
         <section>
             <div className="container pt-7">
                 <div className="row">

@@ -1,12 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 
 const GoogleAds = () => {
     const adRef = useRef(null);
+    const [adsClientID, setAdsClientID] = useState('');
+    const [adSlot, setAdSlot] = useState('');
 
     useEffect(() => {
+        // Function to load the ad after setting client ID
         const loadAds = () => {
             if (window.adsbygoogle && adRef.current) {
-                // Check if the innerHTML is empty to prevent multiple ads
+                // Check if the ad element hasn't already loaded to avoid duplicates
                 if (!adRef.current.innerHTML) {
                     console.log("Pushing ad...");
                     window.adsbygoogle.push({});
@@ -14,30 +18,43 @@ const GoogleAds = () => {
             }
         };
 
-        // Load the Google Ads script if not already loaded
-        if (!window.adsbygoogle) {
-            const script = document.createElement('script');
-            script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9363292015129803";
-            script.async = true;
-            script.onload = loadAds; // Load ads once the script is fully loaded
-            script.onerror = () => console.error('Failed to load adsbygoogle script');
-            document.body.appendChild(script);
-        } else {
-            loadAds();
-        }
+        // Fetch ad settings from the backend
+        axios.get('http://localhost:5000/api/ads/settings')
+            .then(response => {
+                const { adsClientID, adSlot } = response.data;
+
+                // Set the client ID in state
+                setAdsClientID(adsClientID);
+                setAdSlot(adSlot)
+
+                // Dynamically load the Google AdSense script with the client ID in the URL
+                if (adsClientID && !document.querySelector(`script[data-adsbygoogle-client="${adsClientID}"]`)) {
+                    const script = document.createElement('script');
+                    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsClientID}`;
+                    script.async = true;
+                    script.crossOrigin = 'anonymous';
+                    script.setAttribute('data-adsbygoogle-client', adsClientID); // Avoid adding multiple scripts with the same client ID
+                    script.onload = loadAds; // Load ads once the script is fully loaded
+                    script.onerror = () => console.error('Failed to load adsbygoogle script');
+                    document.body.appendChild(script);
+                }
+            })
+            .catch(error => console.error('Error loading ad settings:', error));
     }, []);
 
     return (
         <div>
-            <ins
-                ref={adRef}
-                className="adsbygoogle"
-                style={{ display: 'block' }}
-                data-ad-client="ca-pub-9363292015129803"
-                data-ad-slot="3193362948"
-                data-ad-format="auto"
-                data-full-width-responsive="true"
-            ></ins>
+            {adsClientID && (
+                <ins
+                    ref={adRef}
+                    className="adsbygoogle"
+                    style={{ display: 'block' }}
+                    data-ad-client={adsClientID}
+                    data-ad-slot={adSlot}  // You can set this dynamically if needed
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"
+                ></ins>
+            )}
         </div>
     );
 };
