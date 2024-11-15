@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import GoogleADs from '../googleAds/GoogleADs';
+import { useSelector } from 'react-redux';
 
 
 const Header = () => {
     const checkUserToken = useMemo(() => !!localStorage.getItem('userToken'), []);
     const checkAdminToken = useMemo(() => !!localStorage.getItem('adminToken'), []);
+    const userData = useSelector(state => state.UserDataSlice.userData);
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleMenu = () => setIsOpen(!isOpen);
@@ -17,7 +19,7 @@ const Header = () => {
                     <div className="col-md-4 col-12">
                         <div className="custom-header">
                             <div className="header">
-                                <NavLink to="/"><img src="/assets/images/logo.svg" alt="Logo" /></NavLink>
+                                <NavLink to={checkUserToken ? '/user/lobby' : '/'}><img src="/assets/images/logo.svg" alt="Logo" /></NavLink>
                             </div>
                             <button className="menu-toggle mob-show" onClick={toggleMenu}>
                                 <i className={`fa-solid ${isOpen ? 'fa-xmark' :'fa-bars'} fa-xl`} style={{ color: "#71cac7" }} />
@@ -35,7 +37,7 @@ const Header = () => {
                                         <NavLink to='/user/about'><li>About</li></NavLink>
                                         <NavLink to='/user/contact'><li>Contact Us</li></NavLink>
                                         <li className="dropdown">
-                                            <NavLink to='/user'> User</NavLink>
+                                            <NavLink to='/user'><li>{userData?.username}</li></NavLink>
                                             <ul className="dropdown-menu">
                                                 <NavLink to='/user'><li>Profile</li></NavLink>
                                                 <NavLink to={`/user/signout/${'isSignout'}`}><li>Logout</li></NavLink>
@@ -82,7 +84,7 @@ const Header = () => {
                                         <NavLink to='/user/about'><li>About</li></NavLink>
                                         <NavLink to='/user/contact'><li>Contact Us</li></NavLink>
                                         <li className="dropdown">
-                                            <NavLink to='/user'> User</NavLink>
+                                            <NavLink to='/user'> <li>{userData?.username}</li></NavLink>
                                             <ul className="dropdown-menu">
                                                 <NavLink to='/user'><li>Profile</li></NavLink>
                                                 <NavLink to={`/user/signout/${'isSignout'}`}><li>Logout</li></NavLink>

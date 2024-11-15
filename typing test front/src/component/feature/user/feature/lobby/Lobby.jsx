@@ -7,6 +7,7 @@ import { dynamicToast } from '../../../../shared/Toast/DynamicToast'
 import { easyWords, generateParagraph, hardWords, mediumWords } from './ParagraphGenerater';
 import DynamicAlert from '../../../../shared/Toast/DynamicAlert'
 import { Helmet } from 'react-helmet';
+import Footer from '../../../../shared/footer/Footer'
 
 
 const Lobby = () => {
@@ -468,7 +469,7 @@ const handleKeyUp = (event) => {
       }
 
       <Header />
-      <section className='lobby-area'>
+      <section className='lobby-area pb-3'>
         <div className="container">
           <div 
             className="row custom-align"
@@ -599,7 +600,7 @@ const handleKeyUp = (event) => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-5 custom-footer-lobby">
+              {/* <div className="col-md-5 custom-footer-lobby">
                 <div className='width-80'>
                   <div className="footer">
                     <ul>
@@ -610,11 +611,13 @@ const handleKeyUp = (event) => {
                     </ul>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
       </section>
+
+      <Footer />
       
       {
         timeUp && (

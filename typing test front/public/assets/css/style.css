@@ -1894,3 +1894,15 @@ button.google-sign-btn img {
     font-size: 25px !important;
   }
 
+  .header-profile{
+    display: flex;
+    align-items: center;
+    justify-content:flex-start ;
+    gap: 5px;
+
+  }
+
+  .header-profile img{
+    width: 12%;
+    border-radius: 50%;
+  }
