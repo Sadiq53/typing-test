@@ -15,6 +15,7 @@ const Lobby = () => {
   const [time, setTime] = useState(60);
   const [userInput, setUserInput] = useState("");
   const typingAreaRef = useRef(null);
+  const typingContainerRef = useRef(null);
   const cursorRef = useRef(null);
   const [blockKey, setBlockKey] = useState({for: '', state: false})
   const containerRef = useRef(null);
@@ -493,23 +494,22 @@ const Lobby = () => {
   };
 
   useEffect(() => {
-    if (cursorRef.current && typingAreaRef.current) {
-      const cursorElement = cursorRef.current;
-      const containerElement = typingAreaRef.current;
-  
-      // Get the cursor's position relative to the container
-      const cursorPosition = cursorElement.getBoundingClientRect().top;
-      const containerPosition = containerElement.getBoundingClientRect().top;
-      const cursorOffset = cursorPosition - containerPosition;
-      console.log(cursorPosition, containerPosition)
-      
-      // Check if the cursor is out of view
-      const containerHeight = containerElement.offsetHeight;
-      if (cursorOffset > containerHeight - 24) { // Adjust this padding value as needed
-        containerElement.scrollTop += cursorOffset - (containerHeight - 24);
+    if (cursorRef.current && typingContainerRef.current) {
+      const cursorOffsetTop = cursorRef.current.offsetTop;
+      const containerScrollTop = typingContainerRef.current.scrollTop;
+      const containerHeight = typingContainerRef.current.clientHeight;
+
+      console.log("Cursor Offset Top:", cursorOffsetTop);
+      console.log("Container Scroll Top:", containerScrollTop);
+      console.log("Container Height:", containerHeight);
+
+      // Auto-scroll logic
+      if (cursorOffsetTop > containerScrollTop + containerHeight) {
+        typingContainerRef.current.scrollTop =
+          cursorOffsetTop - containerHeight + 20; // Add padding
       }
     }
-  }, [userInput]); // Trigger auto-scroll on user input changes
+  }, [userInput]); // Trigger re-run when `userInput` changes
   
   return (
     <>
@@ -616,6 +616,7 @@ const Lobby = () => {
                     onBlur={() => {setHasFocus(false), setRootFocus(false)}}
                     onKeyDown={(e)=>blockCopyPaste(e)}
                     onKeyUp={(e)=>blockCopyPaste(e)}
+                    ref={typingContainerRef}
                     >
                 <div style={{ fontSize: "30px" }}>
                   {currentParagraph && typeof currentParagraph === "string" 
