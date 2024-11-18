@@ -43,11 +43,12 @@ const Certificate = forwardRef((props, ref) => {
         if (props) {
             const { data, date } = props?.props || {}; // Safely destructure props
             if (data && date) {
-                const { wpm, consistency, accuracy } = data;
+                const { wpm, consistency, accuracy, level } = data;
     
                 setData({
                     wpm: Math.round(calculateAverage(wpm)),
                     username: userData?.username,
+                    level: level,
                     consistency: Math.round(calculateAverage(consistency)),
                     accuracy: Math.round(calculateAverage(accuracy)),
                     date: formatDate(date), // Ensure the date is valid before formatting
@@ -96,6 +97,9 @@ const Certificate = forwardRef((props, ref) => {
                                 </span>
                                 <span className="pm-credits-text  bold sans">
                                     Accuracy : {data ? data.accuracy : ''}
+                                </span>
+                                <span className="pm-credits-text  bold sans">
+                                    Level : {data ? data.level : ''}
                                 </span>
                             </div>
                             </div>

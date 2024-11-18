@@ -13,7 +13,7 @@ const BlogInner = () => {
     const [formattedDate, setFormattedDate] = useState();
 
     useEffect(() => {
-        const filteredData = blogData?.filter(value => value._id === param?.id);
+        const filteredData = blogData?.filter(value => value.permalink === param?.id);
         setDisplayData(filteredData ? filteredData[0] : null); // Handle cases where no data found
     }, [blogData, param]);
 

@@ -16515,7 +16515,7 @@ fieldset:disabled .btn {
 .nav-small-cap .nav-small-cap-icon {
   display: none;
 }
-.sidebar-nav ul .sidebar-item .sidebar-link {
+.sidebar-nav ul .sidebar-item-cs .sidebar-link-cs {
   color: #2a3547;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -16533,47 +16533,47 @@ fieldset:disabled .btn {
   gap: 15px;
   font-weight: 400;
 }
-.sidebar-nav ul .sidebar-item .sidebar-link span:first-child {
+.sidebar-nav ul .sidebar-item-cs .sidebar-link-cs span:first-child {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
 }
-.sidebar-nav ul .sidebar-item .sidebar-link .ti {
+.sidebar-nav ul .sidebar-item-cs .sidebar-link-cs .ti {
   -ms-flex-negative: 0;
   flex-shrink: 0;
   font-size: 21px;
 }
-.sidebar-nav ul .sidebar-item .sidebar-link:hover {
+.sidebar-nav ul .sidebar-item-cs .sidebar-link-cs:hover {
   background-color: rgba(93, 135, 255, 0.1);
   color: #71CAC7;
 }
-.sidebar-nav ul .sidebar-item .sidebar-link:hover.has-arrow:after {
+.sidebar-nav ul .sidebar-item-cs .sidebar-link-cs:hover.has-arrow:after {
   border-color: #71CAC7;
 }
-.sidebar-nav ul .sidebar-item .sidebar-link.active:hover.has-arrow:after {
+.sidebar-nav ul .sidebar-item-cs .sidebar-link-cs.active:hover.has-arrow:after {
   border-color: #fff;
 }
-.sidebar-nav ul .sidebar-item .link-disabled {
+.sidebar-nav ul .sidebar-item-cs .link-disabled {
   opacity: 0.38;
 }
-.sidebar-nav ul .sidebar-item .first-level .sidebar-item {
+.sidebar-nav ul .sidebar-item-cs .first-level .sidebar-item-cs {
   -webkit-transition: all 0.4s ease-in-out;
   transition: all 0.4s ease-in-out;
   border-bottom: 0;
 }
-.sidebar-nav ul .sidebar-item .first-level .sidebar-item .sidebar-link:hover {
+.sidebar-nav ul .sidebar-item-cs .first-level .sidebar-item-cs .sidebar-link-cs:hover {
   background-color: transparent;
   color: #71CAC7;
 }
 .sidebar-nav
   ul
-  .sidebar-item
+  .sidebar-item-cs
   .first-level
-  .sidebar-item
-  .sidebar-link.active.has-arrow:after {
+  .sidebar-item-cs
+  .sidebar-link-cs.active.has-arrow:after {
   border-color: #71CAC7;
 }
-.sidebar-nav ul .sidebar-item .first-level .sidebar-item > .sidebar-link {
+.sidebar-nav ul .sidebar-item-cs .first-level .sidebar-item-cs > .sidebar-link-cs {
   padding: 8px 10px;
   border-radius: 7px;
   font-size: 14px;
@@ -16581,10 +16581,10 @@ fieldset:disabled .btn {
 }
 .sidebar-nav
   ul
-  .sidebar-item
+  .sidebar-item-cs
   .first-level
-  .sidebar-item
-  > .sidebar-link
+  .sidebar-item-cs
+  > .sidebar-link-cs
   .sidebar-icon {
   -ms-flex-negative: 0;
   flex-shrink: 0;
@@ -16593,28 +16593,38 @@ fieldset:disabled .btn {
   width: 14px;
   height: 14px;
 }
-.sidebar-nav ul .sidebar-item .first-level .sidebar-item:last-child {
+.sidebar-nav ul .sidebar-item-cs .first-level .sidebar-item-cs:last-child {
   margin-bottom: 16px;
 }
-.sidebar-nav ul .sidebar-item .first-level .sidebar-link .ti {
+.sidebar-nav ul .sidebar-item-cs .first-level .sidebar-link-cs .ti {
   font-size: 7px;
 }
-.sidebar-nav ul .sidebar-item .first-level .sidebar-item .sidebar-link.active {
+.sidebar-nav ul .sidebar-item-cs .first-level .sidebar-item-cs .sidebar-link-cs.active {
   background-color: transparent !important;
   color: #71CAC7 !important;
 }
-.sidebar-nav ul .sidebar-item .two-level .sidebar-item .sidebar-link {
+.sidebar-nav ul .sidebar-item-cs .two-level .sidebar-item-cs .sidebar-link-cs {
   padding: 8px 10px 8px 45px;
 }
-.sidebar-nav ul .sidebar-item .three-level .sidebar-item .sidebar-link {
+.sidebar-nav ul .sidebar-item-cs .three-level .sidebar-item-cs .sidebar-link-cs {
   padding: 8px 10px 8px 60px;
 }
-.sidebar-nav ul .sidebar-item.selected > .sidebar-link,
-.sidebar-nav ul .sidebar-item.selected > .sidebar-link.active,
-.sidebar-nav ul .sidebar-item > .sidebar-link.active {
+/* .sidebar-nav ul .sidebar-item-cs.selected > .sidebar-link-cs,
+.sidebar-nav ul .sidebar-item-cs.selected > .sidebar-link-cs.active,
+.sidebar-nav ul .sidebar-item-cs > .sidebar-link-cs.active {
+  background-color: #71CAC7;
+  color: #fff;
+} */
+
+.sidebar-link-cs.active {
   background-color: #71CAC7;
   color: #fff;
 }
+.sidebar-link-cs:hover {
+  background-color: #71CAC7 !important;
+  color: #fff;
+}
+
 .sidebar-nav .sidebar-list .sidebar-list-item {
   padding: 8px 0;
 }

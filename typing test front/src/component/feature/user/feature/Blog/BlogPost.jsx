@@ -4,7 +4,7 @@ import { BASE_API_URL } from "../../../../../util/API_URL"
 
 const BlogPost = (props) => {
   
-  const {title, createdat, featuredImage, _id, description} = props?.props
+  const {title, createdat, featuredImage, permalink, description} = props?.props
   const isToken = localStorage.getItem('userToken')
   const [formattedDate, setFormattedDate] = useState();
 
@@ -35,12 +35,12 @@ const BlogPost = (props) => {
   return (
     <>
         <div className="blog-post my-3">
-            <div className="blog-img"><NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}><img src={`${featuredImage?.path}`} alt="" /></NavLink></div>
+            <div className="blog-img"><NavLink to={`${isToken ? '/user/' : '/'}blog/${permalink}`}><img src={`${featuredImage?.path}`} alt="" /></NavLink></div>
             <div className="blog-content">
-                <NavLink className="text-dec-none" to={`${isToken ? '/user/' : '/'}blog/${_id}`}><h1 >{title}</h1></NavLink>
+                <NavLink className="text-dec-none" to={`${isToken ? '/user/' : '/'}blog/${permalink}`}><h1 >{title}</h1></NavLink>
                 <p>{description.length > 100 ? description.slice(0, 100) + "..." : description}</p>
             </div>
-            <NavLink to={`${isToken ? '/user/' : '/'}blog/${_id}`}>Read More...</NavLink>
+            <NavLink to={`${isToken ? '/user/' : '/'}blog/${permalink}`}>Read More...</NavLink>
         </div>
     </>
   )

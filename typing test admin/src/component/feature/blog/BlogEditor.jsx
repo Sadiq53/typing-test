@@ -3,14 +3,14 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Quill theme
 import { dynamicToast } from '../../shared/Toast/DynamicToast';
 import { useDispatch, useSelector } from 'react-redux';
-import { handleAddBlogPost, handleEditBlogPost, resetState } from '../../../redux/AdminDataSlice';
+import { handleAddBlogPost, handleDeleteBlogCategory, handleEditBlogPost, resetState } from '../../../redux/AdminDataSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import StateCircleLoader from '../../shared/loader/StateCircleLoader';
 import { BASE_API_URL } from '../../../util/API_URL'
 import AddBlogCategory from './blogElements/AddBlogCategory';
 
 const BlogEditor = () => {
-    const [content, setContent] = useState({ content: '', title: '', description : '', category : [], status : '', tags : [], seoTitle : '', seoDescription : '', index : '' });
+    const [content, setContent] = useState({ content: '', title: '', description : '', category : [], status : '', tags : [], seoTitle : '', seoDescription : '', index : '', permalink: '' });
     const [imageData, setImageData] = useState();
     const featuredImage = useRef(null);
     const dispatch = useDispatch();
@@ -87,6 +87,7 @@ const BlogEditor = () => {
                     index: filterData.index || prevContent.index,
                     seoDescription: filterData.seoDescription || prevContent.seoDescription,
                     seoTitle: filterData.seoTitle || prevContent.seoTitle,
+                    permalink : filterData.permalink || prevContent.permalink
                 }));
                 setDisplayData(filterData);
             } else {
@@ -109,11 +110,10 @@ const BlogEditor = () => {
             tags: displayData.tags || prevContent.tags,
             index: displayData.index || prevContent.index,
             seoDescription: displayData.seoDescription || prevContent.seoDescription,
-            seoTitle: displayData.seoTitle || prevContent.seoTitle
+            seoTitle: displayData.seoTitle || prevContent.seoTitle,
+            permalink : displayData.permalink || prevContent.permalink
         }));
     }, [blogData, displayData]);
-    
-    
 
     // useEffect(()=>{console.log(content)}, [])
 
@@ -137,6 +137,7 @@ const BlogEditor = () => {
         profileData.append('category', JSON.stringify(content.category))
         profileData.append('status', content.status)
         profileData.append('tags', JSON.stringify(content.tags))
+        profileData.append('permalink', content.permalink)
     
         if(param?.id) {
             profileData.append('id', displayData?._id)
@@ -189,6 +190,41 @@ const BlogEditor = () => {
         setTagInput(e.target.value);
     };
 
+    const deleteTheCategory = (value) => {
+        // console.log(value)
+        dispatch(handleDeleteBlogCategory(value))
+    }
+
+    const permalinkFormat = (event) => {
+        const title = event.target.value;
+        const permalink = title
+            .toLowerCase()             // Convert the title to lowercase
+            .replace(/\s+/g, "-");     // Replace spaces with hyphens (handles multiple spaces too)
+    
+        setContent({ 
+            ...content, 
+            permalink: permalink       // Update permalink in real-time
+        });
+    };
+    
+
+    const setTitlePermalink = (event) => {
+        const title = event.target.value;
+        const permalink = title
+            .toLowerCase()            // Convert the title to lowercase
+            .split(" ")              // Split the title into words
+            .filter(word => word)    // Remove empty strings (in case of extra spaces)
+            .join("-");  
+
+        setContent({ 
+            ...content, 
+            title: title,    
+            permalink: permalink     // Keep the original title
+        });
+        permalinkFormat(title)
+    };
+    
+
     return (
         <>
             <section>
@@ -201,7 +237,7 @@ const BlogEditor = () => {
                                 <div className="blog-form-cs">
                                     <div className='my-2'>
                                         <label className='font-active' htmlFor="Title">Enter Post Title: &nbsp;</label>
-                                        <input className='form-control' placeholder='Enter Your Blog Title Here' type="text" value={content.title} onChange={(event) => setContent({ ...content, title: event.target.value })} name="title" />
+                                        <input className='form-control' placeholder='Enter Your Blog Title Here' type="text" value={content.title} onChange={(event) => setTitlePermalink(event)} name="title" />
                                     </div>
                                     <div className='my-2'>
                                         <label className='font-active' htmlFor="Title">Description: &nbsp;</label>
@@ -278,6 +314,12 @@ const BlogEditor = () => {
                                 </div>
                                 <div className="blog-main-layout">
                                     <div className="blog-side-header">
+                                        Permalink
+                                    </div>
+                                    <input type='text' value={content?.permalink} placeholder='Edit Permalink' onChange={(event)=> permalinkFormat(event)} className='form-control' />
+                                </div>
+                                <div className="blog-main-layout">
+                                    <div className="blog-side-header">
                                         Status
                                     </div>
                                     <select
@@ -303,17 +345,20 @@ const BlogEditor = () => {
                                         <div className="blog-category">
                                             {blogCategory?.length !== 0 ? (
                                                 blogCategory?.map((value, index) => (
-                                                    <div key={index} className="form-check">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id={`category-${index}`}
-                                                            checked={content?.category?.includes(value)}
-                                                            onChange={() => handleCheckboxChange(value)}
-                                                        />
-                                                        <label className="form-check-label" htmlFor={`category-${index}`}>
-                                                            {value}
-                                                        </label>
+                                                    <div key={index} className="form-check cs-blog-category">
+                                                        <div>
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id={`category-${index}`}
+                                                                checked={content?.category?.includes(value)}
+                                                                onChange={() => handleCheckboxChange(value)}
+                                                            />
+                                                            <label className="form-check-label" htmlFor={`category-${index}`}>
+                                                                {value}
+                                                            </label>
+                                                        </div>
+                                                        <button onClick={()=>deleteTheCategory(value)} className='btn'><i class="fa-solid fa-xmark text-danger"></i></button>
                                                     </div>
                                                 ))
                                             ) : (

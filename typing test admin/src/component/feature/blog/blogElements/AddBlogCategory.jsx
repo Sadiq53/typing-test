@@ -57,7 +57,7 @@ const AddBlogCategory = () => {
             <div className="input-group mb-3">
                 <input
                     type="text"
-                    className="form-control"
+                    className="form-control m-0"
                     placeholder="Enter Category"
                     aria-label="Category"
                     aria-describedby="basic-addon1"

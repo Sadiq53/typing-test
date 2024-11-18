@@ -34,10 +34,8 @@ const Header = () => {
                                         <NavLink to='/user/lobby'><li>Start Live Test</li></NavLink>
                                         <NavLink to='/user/leaderboard'><li>Leaderboard</li></NavLink>
                                         <NavLink to='/user/blog'><li>Blogs</li></NavLink>
-                                        <NavLink to='/user/about'><li>About</li></NavLink>
-                                        <NavLink to='/user/contact'><li>Contact Us</li></NavLink>
                                         <li className="dropdown">
-                                            <NavLink to='/user'><li>{userData?.username}</li></NavLink>
+                                            <NavLink to='/user'><li className='header-profile'><img src={userData?.profileimage?.s3url ? `${userData?.profileimage?.s3url}` : '/assets/images/profile.png'} alt="" /> {userData?.username} </li></NavLink>
                                             <ul className="dropdown-menu">
                                                 <NavLink to='/user'><li>Profile</li></NavLink>
                                                 <NavLink to={`/user/signout/${'isSignout'}`}><li>Logout</li></NavLink>
@@ -65,8 +63,8 @@ const Header = () => {
                                         <NavLink to='/'><li>Start Live Test</li></NavLink>
                                         <NavLink to='/leaderboard'><li>Leaderboard</li></NavLink>
                                         <NavLink to='/blog'><li>Blogs</li></NavLink>
-                                        <NavLink to='/about'><li>About</li></NavLink>
-                                        <NavLink to='/contact'><li>Contact Us</li></NavLink>
+                                        {/* <NavLink to='/about'><li>About</li></NavLink> */}
+                                        {/* <NavLink to='/contact'><li>Contact Us</li></NavLink> */}
                                         <NavLink to='/signup'><li> Login/Signup</li></NavLink>
                                     </>
                                 )}
@@ -78,18 +76,11 @@ const Header = () => {
                             <ul className="menu">
                                 {checkUserToken ? (
                                     <>
+                                        <NavLink to='/user'><li className='header-profile'><img src={userData?.profileimage?.s3url ? `${userData?.profileimage?.s3url}` : '/assets/images/profile.png'} alt="" /> {userData?.username} </li></NavLink>
                                         <NavLink to='/user/lobby'><li>Start Live Test</li></NavLink>
                                         <NavLink to='/user/leaderboard'><li>Leaderboard</li></NavLink>
                                         <NavLink to='/user/blog'><li>Blogs</li></NavLink>
-                                        <NavLink to='/user/about'><li>About</li></NavLink>
-                                        <NavLink to='/user/contact'><li>Contact Us</li></NavLink>
-                                        <li className="dropdown">
-                                            <NavLink to='/user'> <li>{userData?.username}</li></NavLink>
-                                            <ul className="dropdown-menu">
-                                                <NavLink to='/user'><li>Profile</li></NavLink>
-                                                <NavLink to={`/user/signout/${'isSignout'}`}><li>Logout</li></NavLink>
-                                            </ul>
-                                        </li>
+                                        <NavLink to={`/user/signout/${'isSignout'}`}><li>Logout</li></NavLink>
                                     </>
                                 )
                                 // : checkAdminToken ? (
@@ -112,8 +103,8 @@ const Header = () => {
                                         <NavLink to='/'><li>Start Live Test</li></NavLink>
                                         <NavLink to='/leaderboard'><li>Leaderboard</li></NavLink>
                                         <NavLink to='/blog'><li>Blogs</li></NavLink>
-                                        <NavLink to='/about'><li>About</li></NavLink>
-                                        <NavLink to='/contact'><li>Contact Us</li></NavLink>
+                                        {/* <NavLink to='/about'><li>About</li></NavLink> */}
+                                        {/* <NavLink to='/contact'><li>Contact Us</li></NavLink> */}
                                         <NavLink to='/signup'><li> Login/Signup</li></NavLink>
                                     </>
                                 )}

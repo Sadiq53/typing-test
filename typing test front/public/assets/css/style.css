@@ -60,7 +60,7 @@
     left: 0;
     list-style: none;
     /* padding: 10px 0; */
-    min-width: 160px;
+    min-width: 130px;
     z-index: 1000;
     border-radius: 4px;
     transition: ease 0.2s;
@@ -159,8 +159,28 @@
     background: #1F1D21;
     width: 100%;
     height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
+    position: relative;
 }
+
+.typing-area-cursor{
+    border-left: 2px solid white;
+    animation: blink 1s infinite;
+    margin-left: 2px;
+    display: inline-block;
+}
+
+@keyframes blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 
 .typing-area::-webkit-scrollbar {
     width: 0px;
@@ -1903,6 +1923,8 @@ button.google-sign-btn img {
   }
 
   .header-profile img{
-    width: 12%;
+    width: 30px;
     border-radius: 50%;
+    height: 30px;
+    object-fit: cover;
   }

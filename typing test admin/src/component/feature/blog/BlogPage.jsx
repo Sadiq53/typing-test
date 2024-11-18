@@ -92,9 +92,9 @@ const BlogPage = () => {
                                             return(
                                             <tr key={index}>
                                                     <td>{index + 1}</td>
-                                                    <td><NavLink className='btn' to={`/admin/blog/${value._id}`}>{value.title}</NavLink></td>
-                                                    <td><NavLink className='btn' to={`/admin/blog/${value._id}`}>{formattedDate}</NavLink></td>
-                                                    <td><NavLink className='btn' to={`/admin/blog/${value._id}`}><span className={`mb-1 badge rounded-pill ${value.status === 'Published' ? 'bg-primary' : value.status === 'Draft' ? 'bg-warning' : 'bg-success'}`}>{value.status}</span></NavLink></td>
+                                                    <td><NavLink className='btn' to={`/admin/blog/${value.permalink}`}>{value.title}</NavLink></td>
+                                                    <td><NavLink className='btn' to={`/admin/blog/${value.permalink}`}>{formattedDate}</NavLink></td>
+                                                    <td><NavLink className='btn' to={`/admin/blog/${value.permalink}`}><span className={`mb-1 badge rounded-pill ${value.status === 'Published' ? 'bg-primary' : value.status === 'Draft' ? 'bg-warning' : 'bg-success'}`}>{value.status}</span></NavLink></td>
                                                     <td><NavLink className='btn' to={`/admin/blog-add/${value._id}`}><i className="fa-regular  fa-pen-to-square fa-lg"></i></NavLink></td>
                                                     <td><button className="btn" onClick={()=>setGetBlogId(value._id)} data-bs-toggle="modal" data-bs-target="#deleteblog"><i class="fa-solid fa-trash fa-lg"></i></button></td>
                                                 </tr>

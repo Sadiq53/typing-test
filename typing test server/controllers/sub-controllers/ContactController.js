@@ -1,6 +1,13 @@
 module.exports = (adminModel, DataModel, key) => {
     const route = require('express').Router();
     const cron = require('node-cron');
+    const jwt = require('jsonwebtoken')
+    const nodemailer = require("nodemailer");
+    require('dotenv').config();
+    const userModel = require('../../model/UserSchema')
+
+
+
 
     route.get('/', async(req, res) => {
         const contacts = await DataModel.findOne({}, { contact: 1, _id: 0 });
@@ -9,17 +16,77 @@ module.exports = (adminModel, DataModel, key) => {
         }
     })
 
+    // Route to handle the reply and send email using AWS SES
+    route.post('/reply', async (req, res) => {
+        try {
+            const { senderid, reply } = req.body; // Assuming senderEmail is part of the request body
+            
+            const getUser = await userModel.findOne({ _id: senderid })
+            const userEmail = getUser?.email
+
+            // Update the MongoDB document with the reply
+            const updatedDocument = await DataModel.updateOne(
+                { 'contact.senderid': senderid }, // Match senderid
+                { $set: { 'contact.$.reply': reply } }, // Update the reply
+                { new: true } // Return the updated document
+            );
+
+            if (updatedDocument.nModified === 0) {
+                return res.status(404).json({ error: 'No matching document found for the sender ID.' });
+            }
+
+           // Create a Nodemailer transporter using your Gmail account
+            const transporter = nodemailer.createTransport({
+                host: "smtp-relay.brevo.com",
+                port: 587,
+                secure: false,
+                auth: {
+                    user: process.env.BREVO_SMTP_MAIL,
+                    pass: process.env.BREVO_SMTP_API_KEY
+                },
+                tls: {
+                    rejectUnauthorized: false,
+                },
+            });
+        
+            const htmlContent = `<html><body>
+                <table >
+                    <tr><th>${reply}</th></tr>
+                </table>
+                </body></html>`;
+            
+                await transporter.sendMail({
+                    from: `"Live Typing Test" <${process.env.BREVO_SENDER_MAIL}>`,
+                    to: userEmail,
+                    subject: "Reply from Admin on your enquiry over Live Typing Test",
+                    html: htmlContent
+                });            
+
+            // Step 4: Send a response to the client after updating the reply and sending the email
+            res.status(200).json({
+                status: 200,
+                type: 'replycontact',
+                message: 'Successfully replied to user and email sent.'
+            });
+        } catch (error) {
+            console.error('Error processing reply:', error);
+            res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        }
+    });
+
     route.post('/', async (req, res) => {
         try {
-            const { time, email, name, message } = req.body;
-    
+            const { time, email, name, message, senderid } = req.body;
+            const decodedId = jwt.decode(senderid, key)
             // Define the new contact entry
             const newContact = {
                 name,
                 email,
                 message,
                 time,
+                senderid: decodedId?.id,
                 status: 'unseen',
+                reply: ''
             };
     
             // Update the document by pushing the new contact to the `contact` array
@@ -120,6 +187,8 @@ module.exports = (adminModel, DataModel, key) => {
             res.status(500).json({ message: 'An error occurred.', error });
         }
     });
+
+   
     
     // Delete contacts older than a specified number of days (15 days here)
     const deleteExpiredContacts = async () => {

@@ -12,6 +12,7 @@ const fs = require('fs');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 require('dotenv').config(); 
+const nodemailer = require("nodemailer");
 const { S3Client, PutObjectCommand, DeleteObjectCommand  } = require('@aws-sdk/client-s3');
 const { Upload } = require('@aws-sdk/lib-storage');
 
@@ -290,6 +291,48 @@ route.post('/signup/google', async(req, res) => {
                     googleId : token,
                     authType : {google : true, email : false}
                 }
+
+                // sending mail--------------------
+                // Create a Nodemailer transporter using your Gmail account
+                const transporter = nodemailer.createTransport({
+                    host: "smtp-relay.brevo.com",
+                    port: 587,
+                    secure: false,
+                    auth: {
+                        user: process.env.BREVO_SMTP_MAIL,
+                        pass: process.env.BREVO_SMTP_API_KEY
+                    },
+                    tls: {
+                        rejectUnauthorized: false,
+                    },
+                });
+
+                const message = {
+                    line1: "Thank you for joining LiveTypingTest! We're delighted to have you on board.",
+                    line2: "If you have any questions or need support, feel free to reach out to us anytime.",
+                    line3: "Wishing you a fantastic journey with us!",
+                    designation: "Best Regards",
+                }
+            
+                const htmlContent = `<html><body>
+                    <table style="text-align: left">
+                        <tr><th>${message.line1}</th></tr>
+                        <tr><th>${message.line2}</th></tr>
+                        <tr><th>${message.line3}</th></tr>
+                        <tr><th>${message.designation}</th></tr>
+                        <tr><th>Admin</th></tr>
+                    </table>
+                    </body></html>`;
+                
+                    await transporter.sendMail({
+                        from: `"Live Typing Test" <${process.env.BREVO_SENDER_MAIL}>`,
+                        to: email,
+                        subject: `Welcome to LiveTypingTest! 🎉`,
+                        html: htmlContent
+                    });
+                // sending mail--------------------
+
+
                 // console.log(finalData)
             await userModel.create(finalData)
             const getUser = await userModel.findOne({ email : email })
@@ -318,6 +361,48 @@ route.post('/signup', async(req, res) => {
                 accountid : accountID(),
                 authType : {google : false, email : true}
             }
+
+            // sending mail--------------------
+                // Create a Nodemailer transporter using your Gmail account
+                const transporter = nodemailer.createTransport({
+                    host: "smtp-relay.brevo.com",
+                    port: 587,
+                    secure: false,
+                    auth: {
+                        user: process.env.BREVO_SMTP_MAIL,
+                        pass: process.env.BREVO_SMTP_API_KEY
+                    },
+                    tls: {
+                        rejectUnauthorized: false,
+                    },
+                });
+
+                const message = {
+                    line1: "Thank you for joining LiveTypingTest! We're delighted to have you on board.",
+                    line2: "If you have any questions or need support, feel free to reach out to us anytime.",
+                    line3: "Wishing you a fantastic journey with us!",
+                    designation: "Best Regards",
+                }
+            
+                const htmlContent = `<html><body>
+                    <table style="text-align: left">
+                        <tr><th>${message.line1}</th></tr>
+                        <tr><th>${message.line2}</th></tr>
+                        <tr><th>${message.line3}</th></tr>
+                        <tr><th>${message.designation}</th></tr>
+                        <tr><th>Admin</th></tr>
+                    </table>
+                    </body></html>`;
+                
+                    await transporter.sendMail({
+                        from: `"Live Typing Test" <${process.env.BREVO_SENDER_MAIL}>`,
+                        to: email,
+                        subject: `Welcome to LiveTypingTest! 🎉`,
+                        html: htmlContent
+                    });
+                // sending mail--------------------
+
+
             await userModel.create(finalData)
             const getUser = await userModel.findOne({ email : email })
             await notificationModel.create({userId : getUser?._id, fcmToken : ''})

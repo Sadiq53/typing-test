@@ -1,6 +1,14 @@
-import {NavLink} from 'react-router-dom'
+import {NavLink, useParams} from 'react-router-dom'
 
 const SideBar = () => {
+
+  const currentUrl = window.location.href;
+
+  // Extract the part after the port number
+  const extractedPath = currentUrl.split(":")[2]?.split("/").slice(1).join("/");
+  console.log(extractedPath)
+  
+
   return (
     <>
     <aside className="left-sidebar ">
@@ -24,9 +32,9 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Home</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === 'admin' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to='/admin'
                 aria-expanded="false"
                 >
@@ -41,10 +49,10 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Users</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
-                to='/admin/users/add'
+                className={extractedPath === 'admin/user/add' ? "sidebar-link-cs active" : "sidebar-link-cs"}
+                to='/admin/user/add'
                 aria-expanded="false"
                 >
                 <span>
@@ -53,9 +61,9 @@ const SideBar = () => {
                 <span className="hide-menu"> Add</span>
                 </NavLink>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === 'admin/users' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to='/admin/users'
                 aria-expanded="false"
                 >
@@ -72,9 +80,9 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Paragrpah</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === 'admin/paragraphs' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to='/admin/paragraphs'
                 aria-expanded="false"
                 >
@@ -91,9 +99,9 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Pages</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === 'admin/pages' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to='/admin/pages'
                 aria-expanded="false"
                 >
@@ -110,9 +118,9 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Blogs</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === 'admin/blog' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to='/admin/blog'
                 aria-expanded="false"
                 >
@@ -129,9 +137,9 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Leaderboard</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === 'admin/leaderboard' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to='/admin/leaderboard'
                 aria-expanded="false"
                 >
@@ -148,9 +156,9 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Ads</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === 'admin/ads' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to='/admin/ads'
                 aria-expanded="false"
                 >
@@ -167,9 +175,9 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">Notification</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === 'admin/push-notification' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to='/admin/push-notification'
                 aria-expanded="false"
                 >
@@ -186,9 +194,9 @@ const SideBar = () => {
                 <i className="ti ti-dots nav-small-cap-icon fs-4" />
                 <span className="hide-menu">AUTH</span>
             </li>
-            <li className="sidebar-item">
+            <li className="sidebar-item-cs">
                 <NavLink
-                className="sidebar-link"
+                className={extractedPath === '/admin' ? "sidebar-link-cs active" : "sidebar-link-cs"}
                 to={`/admin/signout/${'isSignout'}`}
                 aria-expanded="false"
                 >

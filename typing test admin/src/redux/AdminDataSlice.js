@@ -429,9 +429,26 @@ const handleCreateUser = createAsyncThunk('handleCreateUser', async(Data) => {
     }
 })
 
-const handleUpdateAdminPassword = createAsyncThunk('handleUpdateAdminPassword', async(formData) => {
+const handleDeleteBlogCategory = createAsyncThunk('handleDeleteBlogCategory', async(data) => {
     const ID = localStorage.getItem('adminToken')
-    const response = await axios.put(`${ADMIN_API_URL}`, formData, { headers : { Authorization : ID } })
+    const response = await axios.delete(`${ADMIN_API_URL}/blog/${data}`, { headers : { Authorization : ID } })
+    if(response.data.status === 200) {
+        let checkMsg = {
+            status : true,
+            message : response.data.message,
+            type : response.data.type,
+            data : data,
+        }
+        return checkMsg
+    } else {
+        let checkMsg = {
+            status : false,
+            message : response.data.message,
+            type : response.data.type,
+            data : []
+        }
+        return checkMsg
+    }
 })
 
 const initialState = {
@@ -963,6 +980,36 @@ const AdminDataSlice = createSlice({
                 messsage : 'Adding Blog Category'
             }
         });
+        builder.addCase(handleDeleteBlogCategory.fulfilled, (state, action) => {
+            // Check if the payload indicates a successful operation
+            if (action.payload.status) {
+                // Set fulfillment state and message
+                state.isFullfilled = true;
+                state.fullFillMsg = {
+                    type: action.payload.type,
+                    message: action.payload.message,
+                };
+                state.adminData.blogCategory = state.adminData.blogCategory?.filter(value => value !== action.payload?.data)
+                // Reset error state
+                state.isError = false;
+                state.isProcessing = false;
+            } else {
+                // Handle error state
+                state.isProcessing = false;
+                state.isError = true;
+                state.errorMsg = {
+                    message: action.payload.message,
+                    type: action.payload.type,
+                };
+            }
+        });              
+        builder.addCase(handleDeleteBlogCategory.pending, (state, action) => {
+            state.isProcessing = true
+            state.processingMsg = {
+                type : 'deleteBlogCategory',
+                messsage : 'Deleting Blog Category'
+            }
+        });
         builder.addCase(handleCreateUser.fulfilled, (state, action) => {
             // Check if the payload indicates a successful operation
             if (action.payload.status) {
@@ -998,5 +1045,5 @@ const AdminDataSlice = createSlice({
 })
 
 export default AdminDataSlice.reducer;
-export {handleGetAdminData, handleSigninAdmin, handleDeleteBulkAccount, handleAdminProfileUpload, handleGetBlogPost, handleCreateUser, handleAddBlogCategory, handleDeleteBlogPost, handleDeleteParagraph, handleEditBlogPost, handleAddBlogPost, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleUploadProfile, handleGetUser};
+export {handleGetAdminData, handleSigninAdmin, handleDeleteBlogCategory, handleDeleteBulkAccount, handleAdminProfileUpload, handleGetBlogPost, handleCreateUser, handleAddBlogCategory, handleDeleteBlogPost, handleDeleteParagraph, handleEditBlogPost, handleAddBlogPost, handleAddParagraphs, handleUpdatePassword, handleBlockUnblockUser, handleDeleteUserAccount, handleUploadProfile, handleGetUser};
 export const {resetState, handleClearState, handleGetAllUsers, handleAddBlogPostToState} = AdminDataSlice.actions

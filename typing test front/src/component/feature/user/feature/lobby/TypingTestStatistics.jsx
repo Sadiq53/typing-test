@@ -42,11 +42,11 @@ const TypingTestStats = () => {
       };
 
     const data = {
-        labels: Array.from({ length: 15 }, (_, i) => i + 1), // X-axis label based on data length
+        labels: Array.from({ length: time }, (_, i) => i + 1), // X-axis label based on data length
         datasets: [
             {
                 label: 'WPM',
-                data: getEvenlySpacedData(wpm, 15),
+                data: getEvenlySpacedData(wpm, time),
                 borderColor: 'rgba(255, 127, 80, 1)',
                 backgroundColor: 'rgba(255, 127, 80, 0.2)',
                 fill: false,
@@ -55,7 +55,7 @@ const TypingTestStats = () => {
             },
             {
                 label: 'Consistency (%)',
-                data: getEvenlySpacedData(consistency, 15),
+                data: getEvenlySpacedData(consistency, time),
                 borderColor: 'rgba(113, 202, 199, 1)',
                 backgroundColor: 'rgba(113, 202, 199, 0.2)',
                 fill: false,
@@ -64,7 +64,7 @@ const TypingTestStats = () => {
             },
             {
                 label: 'Accuracy (%)',
-                data: getEvenlySpacedData(accuracy, 15),
+                data: getEvenlySpacedData(accuracy, time),
                 borderColor: 'rgba(255, 255, 255, 1)',
                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
                 fill: false,
@@ -88,7 +88,7 @@ const TypingTestStats = () => {
         scales: {
             y: {
                 beginAtZero: true,
-                max: 100, // Assuming percentages and WPM are capped at 100%
+                max: 110, // Assuming percentages and WPM are capped at 100%
             },
         },
     };
@@ -166,18 +166,18 @@ const TypingTestStats = () => {
         setShowAlert(false); // Set showAlert to false
     };
 
-    useEffect(()=>{
-        if(isCompleted){
-            setShowAlert(true)
-            setAlertDetail({
-                title : 'Congratulations!',
-                type : 'Success',
-                message : `Hurrey! You have comleted the test before the time`,
-                navigateTo : '',
-                confirmBtn : true
-            })
-        }
-    }, [])
+    // useEffect(()=>{
+    //     if(isCompleted){
+    //         setShowAlert(true)
+    //         setAlertDetail({
+    //             title : 'Congratulations!',
+    //             type : 'Success',
+    //             message : `Hurrey! You have comleted the test before the time`,
+    //             navigateTo : '',
+    //             confirmBtn : true
+    //         })
+    //     }
+    // }, [])
 
     const calculateAverage = (numbers) => {
         if (numbers.length === 0) return 0; // Avoid division by zero

@@ -38,6 +38,8 @@ const DynamicPagesDataSchema = mongoose.Schema({
         name : { type : String, default : '' },
         email : { type : String, default : '' },
         message : { type : String, default : '' },
+        senderid : { type : String, default : '' },
+        reply : { type : String, default : '' },
         time : { type : Date, default : Date.now() },
         status : { type : String, default : 'unseen' },
     }]

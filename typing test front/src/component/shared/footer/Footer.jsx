@@ -23,7 +23,11 @@ const Footer = () => {
                             </div>
                             <div className="footer">
                                 <ul className='mb-3'>
-                                    <li><NavLink to={checkUserToken ? '/user/contact' : '/contact'}>Contact Us &nbsp; |</NavLink></li>
+                                    {
+                                        checkUserToken && (
+                                            <li><NavLink to='/user/contact'>Contact Us &nbsp; |</NavLink></li>
+                                        )
+                                    }
                                     <li><NavLink to={checkUserToken ? '/user/about' : '/about'}>About &nbsp; |</NavLink></li>
                                     <li><NavLink to={checkUserToken ? '/user/privacy' : '/privacy'}>Privacy Policy &nbsp; |</NavLink></li>
                                     <li><NavLink to={checkUserToken ? '/user/term-condition' : '/term-condition'}>Terms & Condition</NavLink></li>

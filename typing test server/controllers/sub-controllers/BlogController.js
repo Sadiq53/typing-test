@@ -40,11 +40,20 @@ const deleteImageFromS3 = async (imageKey) => {
 route.post('/', upload, async (req, res) => {
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
-        const { title, content, date, description, status, category, tags, seoTitle, index, seoDescription } = req.body;
-        console.log(index, seoDescription, seoTitle)
+        const { title, content, date, description, status, category, tags, seoTitle, index, seoDescription, permalink } = req.body;
+
         const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
         if (isThisAdmin) {
             try {
+                let uniquePermalink = permalink;
+
+                // Check for existing permalink and append suffix if necessary
+                let counter = 2;
+                while (await adminModel.findOne({ "blog.permalink": uniquePermalink })) {
+                    uniquePermalink = `${permalink}-${counter}`;
+                    counter++;
+                }
+
                 let s3ImageUrl = '';
                 let imageName = '';
 
@@ -78,6 +87,7 @@ route.post('/', upload, async (req, res) => {
                     seoDescription,
                     seoTitle,
                     index,
+                    permalink: uniquePermalink,
                     featuredImage: {
                         name: req.file?.originalname || null,
                         path: s3ImageUrl, // Save the S3 URL in the database
@@ -114,8 +124,8 @@ route.post('/', upload, async (req, res) => {
 route.post('/edit', upload, async (req, res) => {
     if (req.headers.authorization) {
         const ID = jwt.decode(req.headers.authorization, key);
-        const { title, content, date, id, description, status, category, tags, seoTitle, index, seoDescription } = req.body;
-        console.log(index, seoDescription, seoTitle)
+        const { title, content, date, id, description, status, category, tags, seoTitle, index, seoDescription, permalink } = req.body;
+        // console.log(index, seoDescription, seoTitle)
 
         // Parse `category` and `tags` fields from JSON.stringify format
         let parsedCategory = [];
@@ -154,7 +164,8 @@ route.post('/edit', upload, async (req, res) => {
                 createdat: date,
                 seoDescription,
                 seoTitle,
-                index
+                index,
+                permalink
             };
 
             if (req.file) {
@@ -310,6 +321,58 @@ route.get('/', async (req, res) => {
     } catch (error) {
         console.error('Error fetching blogs:', error);
         res.status(500).json({ status: 500, message: 'Internal server error' });
+    }
+});
+
+route.delete('/:name', async (req, res) => {
+    if (req.headers.authorization) {
+        try {
+            // Decode the JWT from the authorization header
+            const ID = jwt.decode(req.headers.authorization, key);
+            const { name } = req.params;
+            // console.log(name)
+
+            // Check if the user is an admin
+            const isThisAdmin = await adminModel.findOne({ _id: ID?.id });
+            
+            if (!isThisAdmin) {
+                return res.status(403).send({ status: 403, message: 'Unauthorized' });
+            }
+
+            // Check if the category exists (case-insensitive)
+            const categoryIndex = isThisAdmin.blogCategory?.findIndex(
+                (cat) => cat.toLowerCase() === name.toLowerCase()
+            );
+
+            if (categoryIndex === -1) {
+                return res.status(404).send({
+                    status: 404,
+                    message: 'Category not found',
+                    type: 'deleteBlogCategory'
+                });
+            }
+
+            // Pull the category from the array
+            await adminModel.updateOne(
+                { _id: ID?.id },
+                { $pull: { blogCategory: isThisAdmin.blogCategory[categoryIndex] } }
+            );
+
+            return res.send({
+                status: 200,
+                message: 'Blog Category deleted successfully',
+                type: 'deleteBlogCategory'
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).send({
+                status: 500,
+                message: 'Internal server error',
+                error: error.message,
+            });
+        }
+    } else {
+        return res.status(401).send({ status: 401, message: 'Authorization header missing' });
     }
 });
 

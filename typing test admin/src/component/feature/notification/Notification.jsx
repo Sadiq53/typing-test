@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {ADMIN_API_URL} from '../../../util/API_URL';
+import { dynamicToast } from '../../shared/Toast/DynamicToast'
 
 const Notification = () => {
   const [title, setTitle] = useState("");

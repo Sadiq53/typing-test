@@ -80,6 +80,7 @@ const UserMatches = () => {
             wpm: data?.wpm,
             accuracy: data?.accuracy,
             consistency: data?.consistency,
+            level: data?.level
         };
         setStats({ data: matchData, date: data?.matchdate });
 

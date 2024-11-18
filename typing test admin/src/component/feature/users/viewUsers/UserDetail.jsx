@@ -314,10 +314,10 @@ const UserDetail = () => {
                     <label>Test Started</label>
                     <h2>{totalMatchesCompleted}</h2>
                   </div>
-                  <div>
+                  {/* <div>
                     <label>Test Completed</label>
                     <h2>26</h2>
-                  </div>
+                  </div> */}
                   <div>
                     <label>Time Typing</label>
                     <h2>{totalTimeOfMatches}</h2>

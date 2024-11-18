@@ -11,10 +11,10 @@ const BlogView = () => {
     const blogData = useSelector(state => state.AdminDataSlice.blog)
     const [displayData, setDisplayData] = useState([])
     const [formattedDate, setFormattedDate] = useState();
-
+ 
     useEffect(()=>{
         if(blogData) {
-            const filteredData = blogData?.filter(value => value._id === param?.id)
+            const filteredData = blogData?.filter(value => value.permalink === param?.id)
             setDisplayData(filteredData[0])
         }
     }, [blogData, param.id])

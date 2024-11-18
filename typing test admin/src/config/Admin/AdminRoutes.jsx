@@ -28,7 +28,7 @@ const adminRoutes = [
         element : <AllUsers />
     },
     {
-        path : 'users/add',
+        path : 'user/add',
         element : <CreateUser />
     },
     {

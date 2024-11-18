@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom"
 import { handleUpdateContactData } from "../../../redux/DynamicPagesDataSlice";
+import axios from "axios";
+import { BASE_API_URL } from "../../../util/API_URL";
+import {dynamicToast} from '../../shared/Toast/DynamicToast'
 
 const DetailContact = () => {
 
     const param = useParams();
     const {id} = param
     const [displayData, setDisplayData] = useState({})
+    const [userReply, setUserReply] = useState(null)
+    const [errMsg, setErrMsg] = useState({state: false, message: ''})
     const dispatch = useDispatch()
 
     const contactData = useSelector(state => state.DynamicPagesDataSlice.contact);
@@ -43,6 +48,25 @@ const DetailContact = () => {
     
         return `${time} ${day}${month} ${year}`;
     }
+
+    const handleSendReply = async() => {
+        if(userReply !== null) {
+            // console.log(contactData)
+            const obj = {
+                senderid : displayData?.senderid,
+                reply : userReply
+            }
+            const response = await axios.post(`${BASE_API_URL}/contact/reply`, obj)
+            if(response.data.status === 200) {
+                dynamicToast({ message: `Replied to ${displayData && displayData?.name}`, timer : 3000, icon: 'success' });
+            } else {
+                dynamicToast({ message: `Failed to Reply to ${displayData && displayData?.name}`, timer : 3000, icon: 'error' });
+            }
+        } else setErrMsg({state: true, message: 'Cannot send empty form'})
+        setTimeout(()=>{
+            setErrMsg({state: false, message: ''})
+        }, 1500)
+    }
     
   return (
     <>
@@ -73,6 +97,24 @@ const DetailContact = () => {
                                         <label>Content</label>
                                         <h5>{displayData && displayData?.message}</h5>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="card">
+                            <div className="card-header">
+                                <div className="contact-show-header">
+                                    <h4>Reply to {displayData && displayData?.name}</h4>
+                                </div>
+                            </div>
+                            <div className="card-body">
+                                <div className="my-3">
+                                    <div className="reply-box">
+                                        <input type="text" name="reply" onChange={(event)=>setUserReply(event.target.value)}  placeholder={`Reply to ${displayData && displayData?.name}`} />
+                                        <button onClick={handleSendReply} className="btn btn-primary"><i class="fa-regular fa-paper-plane-top"></i></button>
+                                    </div>
+                                    {
+                                        errMsg?.state && (<small className="text-danger text-sm">{errMsg?.message}</small>)
+                                    }
                                 </div>
                             </div>
                         </div>

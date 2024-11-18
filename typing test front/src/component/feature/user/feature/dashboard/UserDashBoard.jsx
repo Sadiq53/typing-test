@@ -248,11 +248,11 @@ useEffect(() => {
                     <div className="profile-input my-3">
                       <div>
                         <label htmlFor="Name">Name :</label>
-                        <button
+                        {/* <button
                         type="submit"
                         >
                           <i className="fa-regular text-idle fa-pen-to-square"></i>
-                        </button>
+                        </button> */}
                       </div>
                       <input
                         name="username"
@@ -267,11 +267,11 @@ useEffect(() => {
                     <div className="profile-input my-3">
                       <div>
                         <label htmlFor="email">Current Email :</label>
-                        <button
+                        {/* <button
                         type="button"
                         >
                             <i className="fa-regular text-idle fa-pen-to-square"></i>
-                        </button>
+                        </button> */}
                       </div>
                       <input
                         name="email"
