@@ -114,7 +114,7 @@ const UserDataSlice = createSlice({
                     type: action.payload.type,
                     message: action.payload.message,
                 };
-                console.log(action.payload?.data) 
+                // console.log(action.payload?.data) 
                 const {privacyPolicy, termsCondition} = action.payload?.data
                 state.term = termsCondition
                 state.privacy = privacyPolicy

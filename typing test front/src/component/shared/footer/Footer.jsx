@@ -25,12 +25,12 @@ const Footer = () => {
                                 <ul className='mb-3'>
                                     {
                                         checkUserToken && (
-                                            <li><NavLink to='/user/contact'>Contact Us &nbsp; |</NavLink></li>
+                                            <li><NavLink to='/contact'>Contact Us &nbsp; |</NavLink></li>
                                         )
                                     }
-                                    <li><NavLink to={checkUserToken ? '/user/about' : '/about'}>About &nbsp; |</NavLink></li>
-                                    <li><NavLink to={checkUserToken ? '/user/privacy' : '/privacy'}>Privacy Policy &nbsp; |</NavLink></li>
-                                    <li><NavLink to={checkUserToken ? '/user/term-condition' : '/term-condition'}>Terms & Condition</NavLink></li>
+                                    <li><NavLink to='/about' >About &nbsp; |</NavLink></li>
+                                    <li><NavLink to='/privacy' >Privacy Policy &nbsp; |</NavLink></li>
+                                    <li><NavLink to='/term-condition'>Terms & Condition</NavLink></li>
                                 </ul>
                                 <ul>
                                     <li className='footer-design'><i class="fa-regular fa-copyright"></i> Copyright 2024 Live Typing Test - All Rights Reserved. </li>

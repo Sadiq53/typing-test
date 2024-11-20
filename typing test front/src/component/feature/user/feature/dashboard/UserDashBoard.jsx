@@ -165,18 +165,6 @@ useEffect(() => {
       dispatch(resetState())
     }
   }, [ isFullfilled, fullFillMsg ])
-
-
-  // handle successfully login toasts-------------------------------------------------------------------
-  useEffect(()=>{
-    if(localStorage.getItem('isSignin')) {
-      dynamicToast({ message: 'Logged in Successfully!', timer: 3000, icon: 'success' });
-      setTimeout(()=>{
-        localStorage.removeItem('isSignin')
-      }, 3500)
-    }
-  },[])
-  // handle successfully login toasts-------------------------------------------------------------------
   
   
   // handle upload profile------------------------------------------------------------------------------
@@ -333,7 +321,7 @@ useEffect(() => {
                     <h2>{totalTimeOfMatches}</h2>
                   </div>
                 </div>
-                <NavLink to={`/user/matches/${'easy'}`}>
+                <NavLink to={`/matches/${'easy'}`}>
                   <div className="stacs mob">
                     <table className='width-80'>
                       <thead>
@@ -373,7 +361,7 @@ useEffect(() => {
                     </table>
                   </div>
                 </NavLink>
-                <NavLink to={`/user/matches/${'medium'}`}>
+                <NavLink to={`/matches/${'medium'}`}>
                   <div className="stacs mob">
                   <table className='width-80'>
                       <thead>
@@ -413,7 +401,7 @@ useEffect(() => {
                     </table>
                   </div>
                 </NavLink>
-                <NavLink to={`/user/matches/${'hard'}`}>
+                <NavLink to={`/matches/${'hard'}`}>
                   <div className="stacs mob">
                   <table className='width-80'>
                       <thead>

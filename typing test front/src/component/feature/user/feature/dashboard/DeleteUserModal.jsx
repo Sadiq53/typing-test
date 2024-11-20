@@ -25,7 +25,7 @@ const DeleteUserModal = () => {
                 clsModal.current.click();
                 setIsLoading(false)
                 setTimeout(()=>{
-                    navigate(`/user/signout/${'accountDelete'}`)
+                    navigate(`/signout/${'accountDelete'}`)
                 },10)
             }
         }

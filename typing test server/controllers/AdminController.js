@@ -442,8 +442,75 @@ route.post('/home-seo', uploadForHomeSEO.single('seoImage'), async (req, res) =>
   }
 });
 
+route.post('/ads', async (req, res) => {
+    if(req.headers.authorization) {
+        const { adsClientID, adSlot } = req.body
 
+    }
+})
 
+route.get('/ads', async (req, res) => {
+    if(req.headers.authorization) {
+        const { adsClientID, adSlot } = req.body
+
+    }
+})
+
+route.post('/google-analytics', async (req, res) => {
+    console.log(req.headers.authorization)
+    try {
+        if (!req.headers.authorization) {
+            return res.status(401).json({ status: 401, message: 'Unauthorized access' });
+        }
+
+        const { trackingId } = req.body;
+
+        if (!trackingId) {
+            return res.status(400).json({ status: 400, message: 'Tracking ID is required' });
+        }
+
+        // Check if the document already exists
+        const document = await DataModel.findOne();
+
+        if (document) {
+            // Update existing document
+            document.googleAnalytics.trackingId = trackingId;
+            await document.save();
+        } else {
+            // Create a new document if none exists
+            const newDocument = new DataModel({
+                googleAnalytics: { trackingId }
+            });
+            await newDocument.save();
+        }
+
+        res.status(200).json({ status: 200, message: 'Tracking ID saved successfully' });
+    } catch (error) {
+        console.error('Error saving tracking ID:', error);
+        res.status(500).json({ status: 500, message: 'Internal Server Error' });
+    }
+});
+
+route.get('/google-analytics', async (req, res) => {
+    try {
+
+        // Fetch the document
+        const document = await DataModel.findOne();
+
+        if (!document || !document.googleAnalytics || !document.googleAnalytics.trackingId) {
+            return res.status(404).json({ status: 404, message: 'Tracking ID not found' });
+        }
+
+        res.status(200).json({
+            status: 200,
+            message: 'Tracking ID fetched successfully',
+            trackingId: document.googleAnalytics.trackingId,
+        });
+    } catch (error) {
+        console.error('Error fetching tracking ID:', error);
+        res.status(500).json({ status: 500, message: 'Internal Server Error' });
+    }
+});
 
 
 

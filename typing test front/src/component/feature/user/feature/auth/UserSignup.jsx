@@ -73,7 +73,7 @@ const UserSignup = () => {
   useEffect(() => {
     if (isFullfilled) {
       if (fullFillMsg?.type === 'signup') {
-        navigate(`/user`)
+        navigate(`/`)
         dispatch(resetState())
       }
     }

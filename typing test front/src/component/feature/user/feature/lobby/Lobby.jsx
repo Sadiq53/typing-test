@@ -11,13 +11,25 @@ import Footer from '../../../../shared/footer/Footer'
 
 
 const Lobby = () => {
+  
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const typingAreaRef = useRef(null);
+  const containerRef = useRef(null);
+  const paragraphRef = useRef(null);
+  const paragraphWrapperRef = useRef(null);
+  // const isCapsLockOn = useRef(false);
+  
+  const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
+  const paragraphs = useSelector(state => state.UserDataSlice.paragraphs)
+  const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
+  const isError = useSelector(state => state.UserDataSlice.isError)
+  const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
+  const homePageSEO = useSelector(state => state.UserDataSlice.homePageSEO)
 
   const [time, setTime] = useState(60);
   const [userInput, setUserInput] = useState("");
-  const typingAreaRef = useRef(null);
-  // const isCapsLockOn = useRef(false);
   const [blockKey, setBlockKey] = useState({for: '', state: false})
-  const containerRef = useRef(null);
   const [hasFocus, setHasFocus] = useState(false);
   const [prevInput, setPrevInput] = useState(false);
   const [prevInputWords, setPrevInputWords] = useState(false);
@@ -26,15 +38,11 @@ const Lobby = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
   const [currentParagraph, setCurrentParagraph] = useState();
-  const isFullfilled = useSelector(state => state.UserDataSlice.isFullfilled)
-  const paragraphs = useSelector(state => state.UserDataSlice.paragraphs)
-  const fullFillMsg = useSelector(state => state.UserDataSlice.fullFillMsg)
-  const isError = useSelector(state => state.UserDataSlice.isError)
-  const isProcessing = useSelector(state => state.UserDataSlice.isProcessing)
-  const homePageSEO = useSelector(state => state.UserDataSlice.homePageSEO)
   const [timeUp, setTimeUp] = useState(false)
   const [rootFocus, setRootFocus] = useState(false)
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
+  const [showAlert, setShowAlert] = useState(false)
+  const [showModal, setShowModal] = useState(false); // Control modal display
   const [alertDetail, setAlertDetail] = useState({
     title : '',
     message : '',
@@ -42,7 +50,6 @@ const Lobby = () => {
     navigateTo : '',
     confirmBtn : false
   })
-  const [showAlert, setShowAlert] = useState(false)
   const [stats, setStats] = useState({
     wpm: [],
     accuracy: [],
@@ -56,9 +63,6 @@ const Lobby = () => {
     time: 0,
     level : ''
   });
-  const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false); // Control modal display
-  const dispatch = useDispatch();
   const [finalStats, setFinalStats] = useState({
     wpm: [],
     accuracy: [],
@@ -72,7 +76,7 @@ const Lobby = () => {
     time: 0,
     level : ''
   })
-  const checkUserToken = useMemo(() => !!localStorage.getItem('userToken'), []);
+
 
   // Function to get a random index based on array length
   function getRandomIndex(array) {
@@ -185,6 +189,12 @@ const Lobby = () => {
 
     setUserInput(input);
     calculateStats(input);
+
+     // Auto-scroll logic
+     const wrapper = paragraphWrapperRef.current;
+     const lineHeight = parseInt(getComputedStyle(wrapper).lineHeight, 10); // Get the line height
+     const currentLine = Math.floor(value.length / wrapper.offsetWidth); // Estimate the current line
+     wrapper.scrollTop = currentLine * lineHeight; // Scroll to the current line
   };
   // Handle input change----------------------------------------------------------------------
 
@@ -204,7 +214,7 @@ const Lobby = () => {
     const currentWord = inputWords[currentWordIndex] || ""; // Current word being typed
     const paragraphWords = currentParagraph.split(" ");
     const validWord = paragraphWords[currentWordIndex] || ""; // Correct word in the paragraph
-  
+
     // Restrict backspace to within the current word
     if (inputWords.length < prevInputWords.length) {
       setUserInput(prevInput); // Revert the input to the previous state
@@ -345,7 +355,7 @@ const Lobby = () => {
     if(isFullfilled){
       if(fullFillMsg?.message === "test complete"){
         if(localStorage.getItem('userToken')) {
-          navigate('/user/stats')
+          navigate('/stats')
           dispatch(resetState())
         }
       }
@@ -422,6 +432,17 @@ const Lobby = () => {
     }
   }, [])
 
+  // handle successfully login toasts-------------------------------------------------------------------
+  useEffect(()=>{
+    if(localStorage.getItem('isSignin')) {
+      dynamicToast({ message: 'Logged in Successfully!', timer: 3000, icon: 'success' });
+      setTimeout(()=>{
+        localStorage.removeItem('isSignin')
+      }, 3500)
+    }
+  },[])
+  // handle successfully login toasts-------------------------------------------------------------------
+
   // Chencking is the user Blocked -----------------------------------------------------------------
   useEffect(() => {
     if(localStorage.getItem('isBlocked')) {
@@ -494,6 +515,22 @@ const Lobby = () => {
 
   // useEffect(()=>{console.log(userInput)}, )
 
+  useEffect(() => {
+    // Adjust the scroll to ensure the current line stays at the top
+    const scrollToCurrentLine = () => {
+      if (paragraphWrapperRef.current && typingAreaRef.current) {
+        const inputRect = typingAreaRef.current.getBoundingClientRect();
+        const wrapperRect = paragraphWrapperRef.current.getBoundingClientRect();
+        const offset = inputRect.top - wrapperRect.top;
+
+        if (offset > 0 || offset < 0) {
+          paragraphWrapperRef.current.scrollTop += offset;
+        }
+      }
+    };
+    scrollToCurrentLine();
+  }, [userInput]); // Run this whenever the userInput changes
+
   return (
     <>
 
@@ -521,10 +558,10 @@ const Lobby = () => {
             onKeyUp={handleKeyUp}
             onKeyDown={handleKeyUp}
             // ref={isCapsLockOn}
-            // style={{
-            //   transition: 'transform 0.3s ease', 
-            //   transform: window.innerWidth < 767 ? hasFocus ? 'translateY(-40%)' : 'none' : hasFocus ? 'translateY(-50%)' : 'none',
-            // }}
+            style={{
+              transition: 'transform 0.3s ease', 
+              transform: window.innerWidth < 767 && hasFocus ? 'translateY(-40%)' : 'none' ,
+            }}
           >
             <div ref={containerRef} className="cutom-lobby-head">
               <div className='lobby-menu'>
@@ -599,8 +636,16 @@ const Lobby = () => {
                     onBlur={() => {setHasFocus(false), setRootFocus(false)}}
                     onKeyDown={(e)=>blockCopyPaste(e)}
                     onKeyUp={(e)=>blockCopyPaste(e)}
+                    ref={paragraphWrapperRef}
                     >
-                <div style={{ fontSize: "30px" }}>
+                <div 
+                    ref={paragraphRef}
+                    style={{
+                      position: "relative",
+                      whiteSpace: "pre-wrap", // Preserve spaces and line breaks
+                      fontSize: '30px'
+                    }}
+                >
                   {currentParagraph && typeof currentParagraph === "string" 
                     ? currentParagraph?.split("").map((char, index) => (
                     <span
@@ -625,7 +670,7 @@ const Lobby = () => {
                   ref={typingAreaRef}
                   value={userInput}
                   onChange={handleInputChange}
-                  style={{ opacity: 0, position: "absolute", top: 0, left: 0 }}
+                  style={{ opacity: 0, position: "absolute", bottom: 0, left: 0 }}
                 />
               </div>
               <div className='reset'><button onClick={resetTest}><i className="fa-solid fa-arrow-rotate-right text-active"></i> <span className='text-idle'>Start Over</span></button></div>

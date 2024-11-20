@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { ADMIN_API_URL } from '../../../util/API_URL';
 
 const GoogleAds = () => {
     const adRef = useRef(null);
@@ -19,7 +20,7 @@ const GoogleAds = () => {
         };
 
         // Fetch ad settings from the backend
-        axios.get('http://localhost:5000/api/ads/settings')
+        axios.get(`${ADMIN_API_URL}/ads`)
             .then(response => {
                 const { adsClientID, adSlot } = response.data;
 

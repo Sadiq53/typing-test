@@ -35,12 +35,12 @@ const BlogPost = (props) => {
   return (
     <>
         <div className="blog-post my-3">
-            <div className="blog-img"><NavLink to={`${isToken ? '/user/' : '/'}blog/${permalink}`}><img src={`${featuredImage?.path}`} alt="" /></NavLink></div>
+            <div className="blog-img"><NavLink to={`${isToken ? '/' : '/'}blog/${permalink}`}><img src={`${featuredImage?.path}`} alt="" /></NavLink></div>
             <div className="blog-content">
-                <NavLink className="text-dec-none" to={`${isToken ? '/user/' : '/'}blog/${permalink}`}><h1 >{title}</h1></NavLink>
+                <NavLink className="text-dec-none" to={`${isToken ? '/' : '/'}blog/${permalink}`}><h1 >{title}</h1></NavLink>
                 <p>{description.length > 100 ? description.slice(0, 100) + "..." : description}</p>
             </div>
-            <NavLink to={`${isToken ? '/user/' : '/'}blog/${permalink}`}>Read More...</NavLink>
+            <NavLink to={`${isToken ? '/' : '/'}blog/${permalink}`}>Read More...</NavLink>
         </div>
     </>
   )

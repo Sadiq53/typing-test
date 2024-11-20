@@ -95,11 +95,7 @@ const TypingTestStats = () => {
 
     const repeatTest = () => {
         localStorage.removeItem('stats')
-        if(localStorage.getItem('userToken')) {
-            navigate('/user/lobby')
-        } else {
-            navigate('/')
-        }
+        navigate('/')
     }
 
     const handleDownload = () => {

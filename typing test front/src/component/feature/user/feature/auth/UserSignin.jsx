@@ -84,7 +84,7 @@ const UserSignin = () => {
   useEffect(() => {
     if(isFullfilled) {
       if(fullFillMsg?.type === 'signin'){
-        navigate(`/user`)
+        navigate(`/`)
         dispatch(resetState())
       }
     }

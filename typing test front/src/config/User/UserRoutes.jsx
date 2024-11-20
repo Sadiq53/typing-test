@@ -13,11 +13,11 @@ import Terms_Condition from '../../component/feature/user/feature/dynamicPages/T
 
 const userRoutes = [
     {
-        path : '',
+        path : 'dashboard',
         element : <UserDashBoard />
     },
     {
-        path : 'lobby',
+        path : '',
         element : <Lobby />
     },
     {

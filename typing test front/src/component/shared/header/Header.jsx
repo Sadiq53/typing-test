@@ -31,14 +31,14 @@ const Header = () => {
                             <ul className="menu">
                                 {checkUserToken ? (
                                     <>
-                                        <NavLink to='/user/lobby'><li>Start Live Test</li></NavLink>
-                                        <NavLink to='/user/leaderboard'><li>Leaderboard</li></NavLink>
-                                        <NavLink to='/user/blog'><li>Blogs</li></NavLink>
+                                        <NavLink to='/'><li>Start Live Test</li></NavLink>
+                                        <NavLink to='/leaderboard'><li>Leaderboard</li></NavLink>
+                                        <NavLink to='/blog'><li>Blogs</li></NavLink>
                                         <li className="dropdown">
-                                            <NavLink to='/user'><li className='header-profile'><img src={userData?.profileimage?.s3url ? `${userData?.profileimage?.s3url}` : '/assets/images/profile.png'} alt="" /> {userData?.username} </li></NavLink>
+                                            <NavLink to='/dashboard'><li className='header-profile'><img src={userData?.profileimage?.s3url ? `${userData?.profileimage?.s3url}` : '/assets/images/profile.png'} alt="" /> {userData?.username} </li></NavLink>
                                             <ul className="dropdown-menu">
-                                                <NavLink to='/user'><li>Profile</li></NavLink>
-                                                <NavLink to={`/user/signout/${'isSignout'}`}><li>Logout</li></NavLink>
+                                                <NavLink to='/dashboard'><li>Profile</li></NavLink>
+                                                <NavLink to={`/signout/${'isSignout'}`}><li>Logout</li></NavLink>
                                             </ul>
                                         </li>
                                     </>
@@ -76,11 +76,11 @@ const Header = () => {
                             <ul className="menu">
                                 {checkUserToken ? (
                                     <>
-                                        <NavLink to='/user'><li className='header-profile'><img src={userData?.profileimage?.s3url ? `${userData?.profileimage?.s3url}` : '/assets/images/profile.png'} alt="" /> {userData?.username} </li></NavLink>
-                                        <NavLink to='/user/lobby'><li>Start Live Test</li></NavLink>
-                                        <NavLink to='/user/leaderboard'><li>Leaderboard</li></NavLink>
-                                        <NavLink to='/user/blog'><li>Blogs</li></NavLink>
-                                        <NavLink to={`/user/signout/${'isSignout'}`}><li>Logout</li></NavLink>
+                                        <NavLink to='/dashboard'><li className='header-profile'><img src={userData?.profileimage?.s3url ? `${userData?.profileimage?.s3url}` : '/assets/images/profile.png'} alt="" /> {userData?.username} </li></NavLink>
+                                        <NavLink to='/'><li>Start Live Test</li></NavLink>
+                                        <NavLink to='/leaderboard'><li>Leaderboard</li></NavLink>
+                                        <NavLink to='/blog'><li>Blogs</li></NavLink>
+                                        <NavLink to={`/signout/${'isSignout'}`}><li>Logout</li></NavLink>
                                     </>
                                 )
                                 // : checkAdminToken ? (

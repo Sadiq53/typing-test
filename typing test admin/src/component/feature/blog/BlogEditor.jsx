@@ -6,8 +6,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { handleAddBlogPost, handleDeleteBlogCategory, handleEditBlogPost, resetState } from '../../../redux/AdminDataSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import StateCircleLoader from '../../shared/loader/StateCircleLoader';
-import { BASE_API_URL } from '../../../util/API_URL'
 import AddBlogCategory from './blogElements/AddBlogCategory';
+import Quill from 'quill';
+
+// Ensure the Code Block module is included
+import 'quill/dist/quill.snow.css'; // import Quill's default CSS styles
+
+// Register the CodeBlock module with Quill
+const CodeBlock = Quill.import('formats/code-block');
+Quill.register(CodeBlock, true);
+
 
 const BlogEditor = () => {
     const [content, setContent] = useState({ content: '', title: '', description : '', category : [], status : '', tags : [], seoTitle : '', seoDescription : '', index : '', permalink: '' });
@@ -249,8 +257,8 @@ const BlogEditor = () => {
                                         value={content.content}
                                         onChange={handleContentChange}
                                         placeholder="Write your blog post here..."
-                                        modules={BlogEditor.modules}
-                                        formats={BlogEditor.formats}
+                                        modules={modules}
+                                        formats={formats}
                                     />
                                 </div>
                             </div>
@@ -432,24 +440,23 @@ const BlogEditor = () => {
     );
 };
 
-// Optional: Customize toolbar options
-BlogEditor.modules = {
+const modules = {
     toolbar: [
-        [{ header: '1' }, { header: '2' }, { font: [] }],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        ['bold', 'italic', 'underline', 'strike'],
-        ['blockquote', 'code-block'],
-        [{ color: [] }, { background: [] }],
-        [{ align: [] }],
-        ['link', 'image', 'video'],
-        ['clean'], // remove formatting
+      [{ header: '1' }, { header: '2' }, { font: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'], // Add 'code-block' to toolbar
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+      ['link', 'image', 'video'],
+      ['clean'], // remove formatting
     ],
-};
+  };
 
-BlogEditor.formats = [
+  const formats = [
     'header', 'font', 'list', 'bullet', 'bold', 'italic', 'underline',
     'strike', 'blockquote', 'code-block', 'color', 'background',
     'align', 'link', 'image', 'video',
-];
+  ];
 
 export default BlogEditor;

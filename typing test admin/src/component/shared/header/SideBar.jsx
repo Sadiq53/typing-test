@@ -6,7 +6,7 @@ const SideBar = () => {
 
   // Extract the part after the port number
   const extractedPath = currentUrl.split(":")[2]?.split("/").slice(1).join("/");
-  console.log(extractedPath)
+//   console.log(extractedPath)
   
 
   return (

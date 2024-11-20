@@ -37,11 +37,13 @@ const AllRoutes = () => {
         //     children : rootRoutes
         // },
         {
-            path : '/',
-            element : isUserTokenPresent() ? (
-                <Navigate to='/user' replace />
-            ) : (<RootModule />),
-            children : rootRoutes
+            path: '/',
+            element: isUserTokenPresent() ? (
+                <UserModule />
+            ) : (
+                <RootModule />
+            ),
+            children: isUserTokenPresent() ? userRoutes : rootRoutes
         },
         {
             path : '/signin',
@@ -66,11 +68,11 @@ const AllRoutes = () => {
         //     element :(<AdminModule />),
         //     children : adminRoutes
         // },
-        {
-            path : '/user',
-            element : (<UserModule />),
-            children : userRoutes
-        },
+        // {
+        //     path : '/user',
+        //     element : (<UserModule />),
+        //     children : userRoutes
+        // },
     ])
     
     return allRoutes

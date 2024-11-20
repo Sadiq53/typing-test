@@ -34,6 +34,10 @@ const DynamicPagesDataSchema = mongoose.Schema({
             imageUrl : { type : String, default : '' },
             imageKey : { type : String, default : '' },
     },
+    manageAds : {
+        adsClientID: { type: String, default: '' },
+        adSlot: { type: String, default: '' }
+    },
     contact : [{
         name : { type : String, default : '' },
         email : { type : String, default : '' },
@@ -42,7 +46,10 @@ const DynamicPagesDataSchema = mongoose.Schema({
         reply : { type : String, default : '' },
         time : { type : Date, default : Date.now() },
         status : { type : String, default : 'unseen' },
-    }]
+    }],
+    googleAnalytics: {
+        trackingId: { type: String, default: '' }
+    }
 
 }, { collection : "dynamiPages" });
 
