@@ -38,6 +38,21 @@ const BlogInner = () => {
     // Only render SEO tags when displayData is available
     if (!displayData) return null;
 
+
+    const processQuillContent = (html) => {
+        if (!html) return ""; // Handle empty or null HTML gracefully
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+    
+        // Handle code blocks without escaping their content
+        doc.querySelectorAll("pre.ql-syntax").forEach((block) => {
+            // Allow the content inside <pre> to remain raw for display
+            block.innerHTML = block.textContent; // Keeps code formatting intact
+        });
+    
+        return doc.body.innerHTML; // Return the processed HTML
+    };
+
     return (
         <>
             <Helmet>
@@ -63,7 +78,12 @@ const BlogInner = () => {
                             <div className="blog-banner my-4">
                                 <img src={displayData?.featuredImage?.path || '/default-image.jpg'} alt="" />
                             </div>
-                            <div className="blog-content my-4" dangerouslySetInnerHTML={{ __html: displayData?.content }} />
+                            <div
+                                className="blog-content my-4"
+                                dangerouslySetInnerHTML={{
+                                    __html: processQuillContent(displayData?.content),
+                                }}
+                            ></div>
                         </div>
                     </div>
                 </div>

@@ -439,137 +439,172 @@ route.post('/updatepass/:id', async(req, res) => {
 });
 
 route.post('/', async (req, res) => {
-    // console.log(req.body)
-    if (req.headers.authorization) {
+    try {
+        // Validate authorization header
+        if (!req.headers.authorization) {
+            return res.status(401).send({ status: 401, message: "Authorization header is missing", type: "auth" });
+        }
+
         const ID = jwt.decode(req.headers.authorization, key);
-        const { wpm, consistency, accuracy, correctChars, incorrectChars, timeOfCompletion, extraChars, time, level } = req.body.data;
-        const {date} = req.body
-        
-        const avgWpm = calculateAverage(wpm)
-        const avgConsis = calculateAverage(consistency)
-        const avgAcc = calculateAverage(accuracy)
-        
-        const testData = { 
-            accuracy : accuracy,
-            consistency : consistency,
-            wpm : wpm,
-            avgwpm : avgWpm,
-            avgacc : avgAcc,
-            avgconsis : avgConsis,
-            matchdate : date,
-            time : time,
-            level : level !== "" ? level : 'easy',
-            timeofcompletion : timeOfCompletion,
-            characters : { 
-                correct : correctChars,
-                incorrect : incorrectChars,
-                extra : extraChars,
-            }}
-            
-      // Create a mapping of time values to match properties
+        if (!ID || !ID.id) {
+            return res.status(401).send({ status: 401, message: "Invalid token or ID", type: "auth" });
+        }
+
+        const { data, date } = req.body;
+        if (!data || typeof data !== 'object') {
+            return res.status(400).send({ status: 400, message: "Invalid data payload", type: "validation" });
+        }
+
+        // Destructure data fields with default fallback values
+        const {
+            wpm = [],
+            consistency = [],
+            accuracy = [],
+            correctChars = 0,
+            incorrectChars = 0,
+            timeOfCompletion = 0,
+            extraChars = 0,
+            time = 0,
+            level = "easy"
+        } = data;
+
+        // Validate numeric fields
+        if (!Array.isArray(wpm) || !Array.isArray(consistency) || !Array.isArray(accuracy)) {
+            return res.status(400).send({ status: 400, message: "wpm, consistency, and accuracy must be arrays", type: "validation" });
+        }
+        if (![15, 60, 180, 300].includes(time)) {
+            return res.status(400).send({ status: 400, message: "Invalid time value", type: "validation" });
+        }
+
+        // Ensure calculations do not involve NaN values
+        const avgWpm = calculateAverage(wpm);
+        const avgConsis = calculateAverage(consistency);
+        const avgAcc = calculateAverage(accuracy);
+        if ([avgWpm, avgConsis, avgAcc].some(val => isNaN(val))) {
+            return res.status(400).send({ status: 400, message: "Invalid average calculations, check input data", type: "calculation" });
+        }
+
+        const testData = {
+            accuracy,
+            consistency,
+            wpm,
+            avgwpm: avgWpm,
+            avgacc: avgAcc,
+            avgconsis: avgConsis,
+            matchdate: date,
+            time,
+            level: level || "easy",
+            timeofcompletion: timeOfCompletion,
+            characters: {
+                correct: correctChars,
+                incorrect: incorrectChars,
+                extra: extraChars,
+            }
+        };
+
+        // Mapping match properties and validation
         const matchPropertyMap = {
             60: 'match_1',
             15: 'match_1',
             180: 'match_3',
             300: 'match_5',
         };
-
-        // Mapping match properties to total average fields
         const findPropertyMatch = {
             'match_1': "top1minavg",
             'match_3': "top3minavg",
             'match_5': "top5minavg",
         };
 
-        // Helper function to calculate new average
-        const calculateNewAverage = (currentAvg, newValue, length) => {
-            if(currentAvg !== 0){
-                const newAvg = (currentAvg * (length-1) + newValue) / (length); // Adjusted length to include the new value
-                return Math.min(newAvg, 100); // Ensure the average does not exceed 100
-            } else {
-                return newValue
-            }
-            
-        };
-
         const matchProperty = matchPropertyMap[time];
-            
-        if (matchProperty) {
-            // Add new data to match property array
-            await userModel.updateOne({ _id: ID.id }, { $push: { [matchProperty]: testData } });
-        
-            const getUserData = await userModel.findOne({ _id: ID.id });
-        
-            const findProperty = findPropertyMatch[matchProperty];
-            const checkDataPresent = getUserData?.[matchProperty];
-            let finalAvgResult;
-            if (checkDataPresent?.length !== 0) {
-                const getTotalAvgData = getUserData?.[findProperty];
-                const dataLength = checkDataPresent?.length;
-                let levelDataLength = checkDataPresent?.map(value => value.level === level)
-                levelDataLength = levelDataLength?.length
-        
-                // Calculate all averages
-                const allData = {
-                    avgwpm: calculateNewAverage(getTotalAvgData?.all?.avgwpm, avgWpm, dataLength),
-                    avgacc: calculateNewAverage(getTotalAvgData?.all?.avgacc, avgAcc, dataLength),
-                    avgconsis: calculateNewAverage(getTotalAvgData?.all?.avgconsis, avgConsis, dataLength),
-                };
-        
-                // Calculate level-based averages
-                const levelData = {
-                    avgwpm: calculateNewAverage(getTotalAvgData?.[level]?.avgwpm, avgWpm, dataLength),
-                    avgacc: calculateNewAverage(getTotalAvgData?.[level]?.avgacc, avgAcc, dataLength),
-                    avgconsis: calculateNewAverage(getTotalAvgData?.[level]?.avgconsis, avgConsis, dataLength),
-                };
-
-                finalAvgResult = {
-                    all : allData,
-                    [level] : levelData
-                }
-        
-                // Update the document with the new averages
-                await userModel.updateMany(
-                    { _id: ID.id },
-                    { $set: { [`${findProperty}.all`]: allData, [`${findProperty}.${level}`]: levelData } }
-                );
-            } 
-
-            // Mapping match properties to total average fields
-            const findRecordMatch = {
-                60: 'highestrecord1min',
-                15: 'highestrecord1min',
-                180: 'highestrecord3min',
-                300: 'highestrecord5min',
-            };
-            const getProp = findRecordMatch[time]
-            const getHighestRecord = getUserData?.[getProp]
-            const getHighestRecordLevel = getHighestRecord[level]
-            const combinationData = ((avgAcc + avgConsis + avgWpm) / 3)
-            let recordBreak;
-            // console.log("I am main Highest Record : ", getHighestRecord)
-            // console.log("I am level Highest Record : ", getHighestRecordLevel)
-            // console.log("I am Combination Data : ", combinationData)
-            if(getHighestRecordLevel?.combination) {
-                if(getHighestRecordLevel?.combination < combinationData) {
-                    await userModel.updateOne({_id : ID.id}, { $set: { [`${getProp}.${level}.combination`]: combinationData}} )
-                    recordBreak = {
-                        oldRecord : getHighestRecordLevel,
-                        newRecord : combinationData
-                    }
-                }
-            } else {
-                await userModel.updateOne({_id : ID.id}, { $set: { [`${getProp}.${level}.combination`]: combinationData}} )
-            }
-            // console.log("I am Record Breaker : ", recordBreak)
-            
-
-            return res.send({ status: 200, message: "test complete", type: "update", stats: testData, avgData : finalAvgResult, recordBreak : recordBreak });
-        } else {
-            return res.send({status : 400, message : "Invalid time line", type : "update"});
+        if (!matchProperty) {
+            return res.status(400).send({ status: 400, message: "Invalid match property", type: "validation" });
         }
-    } else {
-        return res.send({status : 401, message : "invalid ID", type : "auth"});
+
+        // Proceed with database updates
+        await userModel.updateOne({ _id: ID.id }, { $push: { [matchProperty]: testData } });
+
+        const getUserData = await userModel.findOne({ _id: ID.id });
+        if (!getUserData) {
+            return res.status(404).send({ status: 404, message: "User not found", type: "database" });
+        }
+
+        const findProperty = findPropertyMatch[matchProperty];
+        const checkDataPresent = getUserData?.[matchProperty] || [];
+        let finalAvgResult;
+
+        if (checkDataPresent.length > 0) {
+            const getTotalAvgData = getUserData?.[findProperty] || {};
+            const dataLength = checkDataPresent.length;
+
+            // Avoid invalid levels
+            let levelDataLength = checkDataPresent.filter(value => value.level === level).length;
+
+            const calculateNewAverage = (currentAvg = 0, newValue = 0, length = 1) => {
+                if (isNaN(currentAvg) || isNaN(newValue) || length <= 0) {
+                    return newValue;
+                }
+                return Math.min((currentAvg * (length - 1) + newValue) / length, 100);
+            };
+
+            // Calculate averages
+            const allData = {
+                avgwpm: calculateNewAverage(getTotalAvgData?.all?.avgwpm, avgWpm, dataLength),
+                avgacc: calculateNewAverage(getTotalAvgData?.all?.avgacc, avgAcc, dataLength),
+                avgconsis: calculateNewAverage(getTotalAvgData?.all?.avgconsis, avgConsis, dataLength),
+            };
+
+            const levelData = {
+                avgwpm: calculateNewAverage(getTotalAvgData?.[level]?.avgwpm, avgWpm, levelDataLength),
+                avgacc: calculateNewAverage(getTotalAvgData?.[level]?.avgacc, avgAcc, levelDataLength),
+                avgconsis: calculateNewAverage(getTotalAvgData?.[level]?.avgconsis, avgConsis, levelDataLength),
+            };
+
+            finalAvgResult = {
+                all: allData,
+                [level]: levelData,
+            };
+
+            // Update averages in DB
+            await userModel.updateMany(
+                { _id: ID.id },
+                { $set: { [`${findProperty}.all`]: allData, [`${findProperty}.${level}`]: levelData } }
+            );
+        }
+
+        // Mapping match properties to total average fields
+        const findRecordMatch = {
+            60: 'highestrecord1min',
+            15: 'highestrecord1min',
+            180: 'highestrecord3min',
+            300: 'highestrecord5min',
+        };
+        const getProp = findRecordMatch[time]
+        const getHighestRecord = getUserData?.[getProp]
+        const getHighestRecordLevel = getHighestRecord[level]
+        const combinationData = ((avgAcc + avgConsis + avgWpm) / 3)
+        let recordBreak;
+        // console.log("I am main Highest Record : ", getHighestRecord)
+        // console.log("I am level Highest Record : ", getHighestRecordLevel)
+        // console.log("I am Combination Data : ", combinationData)
+        if(getHighestRecordLevel?.combination) {
+            if(getHighestRecordLevel?.combination < combinationData) {
+                await userModel.updateOne({_id : ID.id}, { $set: { [`${getProp}.${level}.combination`]: combinationData}} )
+                recordBreak = {
+                    oldRecord : getHighestRecordLevel,
+                    newRecord : combinationData
+                }
+            }
+        } else {
+            await userModel.updateOne({_id : ID.id}, { $set: { [`${getProp}.${level}.combination`]: combinationData}} )
+        }
+        // console.log("I am Record Breaker : ", recordBreak)
+        
+
+        return res.send({ status: 200, message: "test complete", type: "update", stats: testData, avgData : finalAvgResult, recordBreak : recordBreak });
+
+    } catch (error) {
+        console.error("Error in route:", error);
+        return res.status(500).send({ status: 500, message: "Internal Server Error", type: "server", error: error.message });
     }
 });
 
@@ -681,8 +716,140 @@ route.post("/save-token", async (req, res) => {
 });
 
 
-
-
-
-
 module.exports = route;
+
+
+// route.post('/', async (req, res) => {
+//     // console.log(req.body)
+//     if (req.headers.authorization) {
+//         const ID = jwt.decode(req.headers.authorization, key);
+//         const { wpm, consistency, accuracy, correctChars, incorrectChars, timeOfCompletion, extraChars, time, level } = req.body.data;
+//         const {date} = req.body
+        
+//         const avgWpm = calculateAverage(wpm)
+//         const avgConsis = calculateAverage(consistency)
+//         const avgAcc = calculateAverage(accuracy)
+        
+//         const testData = { 
+//             accuracy : accuracy,
+//             consistency : consistency,
+//             wpm : wpm,
+//             avgwpm : avgWpm,
+//             avgacc : avgAcc,
+//             avgconsis : avgConsis,
+//             matchdate : date,
+//             time : time,
+//             level : level !== "" ? level : 'easy',
+//             timeofcompletion : timeOfCompletion,
+//             characters : { 
+//                 correct : correctChars,
+//                 incorrect : incorrectChars,
+//                 extra : extraChars,
+//             }}
+            
+//       // Create a mapping of time values to match properties
+//         const matchPropertyMap = {
+//             60: 'match_1',
+//             15: 'match_1',
+//             180: 'match_3',
+//             300: 'match_5',
+//         };
+
+//         // Mapping match properties to total average fields
+//         const findPropertyMatch = {
+//             'match_1': "top1minavg",
+//             'match_3': "top3minavg",
+//             'match_5': "top5minavg",
+//         };
+
+//         // Helper function to calculate new average
+//         const calculateNewAverage = (currentAvg, newValue, length) => {
+//             if(currentAvg !== 0){
+//                 const newAvg = (currentAvg * (length-1) + newValue) / (length); // Adjusted length to include the new value
+//                 return Math.min(newAvg, 100); // Ensure the average does not exceed 100
+//             } else {
+//                 return newValue
+//             }
+            
+//         };
+
+//         const matchProperty = matchPropertyMap[time];
+            
+//         if (matchProperty) {
+//             // Add new data to match property array
+//             await userModel.updateOne({ _id: ID.id }, { $push: { [matchProperty]: testData } });
+        
+//             const getUserData = await userModel.findOne({ _id: ID.id });
+        
+//             const findProperty = findPropertyMatch[matchProperty];
+//             const checkDataPresent = getUserData?.[matchProperty];
+//             let finalAvgResult;
+//             if (checkDataPresent?.length !== 0) {
+//                 const getTotalAvgData = getUserData?.[findProperty];
+//                 const dataLength = checkDataPresent?.length;
+//                 let levelDataLength = checkDataPresent?.map(value => value.level === level)
+//                 levelDataLength = levelDataLength?.length
+        
+//                 // Calculate all averages
+//                 const allData = {
+//                     avgwpm: calculateNewAverage(getTotalAvgData?.all?.avgwpm, avgWpm, dataLength),
+//                     avgacc: calculateNewAverage(getTotalAvgData?.all?.avgacc, avgAcc, dataLength),
+//                     avgconsis: calculateNewAverage(getTotalAvgData?.all?.avgconsis, avgConsis, dataLength),
+//                 };
+        
+//                 // Calculate level-based averages
+//                 const levelData = {
+//                     avgwpm: calculateNewAverage(getTotalAvgData?.[level]?.avgwpm, avgWpm, dataLength),
+//                     avgacc: calculateNewAverage(getTotalAvgData?.[level]?.avgacc, avgAcc, dataLength),
+//                     avgconsis: calculateNewAverage(getTotalAvgData?.[level]?.avgconsis, avgConsis, dataLength),
+//                 };
+
+//                 finalAvgResult = {
+//                     all : allData,
+//                     [level] : levelData
+//                 }
+        
+//                 // Update the document with the new averages
+//                 await userModel.updateMany(
+//                     { _id: ID.id },
+//                     { $set: { [`${findProperty}.all`]: allData, [`${findProperty}.${level}`]: levelData } }
+//                 );
+//             } 
+
+//             // Mapping match properties to total average fields
+//             const findRecordMatch = {
+//                 60: 'highestrecord1min',
+//                 15: 'highestrecord1min',
+//                 180: 'highestrecord3min',
+//                 300: 'highestrecord5min',
+//             };
+//             const getProp = findRecordMatch[time]
+//             const getHighestRecord = getUserData?.[getProp]
+//             const getHighestRecordLevel = getHighestRecord[level]
+//             const combinationData = ((avgAcc + avgConsis + avgWpm) / 3)
+//             let recordBreak;
+//             // console.log("I am main Highest Record : ", getHighestRecord)
+//             // console.log("I am level Highest Record : ", getHighestRecordLevel)
+//             // console.log("I am Combination Data : ", combinationData)
+//             if(getHighestRecordLevel?.combination) {
+//                 if(getHighestRecordLevel?.combination < combinationData) {
+//                     await userModel.updateOne({_id : ID.id}, { $set: { [`${getProp}.${level}.combination`]: combinationData}} )
+//                     recordBreak = {
+//                         oldRecord : getHighestRecordLevel,
+//                         newRecord : combinationData
+//                     }
+//                 }
+//             } else {
+//                 await userModel.updateOne({_id : ID.id}, { $set: { [`${getProp}.${level}.combination`]: combinationData}} )
+//             }
+//             // console.log("I am Record Breaker : ", recordBreak)
+            
+
+//             return res.send({ status: 200, message: "test complete", type: "update", stats: testData, avgData : finalAvgResult, recordBreak : recordBreak });
+//         } else {
+//             return res.send({status : 400, message : "Invalid time line", type : "update"});
+//         }
+//     } else {
+//         return res.send({status : 401, message : "invalid ID", type : "auth"});
+//     }
+// });

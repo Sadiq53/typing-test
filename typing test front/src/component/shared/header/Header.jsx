@@ -19,7 +19,7 @@ const Header = () => {
                     <div className="col-md-4 col-12">
                         <div className="custom-header">
                             <div className="header">
-                                <NavLink to={checkUserToken ? '/user/lobby' : '/'}><img src="/assets/images/logo.svg" alt="Logo" /></NavLink>
+                                <NavLink to={checkUserToken ? '/' : '/'}><img src="/assets/images/logo.svg" alt="Logo" /></NavLink>
                             </div>
                             <button className="menu-toggle mob-show" onClick={toggleMenu}>
                                 <i className={`fa-solid ${isOpen ? 'fa-xmark' :'fa-bars'} fa-xl`} style={{ color: "#71cac7" }} />

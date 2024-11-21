@@ -45,7 +45,7 @@ const UserAuth = () => {
   return (
     <>
         <Header />
-        <GoogleOAuthProvider clientId="817929072053-bkhte3f6rubnvt3f5g26t4qpa094fcjl.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId="466565788678-qm48dd40fpu29rh75c2hh1tsoqvr8n8s.apps.googleusercontent.com">
         <section>
             <div className="container my-4">
                 <div className="row align-items-start gap-40">

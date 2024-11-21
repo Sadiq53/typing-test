@@ -300,7 +300,7 @@ useEffect(() => {
                     </div>
                   </div>
                 <div className="profile-sec3">
-                  <NavLink to={`/user/signout/${'isSignout'}`} className="theme-btn width-100">Logout</NavLink>
+                  <NavLink to={`/signout/${'isSignout'}`} className="theme-btn width-100">Logout</NavLink>
                   <button data-bs-toggle="modal" data-bs-target="#deleteaccount" className="delete-btn">Delete Account</button>
                 </div>
               </div>

@@ -491,27 +491,30 @@ const Lobby = () => {
   };
   // Putting eye on caps lock -----------------------------------------------------------------
 
-  const blockCopyPaste = (event) => {
+  const blockRestrictedKeys = (event) => {
     if (event.type === 'keydown') {
       // Handle keydown event
       if (event.ctrlKey && event.key === 'c') {
         event.preventDefault(); // Prevent the default copy action
-        setBlockKey({for: 'Copying is disabled', state: true})
-        setTimeout(()=>{setBlockKey({for: '', state: false})}, 1500)
+        setBlockKey({ for: 'Copying is disabled', state: true });
+        setTimeout(() => { setBlockKey({ for: '', state: false }); }, 1500);
       }
       if (event.ctrlKey && event.key === 'v') {
         event.preventDefault(); // Prevent the default paste action
-        setBlockKey({for: 'Pasting is disabled', state: true})
-        setTimeout(()=>{setBlockKey({for: '', state: false})}, 1500)
+        setBlockKey({ for: 'Pasting is disabled', state: true });
+        setTimeout(() => { setBlockKey({ for: '', state: false }); }, 1500);
+      }
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault(); // Prevent Backspace and Delete actions
+        setBlockKey({ for: 'Deleting is disabled', state: true });
+        setTimeout(() => { setBlockKey({ for: '', state: false }); }, 1500);
       }
     } else if (event.type === 'keyup') {
       // Optionally handle keyup events if needed
-      if (event.ctrlKey && (event.key === 'c' || event.key === 'v')) {
-        // You can show a toast here if necessary, but it’s generally less common to block during keyup
-        console.log(`Key released: ${event.key}`);
-      }
+      console.log(`Key released: ${event.key}`);
     }
   };
+  
 
   // useEffect(()=>{console.log(userInput)}, )
 
@@ -558,10 +561,10 @@ const Lobby = () => {
             onKeyUp={handleKeyUp}
             onKeyDown={handleKeyUp}
             // ref={isCapsLockOn}
-            style={{
-              transition: 'transform 0.3s ease', 
-              transform: window.innerWidth < 767 && hasFocus ? 'translateY(-40%)' : 'none' ,
-            }}
+            // style={{
+            //   transition: 'transform 0.3s ease', 
+            //   transform: window.innerWidth < 767 && hasFocus ? 'translateY(-20%)' : 'none' ,
+            // }}
           >
             <div ref={containerRef} className="cutom-lobby-head">
               <div className='lobby-menu'>
@@ -634,8 +637,8 @@ const Lobby = () => {
                     onClick={() => {typingAreaRef.current.focus(), setRootFocus(true)}} 
                     onFocus={() => {setHasFocus(true), setRootFocus(true)}} 
                     onBlur={() => {setHasFocus(false), setRootFocus(false)}}
-                    onKeyDown={(e)=>blockCopyPaste(e)}
-                    onKeyUp={(e)=>blockCopyPaste(e)}
+                    onKeyDown={(e)=>blockRestrictedKeys(e)}
+                    onKeyUp={(e)=>blockRestrictedKeys(e)}
                     ref={paragraphWrapperRef}
                     >
                 <div 
@@ -670,7 +673,8 @@ const Lobby = () => {
                   ref={typingAreaRef}
                   value={userInput}
                   onChange={handleInputChange}
-                  style={{ opacity: 0, position: "absolute", bottom: 0, left: 0 }}
+                  className='main-input-cs'
+                  // style={{ opacity: 0, position: "absolute", bottom: 0, left: 0 }}
                 />
               </div>
               <div className='reset'><button onClick={resetTest}><i className="fa-solid fa-arrow-rotate-right text-active"></i> <span className='text-idle'>Start Over</span></button></div>

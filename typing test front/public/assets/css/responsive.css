@@ -303,5 +303,9 @@
     .footer .custom{
         justify-content: center;
     }
+    .main-input-cs{
+        top: 50%;
+        transform: translateY(-50%);
+    }
     
 }

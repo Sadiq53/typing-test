@@ -26,10 +26,10 @@ const ManageAds = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`${ADMIN_API_URL}/ads`, {
-                adsScriptSnippet,
-                adsClientID,
-            });
+            // await axios.post(`${ADMIN_API_URL}/ads`, {
+            //     adsScriptSnippet,
+            //     adsClientID,
+            // });
             dynamicToast({ message: 'Ad settings saved successfully', timer : 3000, icon: 'success' });
         } catch (error) {
             console.error('Error saving ad settings:', error);

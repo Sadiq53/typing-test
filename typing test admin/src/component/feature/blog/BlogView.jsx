@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { BASE_API_URL } from "../../../util/API_URL";
 import {Helmet} from 'react-helmet'
+import { marked } from "marked";
 
 
 const BlogView = () => {
@@ -43,6 +44,22 @@ const BlogView = () => {
           // console.log('Invalid date format:', displayData); 
         }, [displayData]);
 
+        const processQuillContent = (html) => {
+          if (!html) return ""; // Handle empty or null HTML gracefully
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+      
+          // Handle code blocks without escaping their content
+          doc.querySelectorAll("pre.ql-syntax").forEach((block) => {
+              // Allow the content inside <pre> to remain raw for display
+              block.innerHTML = block.textContent; // Keeps code formatting intact
+          });
+      
+          return doc.body.innerHTML; // Return the processed HTML
+      };
+      
+      
+
   return (
     <>
       <Helmet>
@@ -65,8 +82,12 @@ const BlogView = () => {
                             <h className="post-time">Posted : {formattedDate}</h>
                         </div>
                         <div className="blog-banner my-4"><img src={`${displayData?.featuredImage?.path}`} alt="" /></div>
-                        <div className="blog-content my-4" dangerouslySetInnerHTML={{ __html: displayData?.content }}>
-                        </div>
+                        <div
+                            className="blog-content my-4"
+                            dangerouslySetInnerHTML={{
+                                __html: processQuillContent(displayData?.content),
+                            }}
+                        ></div>
                     </div>
                 </div>
             </div>

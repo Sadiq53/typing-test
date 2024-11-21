@@ -27,10 +27,12 @@ const BlogPage = () => {
         setIsLoading(true);
         try {
             const response = await axios.get(`${ADMIN_API_URL}/blog?page=${page}&limit=${blogsPerPage}`);
-            dispatch(handleAddBlogPostToState(response.data.data))
-            setBlogs(response.data.data);
-            setTotalBlogs(response.data.totalBlogs);
-            setIsLoading(false);
+            if(response.data.status === 200){
+                dispatch(handleAddBlogPostToState(response.data.data))
+                setBlogs(response.data.data);
+                setTotalBlogs(response.data.totalBlogs);
+                setIsLoading(false);
+            }
         } catch (error) {
             console.error('Error fetching blogs:', error);
             setIsLoading(false);
@@ -51,6 +53,15 @@ const BlogPage = () => {
                         <div className="col-md-12">
                             <div className="d-flex justify-content-between">
                                 <h3 className="font-active">View/Edit Our Blogs</h3>
+                                {
+                                    isLoading && (
+                                        <div className="rl-loading-container">
+                                            <div className="rl-loading-thumb rl-loading-thumb-1"></div>
+                                            <div className="rl-loading-thumb rl-loading-thumb-2"></div>
+                                            <div className="rl-loading-thumb rl-loading-thumb-3"></div>
+                                        </div>
+                                    )
+                                }
                                 <NavLink to="/admin/blog-add" className="btn btn-primary btn-md">
                                     Add Blog &nbsp; <i className="fa-duotone fa-solid fa-plus fa-lg" style={{color : "#000"}}></i>
                                 </NavLink>

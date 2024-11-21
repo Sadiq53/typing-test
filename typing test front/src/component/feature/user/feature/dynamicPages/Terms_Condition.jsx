@@ -34,6 +34,20 @@ const Terms_Condition = () => {
       console.log('Invalid date format:', termData); 
     }, [termData]);
 
+    const processQuillContent = (html) => {
+      if (!html) return ""; // Handle empty or null HTML gracefully
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+  
+      // Handle code blocks without escaping their content
+      doc.querySelectorAll("pre.ql-syntax").forEach((block) => {
+          // Allow the content inside <pre> to remain raw for display
+          block.innerHTML = block.textContent; // Keeps code formatting intact
+      });
+  
+      return doc.body.innerHTML; // Return the processed HTML
+  };
+
   return (
     <>
         <Header />
@@ -45,7 +59,12 @@ const Terms_Condition = () => {
                         <h4 className="font-active">Terms & Condition</h4>
                         <p className="font-idle">{formattedDate}</p>
                       </div>
-                    <div className="dynamic-paglayout my-4" dangerouslySetInnerHTML={{ __html: termData?.content }}></div>
+                      <div
+                          className="dynamic-paglayout my-4"
+                          dangerouslySetInnerHTML={{
+                              __html: processQuillContent(termData?.content),
+                          }}
+                      ></div>
                     </div>
                 </div>
             </div>

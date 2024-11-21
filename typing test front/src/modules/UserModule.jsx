@@ -24,7 +24,7 @@ const UserModule = () => {
     // Request permission to receive notifications
     const requestPermission = async () => {
     try {
-        const token = await getToken(messaging, { vapidKey: "BM1DDx1f-tHNs1IMylr8YE-P-jfD-BJIRSldNJE87oKiBnk6xTYs34RM1sosyQbzwa-cIkZBbHQsS_C-LwmRICM" });
+        const token = await getToken(messaging, { vapidKey: "BOU19idOtLs9r2PE7MlijvtivcxdL4lEBU_r3wMt0VTA1thHhytEGAlTk2LDBsPDsV9A2yOX7PyBJnSKJ0BOfGM" });
         if (token) {
         // Save the token to the server
         await fetch(`${USER_API_URL}/save-token`, {
